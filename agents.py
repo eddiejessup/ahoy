@@ -1,3 +1,6 @@
+from __future__ import print_function, division
+
+
 class Agents(object):
 
     def __init__(self, positions, directions, rudder_controller_sets,

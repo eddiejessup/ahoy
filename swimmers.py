@@ -1,3 +1,7 @@
+from __future__ import print_function, division
+import numpy as np
+
+
 class Swimmers(object):
 
     def __init__(self, dt, v_0):
@@ -5,6 +9,5 @@ class Swimmers(object):
         self.v_0 = v_0
 
     def displace(self, directions, positions):
-        dr = self.v_0 * directions.u * self.dt
-        positions = positions.displace(dr)
-        return positions
+        dr = self.v_0 * directions.u() * self.dt
+        return positions.displace(dr)

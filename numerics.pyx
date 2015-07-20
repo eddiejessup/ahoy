@@ -7,10 +7,10 @@ from libc.math cimport sin, cos
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
-def rot_diff_2d(np.ndarray[np.float_t, ndim=2] v, double D, double dt):
+def rotate_2d(np.ndarray[np.float_t, ndim=2] v,
+              np.ndarray[np.float_t, ndim=1] th):
     cdef:
         unsigned int i
-        np.ndarray[np.float_t, ndim=1] th = np.random.normal(scale=np.sqrt(2.0 * D * dt), size=v.shape[0])
         np.ndarray[np.float_t, ndim=2] v_rot = np.empty((v.shape[0], v.shape[1]))
         double cos_th, sin_th
 

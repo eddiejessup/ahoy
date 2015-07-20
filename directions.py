@@ -1,18 +1,56 @@
-from ciabatta import vector
+from __future__ import print_function, division
+import numpy as np
 
 
-class Directions(object):
+class Directions1D(object):
 
     def __init__(self, u_0):
-        self.u = u_0
-        self.n, self.dim = self.u.shape
+        self.sign = np.sign(u_0[:, 0])
+        self.sign_0 = self.sign.copy()
+        self.n, self.dim = u_0.shape
 
-    def rotate(self, ths):
-        pass
+    def tumble(self, tumblers, rng=None):
+        if rng is None:
+            rng = np.random
+        self.sign[tumblers] = rng.randint(2, size=tumblers.sum()) * 2 - 1
+        return self
+
+    def u(self):
+        return self.sign[:, np.newaxis].copy()
+
+    def u_0(self):
+        return self.sign_0[:, np.newaxis].copy()
 
 
-class UniformDirections(Directions):
+class Directions2D(Directions1D):
 
-    def __init__(self, n, dim):
-        u_0 = vector.sphere_pick(n=n, d=dim)
-        Directions.__init__(self, u_0)
+    def __init__(self, u_0):
+        self.th = np.arctan2(u_0[:, 1], u_0[:, 0])
+        self.th_0 = self.th.copy()
+        self.n, self.dim = u_0.shape
+
+    def tumble(self, tumblers, rng=None):
+        if rng is None:
+            rng = np.random
+        self.th[tumblers] = rng.uniform(-np.pi, np.pi, size=tumblers.sum())
+        return self
+
+    def rotate(self, dth):
+        self.th += dth
+        return self
+
+    def _th_to_u(self, th):
+        return np.array([np.cos(self.th), np.sin(self.th)]).T
+
+    def u(self):
+        return self._th_to_u(self.th)
+
+    def u_0(self):
+        return self._th_to_u(self.th_0)
+
+
+def directions_factory(u_0, dim):
+    if dim == 1:
+        return Directions1D(u_0)
+    elif dim == 2:
+        return Directions2D(u_0)
