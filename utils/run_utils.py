@@ -86,23 +86,34 @@ def get_aligned_directions(n, dim):
     return u
 
 
-def model_factory(seed, dim, dt, L, n, v_0, p_0, origin_flag=False,
-                  aligned_flag=False,
-                  chi=None, onesided_flag=False, tumble_chemo_flag=False,
-                  D_rot_0=None, D_rot_chemo_flag=False):
-    """D_rot* parameters only relevant in dim > 1"""
-    rng = np.random.RandomState(seed)
+def positions_factory(n, dim, L, origin_flag, rng):
     if origin_flag:
         r_0 = np.zeros([n, dim])
     else:
         r_0 = get_uniform_points(n, dim, L, rng)
-    ps = ships.positions.Positions(r_0, L)
+    return ships.positions.Positions(r_0, L)
+
+
+def directions_factory(n, dim, aligned_flag, rng):
     if aligned_flag:
         u_0 = get_aligned_directions(n, dim)
     else:
         u_0 = get_uniform_directions(n, dim, rng)
-    ds = ships.directions.directions_factory(u_0, dim)
+    return ships.directions.directions_factory(u_0, dim)
 
+
+def rud_conts_factory(chemo_flag, onesided_flag, ruds, noise_0, v_0, chi,
+                      esters):
+    if chemo_flag:
+        rud_conts = chemo_rud_conts_factory(onesided_flag, ruds, noise_0, v_0,
+                                            chi, esters)
+    else:
+        rud_conts = RudderControllers(ruds, noise_0)
+    return rud_conts
+
+
+def rud_cont_sets_factory(dim, dt, v_0, p_0, chi, onesided_flag,
+                          tumble_chemo_flag, D_rot_0, D_rot_chemo_flag, rng):
     # If no base source of noise to modulate, then no way to do chemotaxis.
     if not p_0:
         tumble_chemo_flag = False
@@ -120,25 +131,31 @@ def model_factory(seed, dim, dt, L, n, v_0, p_0, origin_flag=False,
     rudder_controller_sets = []
     if p_0:
         tumble_ruds = ships.rudders.TumbleRudders(dt, rng)
-        if tumble_chemo_flag:
-            tumble_rud_conts = chemo_rud_conts_factory(onesided_flag,
-                                                       tumble_ruds,
-                                                       p_0, v_0, chi,
-                                                       esters)
-        else:
-            tumble_rud_conts = RudderControllers(tumble_ruds, p_0)
+        tumble_rud_conts = rud_conts_factory(tumble_chemo_flag, onesided_flag,
+                                             tumble_ruds, p_0, v_0, chi,
+                                             esters)
         rudder_controller_sets.append(tumble_rud_conts)
     if D_rot_0:
         rotation_ruds = ships.rudders.rotation_rudders_factory(dt, dim, rng)
-        if D_rot_chemo_flag:
-            rotation_rud_conts = chemo_rud_conts_factory(onesided_flag,
-                                                         rotation_ruds,
-                                                         D_rot_0, v_0,
-                                                         chi, esters)
-        else:
-            rotation_rud_conts = RudderControllers(rotation_ruds, D_rot_0)
+        rotation_rud_conts = rud_conts_factory(D_rot_chemo_flag, onesided_flag,
+                                               rotation_ruds, D_rot_0, v_0,
+                                               chi, esters)
         rudder_controller_sets.append(rotation_rud_conts)
+    return rudder_controller_sets
+
+
+def model_factory(seed, dim, dt, L, n, v_0, p_0, origin_flag=False,
+                  aligned_flag=False,
+                  chi=None, onesided_flag=False, tumble_chemo_flag=False,
+                  D_rot_0=None, D_rot_chemo_flag=False):
+    """D_rot* parameters only relevant in dim > 1"""
+    rng = np.random.RandomState(seed)
+    ps = positions_factory(n, dim, L, origin_flag, rng)
+    ds = directions_factory(n, dim, aligned_flag, rng)
+    rud_cont_sets = rud_cont_sets_factory(dim, dt, v_0, p_0, chi,
+                                          onesided_flag, tumble_chemo_flag,
+                                          D_rot_0, D_rot_chemo_flag, rng)
     swims = ships.swimmers.Swimmers(dt, v_0)
-    agents = ships.agents.Agents(ps, ds, rudder_controller_sets, swims)
+    agents = ships.agents.Agents(ps, ds, rud_cont_sets, swims)
     model = ships.model.Model(dt, agents)
     return model

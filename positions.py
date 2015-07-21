@@ -5,7 +5,14 @@ from ciabatta import fields, vector
 
 class Positions(object):
 
-    def __init__(self, r_0, L):
+    def __init__(self, L, r_0=None, origin_flag=None, n=None, dim=None,
+                 rng=None):
+        if origin_flag is not None:
+            if origin_flag:
+                r_0 = np.zeros([n, dim])
+            else:
+                r_0 = get_uniform_points(n, dim, L, rng)
+
         self.r = r_0
         self.r_0 = self.r.copy()
         self.n, self.dim = self.r.shape
@@ -50,3 +57,12 @@ class Positions(object):
             return '{:g}'.format(x) if np.isfinite(x) else 'i'
         L_repr = [format_inf(e) for e in self.L]
         return 'L={},origin={:d}'.format(L_repr, self.origin_flag)
+
+
+def get_uniform_points(n, dim, L, rng=None):
+    if rng is None:
+        rng = np.random
+    r = np.zeros([n, dim])
+    for i_dim in np.where(np.isfinite(L))[0]:
+        r[:, i_dim] = rng.uniform(-L[i_dim] / 2.0, L[i_dim] / 2.0, size=n)
+    return r

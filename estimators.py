@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from ships.ring_buffer import CylinderBuffer
 
 
 def get_K(t, dt, t_rot_0):
@@ -52,16 +53,15 @@ class TemporalCDotEstimators(CDotEstimators):
     def __init__(self, dt, n, t_mem, t_rot_0):
         self.t_mem = t_mem
         self.K_dt = get_K(self.t_mem, dt, t_rot_0) * dt
-        self.c_mem = np.zeros([n, self.K_dt.shape[0]])
+        self.c_mem = CylinderBuffer(n, self.K_dt.shape[0])
 
     @abstractmethod
     def _get_cs(self, positions):
         return
 
     def get_cdots(self, positions, directions):
-        self.c_mem[:, 1:] = self.c_mem.copy()[:, :-1]
-        self.c_mem[:, 0] = self._get_cs(positions)
-        return np.sum(self.c_mem * self.K_dt, axis=1)
+        self.c_mem.update(self._get_cs(positions))
+        return self.c_mem.integral_transform(self.K_dt)
 
 
 class LinearTemporalCDotEstimators(TemporalCDotEstimators):
