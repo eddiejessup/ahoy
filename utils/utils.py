@@ -1,8 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import vector
-from ciabatta.runner_utils import (get_recent_model, get_recent_filename,
-                                   get_filenames, filename_to_model)
+from ciabatta.runner_utils import get_filenames, filename_to_model
 
 
 def get_vd_coeff(x, t):
@@ -44,7 +43,7 @@ def get_r_scalar(m):
 
 
 def get_v_net_vector(m):
-    v = m.agents.swimmers.v_0 * m.agents.directions.u
+    v = m.agents.swimmers.v_0 * m.agents.directions.u()
     return np.mean(v, axis=0)
 
 
@@ -117,6 +116,7 @@ def t_Ds_scalar(dirname):
     """
     return _t_measures(dirname, get_D_scalar)
 
+
 def t_Ds_vector(dirname):
     """Calculate the particle diffusion constant over time along each axis
     for a model output directory.
@@ -154,6 +154,7 @@ def t_rs_scalar(dirname):
     """
     return _t_measures(dirname, get_r_scalar)
 
+
 def t_rs_vector(dirname):
     """Calculate the particle displacement over time along each axis
     for a model output directory.
@@ -190,6 +191,7 @@ def t_v_nets_scalar(dirname):
          Centre-of-mass particle speeds.
     """
     return _t_measures(dirname, get_v_net_scalar)
+
 
 def t_v_nets_vector(dirname):
     """Calculate the particle's centre-of-mass velocity over time

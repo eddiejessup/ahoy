@@ -3,6 +3,16 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 
 
+def get_K(t, dt, t_rot_0):
+    A = 0.5
+    ts = np.arange(0.0, t, dt)
+    gs = ts / t_rot_0
+    K = np.exp(-gs) * (1.0 - A * (gs + (gs ** 2) / 2.0))
+    K[K < 0.0] *= np.abs(K[K >= 0.0].sum() / K[K < 0.0].sum())
+    K /= np.sum(K * -ts * dt)
+    return K
+
+
 class CDotEstimators(object):
     __metaclass__ = ABCMeta
 
@@ -33,10 +43,16 @@ class LinearSpatialCDotEstimators(SpatialCDotEstimators):
         grad_cs[:, 0] = 1.0
         return grad_cs
 
+    def __repr__(self):
+        return 'SpatialLinear'
+
 
 class TemporalCDotEstimators(CDotEstimators):
-    def __init__(self, t_mem, t_rot_0):
-        raise NotImplemented
+
+    def __init__(self, dt, n, t_mem, t_rot_0):
+        self.t_mem = t_mem
+        self.K_dt = get_K(self.t_mem, dt, t_rot_0) * dt
+        self.c_mem = np.zeros([n, self.K_dt.shape[0]])
 
     @abstractmethod
     def _get_cs(self, positions):
@@ -45,4 +61,13 @@ class TemporalCDotEstimators(CDotEstimators):
     def get_cdots(self, positions, directions):
         self.c_mem[:, 1:] = self.c_mem.copy()[:, :-1]
         self.c_mem[:, 0] = self._get_cs(positions)
-        return np.sum(self.c_mem * self.K * self.dt, axis=1)
+        return np.sum(self.c_mem * self.K_dt, axis=1)
+
+
+class LinearTemporalCDotEstimators(TemporalCDotEstimators):
+
+    def _get_cs(self, positions):
+        return positions.get_unwrapped_dr()[:, 0]
+
+    def __repr__(self):
+        return 'TemporalLinear'

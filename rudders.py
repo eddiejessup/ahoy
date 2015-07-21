@@ -24,6 +24,9 @@ class TumbleRudders(Rudders):
         tumblers = self._get_tumblers(directions, noise)
         return directions.tumble(tumblers, self.rng)
 
+    def __repr__(self):
+        return 'Tumbler'
+
 
 class RotationRudders(Rudders):
     __metaclass__ = ABCMeta
@@ -35,6 +38,9 @@ class RotationRudders(Rudders):
     def rotate(self, directions, noise):
         dth = self._get_dth(directions, noise)
         return directions.rotate(dth)
+
+    def __repr__(self):
+        return 'Rotor'
 
 
 class RotationRudders2D(RotationRudders):

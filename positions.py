@@ -11,6 +11,8 @@ class Positions(object):
         self.n, self.dim = self.r.shape
         self.L = L
         self.wraps = np.zeros_like(self.r, dtype=np.int)
+        self.volume = np.product(self.L)
+        self.origin_flag = np.allclose(self.r_0, 0.0)
 
     def _wrap(self):
         wraps_cur = np.zeros([self.n], dtype=np.int)
@@ -43,5 +45,8 @@ class Positions(object):
     def get_unwrapped_dr_mag(self):
         return vector.vector_mag(self.get_unwrapped_dr())
 
-    def get_origin_flag(self):
-        return np.allclose(self.r_0, 0.0)
+    def __repr__(self):
+        def format_inf(x):
+            return '{:g}'.format(x) if np.isfinite(x) else 'i'
+        L_repr = [format_inf(e) for e in self.L]
+        return 'L={},origin={:d}'.format(L_repr, self.origin_flag)

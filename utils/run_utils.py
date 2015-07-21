@@ -86,14 +86,12 @@ def get_aligned_directions(n, dim):
     return u
 
 
-def model_factory(dim, dt, L, n, v_0, p_0, origin_flag=False,
+def model_factory(seed, dim, dt, L, n, v_0, p_0, origin_flag=False,
                   aligned_flag=False,
                   chi=None, onesided_flag=False, tumble_chemo_flag=False,
-                  rng=None,
                   D_rot_0=None, D_rot_chemo_flag=False):
     """D_rot* parameters only relevant in dim > 1"""
-    if rng is None:
-        rng = np.random.RandomState()
+    rng = np.random.RandomState(seed)
     if origin_flag:
         r_0 = np.zeros([n, dim])
     else:

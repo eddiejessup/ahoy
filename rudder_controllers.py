@@ -15,6 +15,9 @@ class RudderControllers(object):
         noise = self.get_noise(positions, directions)
         return self.rudders.rotate(directions, noise)
 
+    def __repr__(self):
+        return 'RC_{}_n0={:g}'.format(self.rudders, self.noise_0)
+
 
 class ChemoRudderControllers(RudderControllers):
 
@@ -29,6 +32,11 @@ class ChemoRudderControllers(RudderControllers):
         fitness = self.chi * cdots / self.v_0
         return self.noise_0 * (1.0 - fitness)
 
+    def __repr__(self):
+        repr_str = 'CRC_2side_{}_n0={:g}_chi={:g}_est={}'
+        return repr_str.format(self.rudders, self.noise_0, self.chi,
+                               self.estimators)
+
 
 class OneSidedChemoRudderControllers(ChemoRudderControllers):
 
@@ -36,6 +44,11 @@ class OneSidedChemoRudderControllers(ChemoRudderControllers):
         noise_two_sided = super(OneSidedChemoRudderControllers,
                                 self).get_noise(positions, directions)
         return np.minimum(self.noise_0, noise_two_sided)
+
+    def __repr__(self):
+        repr_str = 'CRC_1side_{}_n0={:g}_chi={:g}_est={}'
+        return repr_str.format(self.rudders, self.noise_0, self.chi,
+                               self.estimators)
 
 
 def chemo_rud_conts_factory(onesided_flag, *args, **kwargs):

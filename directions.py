@@ -8,6 +8,7 @@ class Directions1D(object):
         self.sign = np.sign(u_0[:, 0])
         self.sign_0 = self.sign.copy()
         self.n, self.dim = u_0.shape
+        self.aligned_flag = np.all(self.sign_0 == 1)
 
     def tumble(self, tumblers, rng=None):
         if rng is None:
@@ -21,6 +22,9 @@ class Directions1D(object):
     def u_0(self):
         return self.sign_0[:, np.newaxis].copy()
 
+    def __repr__(self):
+        return 'aligned={:d}'.format(self.aligned_flag)
+
 
 class Directions2D(Directions1D):
 
@@ -28,6 +32,7 @@ class Directions2D(Directions1D):
         self.th = np.arctan2(u_0[:, 1], u_0[:, 0])
         self.th_0 = self.th.copy()
         self.n, self.dim = u_0.shape
+        self.aligned_flag = np.allclose(self.th_0, 0.0)
 
     def tumble(self, tumblers, rng=None):
         if rng is None:

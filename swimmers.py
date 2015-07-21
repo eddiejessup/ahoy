@@ -11,3 +11,6 @@ class Swimmers(object):
     def displace(self, directions, positions):
         dr = self.v_0 * directions.u() * self.dt
         return positions.displace(dr)
+
+    def __repr__(self):
+        return '{:g}'.format(self.v_0)

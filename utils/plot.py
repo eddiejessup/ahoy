@@ -22,8 +22,8 @@ def plot_2d(dirname):
     plt.subplots_adjust(left=0.25, bottom=0.25)
     plot_p = ax_vis.quiver(m_0.agents.positions.r[:, 0],
                            m_0.agents.positions.r[:, 1],
-                           m_0.agents.directions.u[:, 0],
-                           m_0.agents.directions.u[:, 1])
+                           m_0.agents.directions.u()[:, 0],
+                           m_0.agents.directions.u()[:, 1])
 
     ax_slide = plt.axes([0.25, 0.1, 0.65, 0.03])
     t_slider = Slider(ax_slide, 'Time', 0, len(fnames), valinit=0)
@@ -35,8 +35,8 @@ def plot_2d(dirname):
         if 0 <= fname_i < len(fnames):
             m = runner_utils.filename_to_model(fnames[fname_i])
             plot_p.set_offsets(m.agents.positions.r)
-            plot_p.set_UVC(m.agents.directions.u[:, 0],
-                           m.agents.directions.u[:, 1])
+            plot_p.set_UVC(m.agents.directions.u()[:, 0],
+                           m.agents.directions.u()[:, 1])
             t_time.set_text('Time: {:g}'.format(m.t))
             fig.canvas.draw_idle()
 
