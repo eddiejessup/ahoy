@@ -1,7 +1,8 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import vector
-from ciabatta.runner_utils import get_filenames, filename_to_model
+from agaro.output_utils import get_filenames, filename_to_model
+from agaro.measure_utils import measures
 
 
 def get_vd_coeff(x, t):
@@ -12,43 +13,46 @@ def get_diff_coeff(x, t):
     return x ** 2 / (2.0 * t)
 
 
-def get_vd_vector(m):
-    dr = m.agents.positions.get_unwrapped_dr()
-    return np.mean(get_vd_coeff(dr, m.t), axis=0)
+def get_ud_vector(m):
+    dr = m.agents.positions.dr()
+    return np.mean(get_vd_coeff(dr, m.t), axis=0) / m.agents.swimmers.v_0
 
 
-def get_vd_scalar(m):
-    dr = m.agents.positions.get_unwrapped_dr_mag()
-    return np.mean(get_vd_coeff(dr, m.t), axis=0)
+def get_ud_scalar(m):
+    dr = m.agents.positions.dr_mag()
+    return np.mean(get_vd_coeff(dr, m.t), axis=0) / m.agents.swimmers.v_0
 
 
 def get_D_vector(m):
-    dr = m.agents.positions.r
+    dr = m.agents.positions.dr()
     return np.mean(get_diff_coeff(dr, m.t), axis=0)
 
 
 def get_D_scalar(m):
-    dr = m.agents.positions.get_unwrapped_dr_mag()
+    dr = m.agents.positions.dr_mag()
     return np.mean(get_diff_coeff(dr, m.t), axis=0)
 
 
 def get_r_vector(m):
-    dr = m.agents.positions.r
+    dr = m.agents.positions.dr()
     return np.mean(dr, axis=0)
 
 
 def get_r_scalar(m):
-    dr = m.agents.positions.get_unwrapped_dr_mag()
+    dr = m.agents.positions.dr_mag()
     return np.mean(dr, axis=0)
 
 
-def get_v_net_vector(m):
-    v = m.agents.swimmers.v_0 * m.agents.directions.u()
-    return np.mean(v, axis=0)
+def get_u_net_vector(m):
+    return np.mean(m.agents.directions.u(), axis=0)
 
 
-def get_v_net_scalar(m):
-    return vector.vector_mag(get_v_net_vector(m))
+def get_u_net_scalar(m):
+    return vector.vector_mag(get_u_net_vector(m))
+
+
+def get_chi(m):
+    return m.agents.get_chi()
 
 
 def _t_measures(dirname, measure_func):
@@ -60,7 +64,7 @@ def _t_measures(dirname, measure_func):
     return np.array(ts), np.array(measures)
 
 
-def t_vds_vector(dirname):
+def t_uds_vector(dirname):
     """Calculate the particle drift speed over time along each axis
     for a model output directory.
 
@@ -73,13 +77,13 @@ def t_vds_vector(dirname):
     -------
     ts: numpy.ndarray[dtype=float]
         Times.
-    vds: numpy.ndarray[dtype=float]
-         Particle drift speeds.
+    uds: numpy.ndarray[dtype=float]
+         Drift speeds, normalised by the swimmer speed.
     """
-    return _t_measures(dirname, get_vd_vector)
+    return _t_measures(dirname, get_ud_vector)
 
 
-def t_vds_scalar(dirname):
+def t_uds_scalar(dirname):
     """Calculate the overall particle drift speed over time
     for a model output directory.
 
@@ -92,10 +96,10 @@ def t_vds_scalar(dirname):
     -------
     ts: numpy.ndarray[dtype=float]
         Times.
-    vds: numpy.ndarray[dtype=float]
+    uds: numpy.ndarray[dtype=float]
          Particle drift speeds.
     """
-    return _t_measures(dirname, get_vd_scalar)
+    return _t_measures(dirname, get_ud_scalar)
 
 
 def t_Ds_scalar(dirname):
@@ -174,7 +178,7 @@ def t_rs_vector(dirname):
     return _t_measures(dirname, get_r_vector)
 
 
-def t_v_nets_scalar(dirname):
+def t_u_nets_scalar(dirname):
     """Calculate the particles' overall centre-of-mass speed over time
     for a model output directory.
 
@@ -190,10 +194,10 @@ def t_v_nets_scalar(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle speeds.
     """
-    return _t_measures(dirname, get_v_net_scalar)
+    return _t_measures(dirname, get_u_net_scalar)
 
 
-def t_v_nets_vector(dirname):
+def t_u_nets_vector(dirname):
     """Calculate the particle's centre-of-mass velocity over time
     for a model output directory.
 
@@ -209,4 +213,29 @@ def t_v_nets_vector(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle velocities.
     """
-    return _t_measures(dirname, get_v_net_vector)
+    return _t_measures(dirname, get_u_net_vector)
+
+
+def chi_uds_scalar(dirnames, t_steady=None):
+    """Calculate the drift speed of a set of
+    model output directories, and their associated chis.
+
+    Parameters
+    ----------
+    dirnames: list[str]
+        Model output directory paths.
+    t_steady: None or float
+        Time to consider the model to be at steady-state.
+        The measure will be averaged over all later times.
+        `None` means just consider the latest time.
+
+    Returns
+    -------
+    chis: numpy.ndarray[dtype=float]
+        Chemotactic sensitivities
+    uds: numpy.ndarray[dtype=float]
+         Drift speeds, normalised by the swimmer speed.
+    """
+    chis = measures(dirnames, get_chi, t_steady)
+    uds = measures(dirnames, get_ud_vector, t_steady)
+    return chis, uds

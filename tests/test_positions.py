@@ -1,0 +1,75 @@
+from __future__ import print_function, division
+import unittest
+import numpy as np
+from ships import positions
+
+
+class TestBase(unittest.TestCase):
+    n = 5
+    seed = 1
+
+    def setUp(self):
+        self.rng = np.random.RandomState(self.seed)
+
+
+class TestPositions1D(TestBase):
+    dim = 1
+
+    def test_displacement(self):
+        ps = positions.Positions(origin_flag=True, n=self.n, dim=self.dim)
+        dr = self.rng.uniform(-10.0, 10.0, size=ps.r.shape)
+        ps.displace(dr)
+        r_naive = ps.r_0 + dr
+        self.assertTrue(np.allclose(r_naive, ps.r))
+
+
+class TestPeriodicPositions1D(TestPositions1D):
+    L = np.array([1.7])
+
+    def setUp(self):
+        super(TestPeriodicPositions1D, self).setUp()
+        self.ps = positions.PeriodicPositions(self.L, origin_flag=False,
+                                              n=self.n, rng=self.rng)
+
+    # Add origin flag test
+
+    def test_wrapping_down(self):
+        dr = np.zeros_like(self.ps.r)
+        self.ps.r[0, 0] = self.L[0] / 2.0
+        dr[0, 0] = 0.9 * self.L[0]
+        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
+
+    def test_wrapping_up(self):
+        dr = np.zeros_like(self.ps.r)
+        self.ps.r[-1, 0] = -self.L[0] / 2.0
+        dr[-1, 0] = -0.9 * self.L[0]
+        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
+
+
+class TestPeriodicPositions2D(TestPeriodicPositions1D):
+    dim = 2
+    L = np.array([0.5, 1.5])
+
+    def test_wrapping_up(self):
+        dr = np.zeros_like(self.ps.r)
+        self.ps.r[-1, -1] = -self.L[-1] / 2.0
+        dr[-1, -1] = -0.9 * self.L[-1]
+        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.assertTrue(np.abs(self.ps.r_w()[:, -1]).max() < self.L[-1] / 2.0)
+
+    def test_infinite_boundaries(self):
+        L = np.array([np.inf, 1.7])
+        ps = positions.PeriodicPositions(L, origin_flag=True, n=self.n)
+        dr = self.rng.uniform(-1.0, 1.0, size=ps.r.shape)
+        ps.displace(dr)
+        r_naive = ps.r_0[:, 0] + dr[:, 0]
+        print(r_naive)
+        print()
+        print(ps.r_w()[:, 0])
+        # Check no wrapping along infinite axis
+        self.assertTrue(np.allclose(r_naive, ps.r_w()[:, 0]))
+        self.assertTrue(np.allclose(r_naive, ps.r[:, 0]))
+        # Check done wrapping along finite axis
+        self.assertTrue(np.all(np.abs(ps.r_w()[:, 1]) < L[1] / 2.0))

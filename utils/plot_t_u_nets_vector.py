@@ -5,4 +5,4 @@ import plot
 
 
 if __name__ == '__main__':
-    plot.plot_t_vds_vector(sys.argv[1])
+    plot.plot_t_u_nets_vector(sys.argv[1])

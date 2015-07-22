@@ -97,22 +97,22 @@ def plot_vis(dirname):
         plot_2d(dirname)
 
 
-def plot_t_vds_scalar(dirname):
+def plot_t_uds_scalar(dirname):
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ts, vds = utils.t_vds_scalar(dirname)
-    ax.plot(ts, vds)
+    ts, uds = utils.t_uds_scalar(dirname)
+    ax.plot(ts, uds)
 
     plt.show()
 
 
-def plot_t_vds_vector(dirname):
+def plot_t_uds_vector(dirname):
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ts, vds = utils.t_vds_vector(dirname)
-    for vd_set in vds.T:
+    ts, uds = utils.t_uds_vector(dirname)
+    for vd_set in uds.T:
         ax.plot(ts, vd_set)
 
     plt.show()
@@ -160,22 +160,35 @@ def plot_t_rs_vector(dirname):
     plt.show()
 
 
-def plot_t_v_nets_scalar(dirname):
+def plot_t_u_nets_scalar(dirname):
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ts, v_nets = utils.t_v_nets_scalar(dirname)
-    ax.plot(ts, v_nets)
+    ts, u_nets = utils.t_u_nets_scalar(dirname)
+    ax.plot(ts, u_nets)
 
     plt.show()
 
 
-def plot_t_v_nets_vector(dirname):
+def plot_t_u_nets_vector(dirname):
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ts, v_nets = utils.t_v_nets_vector(dirname)
-    for v_net_set in v_nets.T:
-        ax.plot(ts, v_net_set)
+    ts, u_nets = utils.t_u_nets_vector(dirname)
+    for u_net_set in u_nets.T:
+        ax.plot(ts, u_net_set)
+
+    plt.show()
+
+
+def plot_chi_uds_scalar(dirnames):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    chis, uds = utils.chi_uds_scalar(dirnames)
+    i_sort = np.argsort(chis)
+    chis, uds = chis[i_sort], uds[i_sort]
+    ax.plot(chis, uds)
+    ax.set_ylim(0.0, 1.1)
 
     plt.show()

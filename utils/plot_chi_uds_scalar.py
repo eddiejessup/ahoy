@@ -5,4 +5,4 @@ import plot
 
 
 if __name__ == '__main__':
-    plot.plot_t_v_nets_vector(sys.argv[1])
+    plot.plot_chi_uds_scalar(sys.argv[1:])
