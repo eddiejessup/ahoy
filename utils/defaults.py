@@ -10,5 +10,6 @@ default_model_kwargs = {
     'L': np.array([np.inf]),
     'p_0': 1.0,
     't_mem': 5.0,
+    'dt_mem': 0.05,
     'Dr_0': 1.0,
 }

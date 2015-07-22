@@ -29,6 +29,7 @@ class TestModel(test.TestBase):
             'rotation_chemo_flag': True,
             # Must have origin flag False to test uniform points function.
             'spatial_chemo_flag': False,
+            'dt_mem': 0.05,
             't_mem': 5.0,
         }
 

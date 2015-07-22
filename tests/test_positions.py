@@ -1,24 +1,16 @@
 from __future__ import print_function, division
-import unittest
 import numpy as np
 from ships import positions
+import test
 
 
-class TestBase(unittest.TestCase):
-    n = 5
-    seed = 1
-
-    def setUp(self):
-        self.rng = np.random.RandomState(self.seed)
-
-
-class TestPositions1D(TestBase):
+class TestPositions1D(test.TestBase):
     dim = 1
 
     def test_displacement(self):
         ps = positions.Positions(origin_flag=True, n=self.n, dim=self.dim)
         dr = self.rng.uniform(-10.0, 10.0, size=ps.r.shape)
-        ps.displace(dr)
+        ps.r += dr
         r_naive = ps.r_0 + dr
         self.assertTrue(np.allclose(r_naive, ps.r))
 
@@ -37,14 +29,14 @@ class TestPeriodicPositions1D(TestPositions1D):
         dr = np.zeros_like(self.ps.r)
         self.ps.r[0, 0] = self.L[0] / 2.0
         dr[0, 0] = 0.9 * self.L[0]
-        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.ps.r += np.full(self.ps.r.shape, dr)
         self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
 
     def test_wrapping_up(self):
         dr = np.zeros_like(self.ps.r)
         self.ps.r[-1, 0] = -self.L[0] / 2.0
         dr[-1, 0] = -0.9 * self.L[0]
-        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.ps.r += np.full(self.ps.r.shape, dr)
         self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
 
 
@@ -56,18 +48,15 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
         dr = np.zeros_like(self.ps.r)
         self.ps.r[-1, -1] = -self.L[-1] / 2.0
         dr[-1, -1] = -0.9 * self.L[-1]
-        self.ps.displace(np.full(self.ps.r.shape, dr))
+        self.ps.r += np.full(self.ps.r.shape, dr)
         self.assertTrue(np.abs(self.ps.r_w()[:, -1]).max() < self.L[-1] / 2.0)
 
     def test_infinite_boundaries(self):
         L = np.array([np.inf, 1.7])
         ps = positions.PeriodicPositions(L, origin_flag=True, n=self.n)
         dr = self.rng.uniform(-1.0, 1.0, size=ps.r.shape)
-        ps.displace(dr)
+        ps.r += dr
         r_naive = ps.r_0[:, 0] + dr[:, 0]
-        print(r_naive)
-        print()
-        print(ps.r_w()[:, 0])
         # Check no wrapping along infinite axis
         self.assertTrue(np.allclose(r_naive, ps.r_w()[:, 0]))
         self.assertTrue(np.allclose(r_naive, ps.r[:, 0]))

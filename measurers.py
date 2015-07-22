@@ -15,7 +15,16 @@ def get_K(t, dt, t_rot_0):
 
 
 class Measurer(object):
-    pass
+    __metaclass__ = ABCMeta
+
+
+class TimeMeasurer(Measurer):
+
+    def __init__(self, time):
+        self.time = time
+
+    def get_time(self):
+        return self.time
 
 
 class PositionMeasurer(Measurer):
@@ -97,20 +106,42 @@ class SpatialDcDxMeasurer(DcDxMeasurer):
 
 class TemporalDcDxMeasurer(DcDxMeasurer):
 
-    def __init__(self, c_measurer, v_0, dt, t_mem, t_rot_0):
+    def __init__(self, c_measurer, v_0, dt_mem, t_mem, t_rot_0,
+                 time_measurer):
         self.c_measurer = c_measurer
         self.v_0 = v_0
+        self.dt_mem = dt_mem
         self.t_mem = t_mem
         n = self.c_measurer.get_cs().shape[0]
-        self.K_dt = get_K(self.t_mem, dt, t_rot_0) * dt
+        self.K_dt = get_K(self.t_mem, self.dt_mem, t_rot_0) * self.dt_mem
         self.c_mem = CylinderBuffer(n, self.K_dt.shape[0])
 
-    def get_dc_dxs(self):
+        self.time_measurer = time_measurer
+
+        # Optimisation, only calculate dc_dx when c memory is updated.
+        self.dc_dx_cache = np.zeros([n])
+        self.t_last_update = 0.0
+
+    def _iterate(self):
         self.c_mem.update(self.c_measurer.get_cs())
+
+    def _get_dc_dxs(self):
         return self.c_mem.integral_transform(self.K_dt) / self.v_0
 
+    def iterate(self):
+        t_now = self.time_measurer.get_time().t
+        if t_now - self.t_last_update > 0.99 * self.dt_mem:
+            self._iterate()
+            self.dc_dx_cache = self._get_dc_dxs()
+            self.t_last_update = t_now
+
+    def get_dc_dxs(self):
+        self.iterate()
+        return self.dc_dx_cache
+
     def __repr__(self):
-        return 'TemporalDcDxMeasurer(tmem={:g})'.format(self.t_mem)
+        return 'TemporalDcDxMeasurer(dtmem={:g},tmem={:g})'.format(self.dt_mem,
+                                                                   self.t_mem)
 
 
 class NoiseMeasurer(Measurer):

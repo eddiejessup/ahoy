@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ships import directions, measurers
+from ships import stime, directions, measurers
 import test
 
 
@@ -65,21 +65,25 @@ class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
         super(TestLinearTemporalDcDxMeasurer, self).setUp()
         self.v_0 = 2.2
         self.dt = 0.01
+        self.dt_mem = 0.05
         self.t_mem = 5.0
         self.t_rot_0 = 1.0
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
+        time = stime.Time(self.dt)
+        time_measurer = measurers.TimeMeasurer(time)
         ps = MockPositions(dim, self.n, self.v_0, u_0)
         position_measurer = measurers.PositionMeasurer(ps)
         c_measurer = measurers.LinearCMeasurer(position_measurer)
         dc_dx_measurer = measurers.TemporalDcDxMeasurer(c_measurer, self.v_0,
-                                                        self.dt, self.t_mem,
-                                                        self.t_rot_0)
-        t = 0.0
-        while t < self.t_mem:
-            ps.iterate(self.dt)
+                                                        self.dt_mem,
+                                                        self.t_mem,
+                                                        self.t_rot_0,
+                                                        time_measurer)
+        while time.t < 2.0 * self.t_mem:
+            ps.iterate(time.dt)
             dc_dxs = dc_dx_measurer.get_dc_dxs()
-            t += self.dt
+            time.iterate()
         self.assertTrue(np.allclose(dc_dxs, dc_dxs_expected))
 
 

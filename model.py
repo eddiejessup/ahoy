@@ -5,28 +5,35 @@ from ships.measurers import OneSidedChemoNoiseMeasurer, TemporalDcDxMeasurer
 
 class Ships(object):
 
-    def __init__(self, dt, agents):
-        self.dt = dt
+    def __init__(self, time, agents):
         self.dim = agents.directions.dim
         self.agents = agents
-
-        self.t = 0.0
-        self.i = 0
+        self.time = time
 
     def iterate(self):
-        self.agents.iterate(self.dt)
+        self.agents.iterate(self.time.dt)
+        self.time.iterate()
 
-        self.t += self.dt
-        self.i += 1
+    @property
+    def t(self):
+        return self.time.i
+
+    @property
+    def dt(self):
+        return self.time.dt
+
+    @property
+    def i(self):
+        return self.time.i
 
     def __repr__(self):
-        return 'Ships(dim={},dt={:g},ags={})'.format(self.dim, self.dt,
+        return 'Ships(dim={},dt={:g},ags={})'.format(self.dim, self.time.dt,
                                                      self.agents)
 
     def get_output_dirname(self):
         align = self.agents.directions.aligned_flag
         spatial = isinstance(self.agents, ships.agents.SpatialAgents)
-        s = 'Ships_{}D,dt={:g},n={},align={:d}'.format(self.dim, self.dt,
+        s = 'Ships_{}D,dt={:g},n={},align={:d}'.format(self.dim, self.time.dt,
                                                        self.agents.n, align)
 
         if spatial:
@@ -58,8 +65,10 @@ class Ships(object):
                                                                  tumb_type_s)
 
                     if tumb_chemo_temp:
+                        tumb_chemo_dt_mem = tumb_nm.dc_dx_measurer.dt_mem
                         tumb_chemo_t_mem = tumb_nm.dc_dx_measurer.t_mem
-                        s += ',ptmem={:g}'.format(tumb_chemo_t_mem)
+                        s += ',dtmem={:g},ptmem={:g}'.format(tumb_chemo_dt_mem,
+                                                             tumb_chemo_t_mem)
 
             elif isinstance(rs, ships.rudders.RotationRudders):
                 rot_nm = rs.noise_measurer

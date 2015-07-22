@@ -31,7 +31,7 @@ class SpatialAgents(Agents):
 
     def iterate(self, dt):
         super(SpatialAgents, self).iterate(dt)
-        self.swimmers.displace(self.positions, dt)
+        self.positions = self.swimmers.displace(self.positions, dt)
 
     def __repr__(self):
         repr_str = 'SAgents(n={},ds={},ps={},ruds={},sws={})'

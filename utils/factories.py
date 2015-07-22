@@ -11,8 +11,11 @@ def model_factory(seed, dim, dt, n, aligned_flag, spatial_flag,
                   chi=None, onesided_flag=None,
                   p_0=None, tumble_chemo_flag=None,
                   Dr_0=None, rotation_chemo_flag=None,
-                  spatial_chemo_flag=None, t_mem=None):
+                  spatial_chemo_flag=None, dt_mem=None, t_mem=None):
     rng = np.random.RandomState(seed)
+
+    t = ships.stime.Time(dt)
+
     ds = ships.directions.directions_factory(dim, aligned_flag=aligned_flag,
                                              n=n, rng=rng)
 
@@ -22,8 +25,9 @@ def model_factory(seed, dim, dt, n, aligned_flag, spatial_flag,
     else:
         ps = None
 
-    dc_dx_measurer = dc_dx_factory(spatial_chemo_flag, ds, ps, v_0, dt, t_mem,
-                                   p_0, Dr_0)
+    dc_dx_measurer = dc_dx_factory(spatial_chemo_flag,
+                                   ds,
+                                   ps, v_0, dt_mem, t_mem, p_0, Dr_0, t)
 
     rudder_sets = []
     if p_0:
@@ -41,13 +45,14 @@ def model_factory(seed, dim, dt, n, aligned_flag, spatial_flag,
                                                     rng))
 
     agents = agents_factory(spatial_flag, ds, rudder_sets, v_0, ps)
-    model = ships.model.Ships(dt, agents)
+    model = ships.model.Ships(t, agents)
     return model
 
 
 def dc_dx_factory(spatial_chemo_flag,
                   ds=None,
-                  ps=None, v_0=None, dt=None, t_mem=None, p_0=None, Dr_0=None):
+                  ps=None, v_0=None, dt_mem=None, t_mem=None, p_0=None,
+                  Dr_0=None, time=None):
     if spatial_chemo_flag:
         direction_measurer = measurers.DirectionMeasurer(ds)
         n, dim = ds.n, ds.dim
@@ -62,8 +67,9 @@ def dc_dx_factory(spatial_chemo_flag,
         c_measurer = measurers.LinearCMeasurer(position_measurer)
         D_rot_0 = p_0 + Dr_0
         t_rot_0 = 1.0 / D_rot_0
-        return measurers.TemporalDcDxMeasurer(c_measurer, v_0, dt, t_mem,
-                                              t_rot_0)
+        time_measurer = measurers.TimeMeasurer(time)
+        return measurers.TemporalDcDxMeasurer(c_measurer, v_0, dt_mem, t_mem,
+                                              t_rot_0, time_measurer)
 
 
 def agents_factory(spatial_flag, ds, rudder_sets,

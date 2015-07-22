@@ -15,10 +15,6 @@ class Positions(object):
         self.n, self.dim = self.r.shape
         self.origin_flag = np.allclose(self.r_0, 0.0)
 
-    def displace(self, dr):
-        self.r += dr
-        return self
-
     def r_mag(self):
         return vector.vector_mag(self.r)
 
@@ -27,6 +23,12 @@ class Positions(object):
 
     def dr_mag(self):
         return vector.vector_mag(self.dr())
+
+    def r_w(self):
+        return self.r
+
+    def r_w_mag(self):
+        return vector.vector_mag(self.r_w())
 
     def __repr__(self):
         return 'Pos(n={},origin={:d})'.format(self.n, self.origin_flag)

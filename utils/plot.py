@@ -37,7 +37,7 @@ def plot_2d(dirname):
             plot_p.set_offsets(m.agents.positions.r)
             plot_p.set_UVC(m.agents.directions.u()[:, 0],
                            m.agents.directions.u()[:, 1])
-            t_time.set_text('Time: {:g}'.format(m.t))
+            t_time.set_text('Time: {:g}'.format(m.time.t))
             fig.canvas.draw_idle()
 
     t_slider.on_changed(update)
