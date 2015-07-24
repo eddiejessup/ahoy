@@ -5,11 +5,7 @@ from ciabatta import fields, vector
 
 class Positions(object):
 
-    def __init__(self, r_0=None, origin_flag=None, n=None, dim=None,
-                 *args, **kwargs):
-        if origin_flag is not None:
-            if origin_flag:
-                r_0 = np.zeros([n, dim])
+    def __init__(self, r_0):
         self.r = r_0
         self.r_0 = self.r.copy()
         self.n, self.dim = self.r.shape
@@ -36,14 +32,7 @@ class Positions(object):
 
 class PeriodicPositions(Positions):
 
-    def __init__(self, L, r_0=None, origin_flag=None, n=None, rng=None,
-                 *args, **kwargs):
-        dim = len(L)
-        if origin_flag is not None:
-            if origin_flag:
-                r_0 = np.zeros([n, dim])
-            else:
-                r_0 = get_uniform_points(n, dim, L, rng)
+    def __init__(self, L, r_0):
         super(PeriodicPositions, self).__init__(r_0)
         self.L = L
         self.volume = np.product(self.L)
@@ -76,17 +65,27 @@ class PeriodicPositions(Positions):
                                                          self.origin_flag)
 
 
-def positions_factory(L, *args, **kwargs):
+def positions_factory(L, r_0):
     if L is None or np.all(np.isinf(L)):
-        return Positions(*args, **kwargs)
+        return Positions(r_0)
     else:
-        return PeriodicPositions(L, *args, **kwargs)
+        return PeriodicPositions(L, r_0)
 
 
-def get_uniform_points(n, dim, L, rng=None):
+def get_uniform_points(n, dim, L, rng=None, obstructors=None):
     if rng is None:
         rng = np.random
     r = np.zeros([n, dim])
-    for i_dim in np.where(np.isfinite(L))[0]:
-        r[:, i_dim] = rng.uniform(-L[i_dim] / 2.0, L[i_dim] / 2.0, size=n)
+    for i_n in range(n):
+        while True:
+            for i_dim in range(dim):
+                if L is not None and np.isfinite(L[i_dim]):
+                    r[i_n, i_dim] = rng.uniform(-L[i_dim] / 2.0,
+                                                L[i_dim] / 2.0)
+                else:
+                    r[i_n, i_dim] = 0.0
+            if obstructors is None:
+                break
+            elif not obstructors.get_obstructeds(r[i_n]):
+                break
     return r

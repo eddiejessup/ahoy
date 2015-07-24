@@ -11,7 +11,7 @@ class Swimmers(object):
         ds = self.direction_measurer.get_directions()
         dr = self.v_0 * ds.u() * dt
         positions.r += dr
-        return positions
+        return positions, dr
 
     def __repr__(self):
         return 'Swims(v={:g})'.format(self.v_0)

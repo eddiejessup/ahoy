@@ -5,18 +5,21 @@ from ships.measurers import OneSidedChemoNoiseMeasurer, TemporalDcDxMeasurer
 
 class Ships(object):
 
-    def __init__(self, time, agents):
-        self.dim = agents.directions.dim
-        self.agents = agents
+    def __init__(self, time, agents, *args, **kwargs):
         self.time = time
+        self.agents = agents
 
     def iterate(self):
         self.agents.iterate(self.time.dt)
         self.time.iterate()
 
     @property
+    def dim(self):
+        return self.agents.directions.dim
+
+    @property
     def t(self):
-        return self.time.i
+        return self.time.t
 
     @property
     def dt(self):
@@ -43,7 +46,7 @@ class Ships(object):
             periodic = isinstance(self.agents.positions,
                                   ships.positions.PeriodicPositions)
             if periodic:
-                s += ',L={}'.format(self.agents.positions.L_repr())
+                s += ',L={}'.format(tuple(self.agents.positions.L_repr()))
 
         for rs in self.agents.rudder_sets:
             if isinstance(rs, ships.rudders.TumbleRudders):
@@ -90,3 +93,21 @@ class Ships(object):
                         rot_chemo_t_mem = rot_nm.dc_dx_measurer.t_mem
                         s += ',Dtmem={:g}'.format(rot_chemo_t_mem)
         return s
+
+
+class SpatialShips(Ships):
+
+    def __init__(self, time, agents, obstructer):
+        super(SpatialShips, self).__init__(time, agents)
+        self.obstructer = obstructer
+
+    def iterate(self):
+        self.agents.iterate(self.time.dt, self.obstructer)
+        self.time.iterate()
+
+
+def ships_factory(spatial_flag, *args, **kwargs):
+    if spatial_flag:
+        return ships.model.SpatialShips(*args, **kwargs)
+    else:
+        return ships.model.Ships(*args, **kwargs)

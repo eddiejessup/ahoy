@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ciabatta import vector
+from ciabatta import vector, crandom
 
 
 class Directions1D(object):
@@ -19,7 +19,7 @@ class Directions1D(object):
     def tumble(self, tumblers, rng=None):
         if rng is None:
             rng = np.random
-        self.sign[tumblers] = rng.randint(2, size=tumblers.sum()) * 2 - 1
+        self.sign[tumblers] = crandom.randbool(tumblers.sum(), rng=rng)
         return self
 
     def u(self):
@@ -27,6 +27,12 @@ class Directions1D(object):
 
     def u_0(self):
         return self.sign_0[:, np.newaxis].copy()
+
+    def reverse(self, mask=None):
+        if mask is not None:
+            self.sign[mask] *= -1
+        else:
+            self.sign *= -1
 
     def __repr__(self):
         return 'Ds1D(n={},align={:d})'.format(self.n, self.aligned_flag)
@@ -63,6 +69,12 @@ class Directions2D(Directions1D):
 
     def u_0(self):
         return self._th_to_u(self.th_0)
+
+    def reverse(self, mask=None):
+        if mask is not None:
+            self.th[mask] += np.pi
+        else:
+            self.th += np.pi
 
     def __repr__(self):
         return 'Ds2D(n={},align={:d})'.format(self.n, self.aligned_flag)

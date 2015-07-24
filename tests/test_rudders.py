@@ -36,7 +36,7 @@ class TestRotationRudders2D(test.TestBase):
         self.assertAlmostEqual(t_rot_actual, t_rot_expect, 1)
 
     def run_random_seeding(self, dim):
-        n = 10000
+        n = 1000
         num_iterations = 100
         rng_seed = 1
 
@@ -67,7 +67,7 @@ class TestTumbleRudders(TestRotationRudders2D):
     rudders_cls = rudders.TumbleRudders
 
     def run_tumble_rate_nd(self, dim):
-        n = 2000
+        n = 1000
         dt = 1.0
         p = self.rng.uniform(0.0, 1.0, size=n)
         noise_measurer = measurers.NoiseMeasurer(p)

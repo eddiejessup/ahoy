@@ -4,26 +4,14 @@ from ships import positions
 import test
 
 
-class TestPositions1D(test.TestBase):
+class TestPeriodicPositions1D(test.TestBase):
     dim = 1
-
-    def test_displacement(self):
-        ps = positions.Positions(origin_flag=True, n=self.n, dim=self.dim)
-        dr = self.rng.uniform(-10.0, 10.0, size=ps.r.shape)
-        ps.r += dr
-        r_naive = ps.r_0 + dr
-        self.assertTrue(np.allclose(r_naive, ps.r))
-
-
-class TestPeriodicPositions1D(TestPositions1D):
     L = np.array([1.7])
 
     def setUp(self):
         super(TestPeriodicPositions1D, self).setUp()
-        self.ps = positions.PeriodicPositions(self.L, origin_flag=False,
-                                              n=self.n, rng=self.rng)
-
-    # Add origin flag test
+        r_0 = positions.get_uniform_points(self.n, self.dim, self.L, self.rng)
+        self.ps = positions.positions_factory(self.L, r_0)
 
     def test_wrapping_down(self):
         dr = np.zeros_like(self.ps.r)
@@ -51,9 +39,10 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
         self.ps.r += np.full(self.ps.r.shape, dr)
         self.assertTrue(np.abs(self.ps.r_w()[:, -1]).max() < self.L[-1] / 2.0)
 
-    def test_infinite_boundaries(self):
+    def test_partial_infinite_boundaries(self):
         L = np.array([np.inf, 1.7])
-        ps = positions.PeriodicPositions(L, origin_flag=True, n=self.n)
+        r_0 = np.zeros([self.n, self.dim])
+        ps = positions.positions_factory(L, r_0)
         dr = self.rng.uniform(-1.0, 1.0, size=ps.r.shape)
         ps.r += dr
         r_naive = ps.r_0[:, 0] + dr[:, 0]

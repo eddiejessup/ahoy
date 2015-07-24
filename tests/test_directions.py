@@ -18,13 +18,13 @@ class TestDirections1D(test.TestBase):
         ds = directions.directions_factory(self.dim, aligned_flag=False,
                                            n=self.n, rng=self.rng)
         mags_0 = np.sum(np.square(ds.u()))
-        tumblers = np.random.choice([True, False], size=ds.n)
+        tumblers = self.rng.choice([True, False], size=ds.n)
         ds_rot = ds.tumble(tumblers)
         mags_rot = np.sum(np.square(ds_rot.u()))
         self.assertTrue(np.allclose(mags_0, mags_rot))
 
     def test_tumble_coverage(self):
-        n = 1000
+        n = 2000
         ds = directions.directions_factory(self.dim, aligned_flag=False,
                                            n=n, rng=self.rng)
         tumblers = np.ones([ds.n], dtype=np.bool)

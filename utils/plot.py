@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
-from ciabatta import runner_utils
+from agaro import output_utils
 import utils
 
 
@@ -10,8 +10,8 @@ def plot_2d(dirname):
     fig = plt.figure()
     ax_vis = fig.add_subplot(111)
 
-    fnames = runner_utils.get_filenames(dirname)
-    m_0 = runner_utils.filename_to_model(fnames[0])
+    fnames = output_utils.get_filenames(dirname)
+    m_0 = output_utils.filename_to_model(fnames[0])
 
     L = m_0.agents.positions.L
 
@@ -20,8 +20,8 @@ def plot_2d(dirname):
     ax_vis.set_aspect('equal')
 
     plt.subplots_adjust(left=0.25, bottom=0.25)
-    plot_p = ax_vis.quiver(m_0.agents.positions.r[:, 0],
-                           m_0.agents.positions.r[:, 1],
+    plot_p = ax_vis.quiver(m_0.agents.positions.r_w()[:, 0],
+                           m_0.agents.positions.r_w()[:, 1],
                            m_0.agents.directions.u()[:, 0],
                            m_0.agents.directions.u()[:, 1])
 
@@ -33,8 +33,8 @@ def plot_2d(dirname):
     def update(val):
         fname_i = int(round(val))
         if 0 <= fname_i < len(fnames):
-            m = runner_utils.filename_to_model(fnames[fname_i])
-            plot_p.set_offsets(m.agents.positions.r)
+            m = output_utils.filename_to_model(fnames[fname_i])
+            plot_p.set_offsets(m.agents.positions.r_w())
             plot_p.set_UVC(m.agents.directions.u()[:, 0],
                            m.agents.directions.u()[:, 1])
             t_time.set_text('Time: {:g}'.format(m.time.t))
@@ -50,9 +50,9 @@ def plot_1d(dirname):
     ax_vis = fig.add_subplot(211)
     ax_d = fig.add_subplot(212)
 
-    fnames = runner_utils.get_filenames(dirname)
+    fnames = output_utils.get_filenames(dirname)
 
-    m_0 = runner_utils.filename_to_model(fnames[0])
+    m_0 = output_utils.filename_to_model(fnames[0])
 
     L = m_0.agents.positions.L
     dx = L / 100.0
@@ -61,7 +61,7 @@ def plot_1d(dirname):
     ax_d.set_xlim(-L[0] / 2.0, L[0] / 2.0)
 
     plt.subplots_adjust(left=0.25, bottom=0.25)
-    plot_p = ax_vis.scatter(m_0.agents.positions.r[:, 0],
+    plot_p = ax_vis.scatter(m_0.agents.positions.r_w()[:, 0],
                             np.zeros([m_0.agents.n]))
 
     d = m_0.agents.positions.get_density_field(dx)
@@ -75,8 +75,8 @@ def plot_1d(dirname):
     def update(val):
         fname_i = int(round(val))
         if 0 <= fname_i < len(fnames):
-            m = runner_utils.filename_to_model(fnames[fname_i])
-            plot_p.set_offsets(np.array([m.agents.positions.r[:, 0],
+            m = output_utils.filename_to_model(fnames[fname_i])
+            plot_p.set_offsets(np.array([m.agents.positions.r_w()[:, 0],
                                          np.zeros([m.agents.n])]).T)
             ds = m.agents.positions.get_density_field(dx) / m.agent_density
             for rect, d in zip(plot_d, ds):
@@ -90,7 +90,7 @@ def plot_1d(dirname):
 
 
 def plot_vis(dirname):
-    dim = runner_utils.get_recent_model(dirname).dim
+    dim = output_utils.get_recent_model(dirname).dim
     if dim == 1:
         plot_1d(dirname)
     elif dim == 2:
