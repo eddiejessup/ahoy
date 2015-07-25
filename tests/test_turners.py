@@ -1,12 +1,12 @@
 from __future__ import print_function, division
 import numpy as np
-from ships import obstructers
+from ships import turners
 from ciabatta.vector import smallest_signed_angle as angle_dist
 import test
 
 
 class TestTurner(test.TestBase):
-    turner_cls = obstructers.Turner
+    turner_cls = turners.Turner
     left = np.pi
     right = 0.0
     up = np.pi / 2.0
@@ -56,7 +56,7 @@ class TestTurner(test.TestBase):
 
 
 class TestBounceBackTurner(TestTurner):
-    turner_cls = obstructers.BounceBackTurner
+    turner_cls = turners.BounceBackTurner
 
     def test_right_left(self):
         self.do_turning(self.left, self.right, self.left)
@@ -69,7 +69,7 @@ class TestBounceBackTurner(TestTurner):
 
 
 class TestReflectTurner(TestTurner):
-    turner_cls = obstructers.ReflectTurner
+    turner_cls = turners.ReflectTurner
 
     def test_right_left(self):
         self.do_turning(self.left, self.right, self.left)
@@ -109,7 +109,7 @@ class TestReflectTurner(TestTurner):
 
 
 class TestAlignTurner(TestTurner):
-    turner_cls = obstructers.AlignTurner
+    turner_cls = turners.AlignTurner
 
     def test_up_left(self):
         self.do_turning(self.left, self.up, self.up)

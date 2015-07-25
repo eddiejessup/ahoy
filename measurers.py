@@ -18,33 +18,6 @@ class Measurer(object):
     __metaclass__ = ABCMeta
 
 
-class TimeMeasurer(Measurer):
-
-    def __init__(self, time):
-        self.time = time
-
-    def get_time(self):
-        return self.time
-
-
-class PositionMeasurer(Measurer):
-
-    def __init__(self, positions):
-        self.positions = positions
-
-    def get_positions(self):
-        return self.positions
-
-
-class DirectionMeasurer(Measurer):
-
-    def __init__(self, directions):
-        self.directions = directions
-
-    def get_directions(self):
-        return self.directions
-
-
 class CMeasurer(Measurer):
     __metaclass__ = ABCMeta
 
@@ -55,12 +28,11 @@ class CMeasurer(Measurer):
 
 class LinearCMeasurer(CMeasurer):
 
-    def __init__(self, position_measurer):
-        self.position_measurer = position_measurer
+    def __init__(self, positions):
+        self.positions = positions
 
     def get_cs(self):
-        ps = self.position_measurer.get_positions()
-        return ps.r[:, 0]
+        return self.positions.r[:, 0]
 
 
 class GradCMeasurer(Measurer):
@@ -69,6 +41,16 @@ class GradCMeasurer(Measurer):
     @abstractmethod
     def get_grad_cs(self):
         return
+
+
+class FieldGradCMeasurer(GradCMeasurer):
+
+    def __init__(self, c_field, positions):
+        self.c_field = c_field
+        self.positions = positions
+
+    def get_grad_cs(self):
+        return self.c_field.get_grad_i(self.positions)
 
 
 class ConstantGradCMeasurer(GradCMeasurer):
@@ -91,14 +73,13 @@ class DcDxMeasurer(Measurer):
 
 class SpatialDcDxMeasurer(DcDxMeasurer):
 
-    def __init__(self, direction_measurer, grad_c_measurer):
-        self.direction_measurer = direction_measurer
+    def __init__(self, directions, grad_c_measurer):
+        self.directions = directions
         self.grad_c_measurer = grad_c_measurer
 
     def get_dc_dxs(self):
-        ds = self.direction_measurer.get_directions()
         grad_c = self.grad_c_measurer.get_grad_cs()
-        return np.sum(ds.u() * grad_c, axis=-1)
+        return np.sum(self.directions.u() * grad_c, axis=-1)
 
     def __repr__(self):
         return 'SpatialDcDxMeasurer()'
@@ -107,7 +88,7 @@ class SpatialDcDxMeasurer(DcDxMeasurer):
 class TemporalDcDxMeasurer(DcDxMeasurer):
 
     def __init__(self, c_measurer, v_0, dt_mem, t_mem, t_rot_0,
-                 time_measurer):
+                 time):
         self.c_measurer = c_measurer
         self.v_0 = v_0
         self.dt_mem = dt_mem
@@ -115,8 +96,7 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         n = self.c_measurer.get_cs().shape[0]
         self.K_dt = get_K(self.t_mem, self.dt_mem, t_rot_0) * self.dt_mem
         self.c_mem = CylinderBuffer(n, self.K_dt.shape[0])
-
-        self.time_measurer = time_measurer
+        self.time = time
 
         # Optimisation, only calculate dc_dx when c memory is updated.
         self.dc_dx_cache = np.zeros([n])
@@ -129,7 +109,7 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         return self.c_mem.integral_transform(self.K_dt) / self.v_0
 
     def iterate(self):
-        t_now = self.time_measurer.get_time().t
+        t_now = self.time.t
         if t_now - self.t_last_update > 0.99 * self.dt_mem:
             self._iterate()
             self.dc_dx_cache = self._get_dc_dxs()

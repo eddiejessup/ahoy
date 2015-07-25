@@ -11,10 +11,8 @@ class TestLinearSpatialDcDxMeasurer(test.TestBase):
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
         ds = directions.directions_factory(dim, u_0)
-        direction_measurer = measurers.DirectionMeasurer(ds)
         grad_c_measurer = measurers.ConstantGradCMeasurer(self.n, dim)
-        dc_dx_measurer = measurers.SpatialDcDxMeasurer(direction_measurer,
-                                                       grad_c_measurer)
+        dc_dx_measurer = measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
         dc_dxs = dc_dx_measurer.get_dc_dxs()
         self.assertTrue(np.allclose(dc_dxs, dc_dxs_expected))
 
@@ -71,15 +69,12 @@ class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
         time = stime.Time(self.dt)
-        time_measurer = measurers.TimeMeasurer(time)
         ps = MockPositions(dim, self.n, self.v_0, u_0)
-        position_measurer = measurers.PositionMeasurer(ps)
-        c_measurer = measurers.LinearCMeasurer(position_measurer)
+        c_measurer = measurers.LinearCMeasurer(ps)
         dc_dx_measurer = measurers.TemporalDcDxMeasurer(c_measurer, self.v_0,
                                                         self.dt_mem,
                                                         self.t_mem,
-                                                        self.t_rot_0,
-                                                        time_measurer)
+                                                        self.t_rot_0, time)
         while time.t < 2.0 * self.t_mem:
             ps.iterate(time.dt)
             dc_dxs = dc_dx_measurer.get_dc_dxs()
@@ -98,10 +93,8 @@ class TestChemoNoiseMeasurer1D(test.TestBase):
         self.v_0 = 2.2
 
     def run_valchemo(self, ds, chi, noise_expected):
-        direction_measurer = measurers.DirectionMeasurer(ds)
         grad_c_measurer = measurers.ConstantGradCMeasurer(self.n, self.dim)
-        dc_dx_measurer = measurers.SpatialDcDxMeasurer(direction_measurer,
-                                                       grad_c_measurer)
+        dc_dx_measurer = measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
         noise_measurer = self.noise_measurer_cls(self.noise_0, chi,
                                                  dc_dx_measurer)
         noise = noise_measurer.get_noise()

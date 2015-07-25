@@ -97,12 +97,14 @@ class Ships(object):
 
 class SpatialShips(Ships):
 
-    def __init__(self, time, agents, obstructer):
+    def __init__(self, time, agents, obstructer, food_field):
         super(SpatialShips, self).__init__(time, agents)
         self.obstructer = obstructer
+        self.food_field = food_field
 
     def iterate(self):
         self.agents.iterate(self.time.dt, self.obstructer)
+        self.food_field.iterate(self.agents.positions)
         self.time.iterate()
 
 

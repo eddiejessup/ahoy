@@ -3,13 +3,12 @@ from __future__ import print_function, division
 
 class Swimmers(object):
 
-    def __init__(self, v_0, direction_measurer):
+    def __init__(self, v_0, directions):
         self.v_0 = v_0
-        self.direction_measurer = direction_measurer
+        self.directions = directions
 
     def displace(self, positions, dt):
-        ds = self.direction_measurer.get_directions()
-        dr = self.v_0 * ds.u() * dt
+        dr = self.v_0 * self.directions.u() * dt
         positions.r += dr
         return positions, dr
 

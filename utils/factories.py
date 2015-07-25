@@ -7,7 +7,7 @@ from ships.measurers import noise_measurer_factory
 
 
 def model_factory(seed, dim, dt, n, aligned_flag, spatial_flag,
-                  v_0=None, origin_flag=None, L=None, obstructer=None,
+                  v_0=None, L=None, obstructer=None,
                   chi=None, onesided_flag=None,
                   p_0=None, tumble_chemo_flag=None,
                   Dr_0=None, rotation_chemo_flag=None,
@@ -54,29 +54,24 @@ def dc_dx_factory(spatial_chemo_flag,
                   ps=None, v_0=None, dt_mem=None, t_mem=None, p_0=None,
                   Dr_0=None, time=None):
     if spatial_chemo_flag:
-        direction_measurer = measurers.DirectionMeasurer(ds)
         n, dim = ds.n, ds.dim
         grad_c_measurer = measurers.ConstantGradCMeasurer(n, dim)
-        return measurers.SpatialDcDxMeasurer(direction_measurer,
-                                             grad_c_measurer)
+        return measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
     else:
         if ps is None:
             raise ValueError('Must have spatial agents to do temporal '
                              'chemotaxis')
-        position_measurer = measurers.PositionMeasurer(ps)
-        c_measurer = measurers.LinearCMeasurer(position_measurer)
+        c_measurer = measurers.LinearCMeasurer(ps)
         D_rot_0 = p_0 + Dr_0
         t_rot_0 = 1.0 / D_rot_0
-        time_measurer = measurers.TimeMeasurer(time)
         return measurers.TemporalDcDxMeasurer(c_measurer, v_0, dt_mem, t_mem,
-                                              t_rot_0, time_measurer)
+                                              t_rot_0, time)
 
 
 def agents_factory(spatial_flag, ds, rudder_sets,
                    v_0=None, ps=None):
     if spatial_flag:
-        direction_measurer = measurers.DirectionMeasurer(ds)
-        swimmers = ships.swimmers.Swimmers(v_0, direction_measurer)
+        swimmers = ships.swimmers.Swimmers(v_0, ds)
         return ships.agents.SpatialAgents(ds, ps, rudder_sets, swimmers)
     else:
         return ships.agents.Agents(ds, rudder_sets)

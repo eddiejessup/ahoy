@@ -1,6 +1,6 @@
 import numpy as np
 from ships.utils import factories
-from ships import obstructers
+from ships.obstructers import SingleSphereObstructer
 import test
 
 
@@ -12,15 +12,11 @@ class TestModel(test.TestBase):
             'n': 10,
             # Must have aligned flag False to test uniform directions function.
             'aligned_flag': False,
-
             'spatial_flag': True,
             'v_0': 1.5,
-            # Must have origin flag False to test uniform points function.
-            'origin_flag': False,
             # Must have at least one periodic axis to test uniform points
             # function.
-            'L': np.array([1.7, np.inf]),
-
+            'L': np.array([1.5, np.inf]),
             'chi': 0.1,
             'onesided_flag': True,
             # Must have tumbling to test tumbling function.
@@ -35,10 +31,13 @@ class TestModel(test.TestBase):
             't_mem': 5.0,
         }
 
-        turner = obstructers.Turner()
+        turner = obstructers.AlignTurner()
         R = 0.4
-        model_kwargs['obstructer'] = obstructers.SingleSphereObstructer(turner,
-                                                                        R)
+        obs = SingleSphereObstructer(turner, R)
+        model_kwargs['obstructer'] = obs
+        dx = np.array(model_kwargs['dim'] * [0.1])
+        mesh = obs.get_mesh(model_kwargs['L'], dx)
+        f = field.FoodField(dim, mesh, dt, D, delta, c_0=1.0)
 
         num_iterations = 1000
         rng_seed = 1

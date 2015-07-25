@@ -32,8 +32,7 @@ class SpatialAgents(Agents):
     def iterate(self, dt, obstructer):
         super(SpatialAgents, self).iterate(dt)
         self.positions, dr = self.swimmers.displace(self.positions, dt)
-        if obstructer is not None:
-            obstructer.obstruct(self.positions, dr, self.directions)
+        obstructer.obstruct(self.positions, dr, self.directions)
 
     def __repr__(self):
         repr_str = 'SAgents(n={},ds={},ps={},ruds={},sws={})'
