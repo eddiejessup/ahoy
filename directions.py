@@ -5,16 +5,21 @@ from ciabatta import vector, crandom
 
 class Directions1D(object):
 
-    def __init__(self, u_0=None, aligned_flag=None, n=None, rng=None):
-        if aligned_flag is not None:
-            if aligned_flag:
-                u_0 = get_aligned_directions(n, dim=1)
-            else:
-                u_0 = get_uniform_directions(n, dim=1, rng=rng)
+    def __init__(self, u_0):
         self.sign = np.sign(u_0[:, 0])
         self.sign_0 = self.sign.copy()
-        self.n, self.dim = u_0.shape
-        self.aligned_flag = np.all(self.sign_0 == 1)
+
+    @property
+    def n(self):
+        return self.u().shape[0]
+
+    @property
+    def dim(self):
+        return self.u().shape[1]
+
+    @property
+    def aligned_flag(self):
+        return np.all(self.u()[:, 0] == 1)
 
     def tumble(self, tumblers, rng=None):
         if rng is None:
@@ -35,21 +40,15 @@ class Directions1D(object):
             self.sign *= -1
 
     def __repr__(self):
-        return 'Ds1D(n={},align={:d})'.format(self.n, self.aligned_flag)
+        dct = {'n': self.n, 'aligned_flag': self.aligned_flag}
+        return '{}({})' % (self.__class__, dct)
 
 
 class Directions2D(Directions1D):
 
-    def __init__(self, u_0=None, aligned_flag=None, n=None, rng=None):
-        if aligned_flag is not None:
-            if aligned_flag:
-                u_0 = get_aligned_directions(n, dim=2)
-            else:
-                u_0 = get_uniform_directions(n, dim=2, rng=rng)
+    def __init__(self, u_0):
         self.th = np.arctan2(u_0[:, 1], u_0[:, 0])
         self.th_0 = self.th.copy()
-        self.n, self.dim = u_0.shape
-        self.aligned_flag = np.allclose(self.th_0, 0.0)
 
     def tumble(self, tumblers, rng=None):
         if rng is None:
@@ -77,14 +76,25 @@ class Directions2D(Directions1D):
             self.th += np.pi
 
     def __repr__(self):
-        return 'Ds2D(n={},align={:d})'.format(self.n, self.aligned_flag)
+        dct = {'n': self.n, 'aligned_flag': self.aligned_flag, 'rng': self.rng}
+        return '{}({})' % (self.__class__, dct)
 
 
-def directions_factory(dim, *args, **kwargs):
+def directions_factory(u_0):
+    dim = u_0.shape[1]
     if dim == 1:
-        return Directions1D(*args, **kwargs)
+        return Directions1D(u_0)
     elif dim == 2:
-        return Directions2D(*args, **kwargs)
+        return Directions2D(u_0)
+
+
+def make_directions(n, dim, aligned_flag=False, rng=None):
+    if aligned_flag:
+        u_0 = np.zeros([n, dim])
+        u_0[:, 0] = 1.0
+    else:
+        u_0 = get_uniform_directions(n, dim, rng)
+    return directions_factory(u_0)
 
 
 def get_uniform_directions(n, dim, rng=None):

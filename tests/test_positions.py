@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ships import positions
+from ahoy import positions
 import test
 
 
@@ -10,8 +10,9 @@ class TestPeriodicPositions1D(test.TestBase):
 
     def setUp(self):
         super(TestPeriodicPositions1D, self).setUp()
-        r_0 = positions.get_uniform_points(self.n, self.dim, self.L, self.rng)
-        self.ps = positions.positions_factory(self.L, r_0)
+        origin_flags = np.zeros([self.dim], dtype=np.bool)
+        self.ps = positions.positions_factory(self.n, self.dim, self.L,
+                                              origin_flags, self.rng)
 
     def test_wrapping_down(self):
         dr = np.zeros_like(self.ps.r)
@@ -41,8 +42,8 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
 
     def test_partial_infinite_boundaries(self):
         L = np.array([np.inf, 1.7])
-        r_0 = np.zeros([self.n, self.dim])
-        ps = positions.positions_factory(L, r_0)
+        ps = positions.positions_factory(self.n, self.dim, L,
+                                         np.array([False, False]), self.rng)
         dr = self.rng.uniform(-1.0, 1.0, size=ps.r.shape)
         ps.r += dr
         r_naive = ps.r_0[:, 0] + dr[:, 0]

@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ships import turners
+from ahoy import turners
 from ciabatta.vector import smallest_signed_angle as angle_dist
 import test
 

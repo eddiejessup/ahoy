@@ -13,4 +13,5 @@ class Swimmers(object):
         return positions, dr
 
     def __repr__(self):
-        return 'Swims(v={:g})'.format(self.v_0)
+        dct = {'v_0': self.v_0}
+        return '{}({})' % (self.__class__, dct)

@@ -1,5 +1,5 @@
 import numpy as np
-from ships import numerics
+from ahoy import numerics
 
 
 class RingBuffer(object):

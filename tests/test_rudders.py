@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import curve_fit
-from ships import directions, rudders, measurers
+from ahoy import directions, rudders, noise_measurers
 import test
 
 
@@ -11,13 +11,13 @@ class TestRotationRudders2D(test.TestBase):
         super(TestRotationRudders2D, self).setUp()
         self.dt = 0.005
         self.noise_0 = 2.0
-        self.noise_measurer = measurers.NoiseMeasurer(self.noise_0)
+        self.noise_measurer = noise_measurers.NoiseMeasurer(self.noise_0)
 
     def run_rudder_autocorrelation(self, dim, t_rot_expect):
         n = 10000
         t_max = 0.5
 
-        ds = directions.directions_factory(dim, aligned_flag=True, n=n)
+        ds = directions.make_directions(n, dim, aligned_flag=True)
         rudders = self.rudders_cls(self.noise_measurer, self.rng)
 
         u_0 = ds.u()
@@ -42,14 +42,14 @@ class TestRotationRudders2D(test.TestBase):
 
         rng = np.random.RandomState(rng_seed)
         np.random.seed(2)
-        ds_1 = directions.directions_factory(dim, aligned_flag=True, n=n)
+        ds_1 = directions.make_directions(n, dim, aligned_flag=True)
         ruds_1 = self.rudders_cls(self.noise_measurer, rng)
         for _ in range(num_iterations):
             ds_1 = ruds_1.rotate(ds_1, self.dt)
 
         rng = np.random.RandomState(rng_seed)
         np.random.seed(3)
-        ds_2 = directions.directions_factory(dim, aligned_flag=True, n=n)
+        ds_2 = directions.make_directions(n, dim, aligned_flag=True)
         ruds_2 = self.rudders_cls(self.noise_measurer, rng)
         for _ in range(num_iterations):
             ds_2 = ruds_2.rotate(ds_2, self.dt)
@@ -70,11 +70,11 @@ class TestTumbleRudders(TestRotationRudders2D):
         n = 1000
         dt = 1.0
         p = self.rng.uniform(0.0, 1.0, size=n)
-        noise_measurer = measurers.NoiseMeasurer(p)
+        noise_measurer = noise_measurers.NoiseMeasurer(p)
 
         n_expected = (p * dt).sum() / 2.0
-        ds = directions.directions_factory(dim, aligned_flag=False, n=n,
-                                           rng=self.rng)
+        ds = directions.make_directions(n, dim, aligned_flag=False,
+                                        rng=self.rng)
         u_0 = ds.u()
         ruds = rudders.TumbleRudders(noise_measurer, self.rng)
         ds_rot = ruds.rotate(ds, dt)

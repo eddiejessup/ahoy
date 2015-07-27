@@ -10,3 +10,7 @@ class Time(object):
     def iterate(self):
         self.t += self.dt
         self.i += 1
+
+    def __repr__(self):
+        dct = {'t': self.t, 'i': self.i, 'dt': self.dt}
+        return '{}({})' % (self.__class__, dct)

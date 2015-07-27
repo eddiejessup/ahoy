@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from ships.ring_buffer import CylinderBuffer
+from ahoy.ring_buffer import CylinderBuffer
 
 
 def get_K(t, dt, t_rot_0):
@@ -26,6 +26,20 @@ class CMeasurer(Measurer):
         return
 
 
+class FieldCMeasurer(CMeasurer):
+
+    def __init__(self, c_field, positions):
+        self.c_field = c_field
+        self.positions = positions
+
+    def get_cs(self):
+        return self.c_field.get_val_i(self.positions)
+
+    def __repr__(self):
+        dct = {'c_field': self.c_field}
+        return '{}({})' % (self.__class__, dct)
+
+
 class LinearCMeasurer(CMeasurer):
 
     def __init__(self, positions):
@@ -33,6 +47,10 @@ class LinearCMeasurer(CMeasurer):
 
     def get_cs(self):
         return self.positions.r[:, 0]
+
+    def __repr__(self):
+        dct = {}
+        return '{}({})' % (self.__class__, dct)
 
 
 class GradCMeasurer(Measurer):
@@ -52,6 +70,10 @@ class FieldGradCMeasurer(GradCMeasurer):
     def get_grad_cs(self):
         return self.c_field.get_grad_i(self.positions)
 
+    def __repr__(self):
+        dct = {'c_field': self.c_field}
+        return '{}({})' % (self.__class__, dct)
+
 
 class ConstantGradCMeasurer(GradCMeasurer):
 
@@ -59,8 +81,20 @@ class ConstantGradCMeasurer(GradCMeasurer):
         self.grad_c = np.zeros([n, dim])
         self.grad_c[:, 0] = 1.0
 
+    @property
+    def n(self):
+        return self.grad_c.shape[0]
+
+    @property
+    def dim(self):
+        return self.grad_c.shape[1]
+
     def get_grad_cs(self):
         return self.grad_c
+
+    def __repr__(self):
+        dct = {}
+        return '{}({})' % (self.__class__, dct)
 
 
 class DcDxMeasurer(Measurer):
@@ -82,7 +116,8 @@ class SpatialDcDxMeasurer(DcDxMeasurer):
         return np.sum(self.directions.u() * grad_c, axis=-1)
 
     def __repr__(self):
-        return 'SpatialDcDxMeasurer()'
+        dct = {'grad_c_measurer': self.grad_c_measurer}
+        return '{}({})' % (self.__class__, dct)
 
 
 class TemporalDcDxMeasurer(DcDxMeasurer):
@@ -93,7 +128,8 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         self.v_0 = v_0
         self.dt_mem = dt_mem
         self.t_mem = t_mem
-        n = self.c_measurer.get_cs().shape[0]
+        cs = self.c_measurer.get_cs()
+        n = cs.shape[0]
         self.K_dt = get_K(self.t_mem, self.dt_mem, t_rot_0) * self.dt_mem
         self.c_mem = CylinderBuffer(n, self.K_dt.shape[0])
         self.time = time
@@ -103,7 +139,8 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         self.t_last_update = 0.0
 
     def _iterate(self):
-        self.c_mem.update(self.c_measurer.get_cs())
+        cs = self.c_measurer.get_cs()
+        self.c_mem.update(cs)
 
     def _get_dc_dxs(self):
         return self.c_mem.integral_transform(self.K_dt) / self.v_0
@@ -120,60 +157,38 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         return self.dc_dx_cache
 
     def __repr__(self):
-        return 'TemporalDcDxMeasurer(dtmem={:g},tmem={:g})'.format(self.dt_mem,
-                                                                   self.t_mem)
+        dct = {'c_measurer': self.c_measurer, 'v_0': self.v_0,
+               'dt_mem': self.dt_mem, 't_mem': self.t_mem,
+               't_last_update': self.t_last_update}
+        return '{}({})' % (self.__class__, dct)
 
 
-class NoiseMeasurer(Measurer):
-
-    def __init__(self, noise_0, *args, **kwargs):
-        self.noise_0 = noise_0
-
-    def get_noise(self):
-        return self.noise_0
-
-    def __repr__(self):
-        return 'Noise(n0={:g})'.format(self.noise_0)
-
-
-class ChemoNoiseMeasurer(NoiseMeasurer):
-
-    def __init__(self, noise_0, chi, dc_dx_measurer):
-        NoiseMeasurer.__init__(self, noise_0)
-        self.chi = chi
-        self.dc_dx_measurer = dc_dx_measurer
-
-    def get_noise(self):
-        dc_dxs = self.dc_dx_measurer.get_dc_dxs()
-        return self.noise_0 * (1.0 - self.chi * dc_dxs)
-
-    def __repr__(self):
-        return 'CNoise2(n0={:g},chi={:g},meas={})'.format(self.noise_0,
-                                                          self.chi,
-                                                          self.dc_dx_measurer)
-
-
-class OneSidedChemoNoiseMeasurer(ChemoNoiseMeasurer):
-
-    def get_noise(self):
-        noise_two_sided = super(OneSidedChemoNoiseMeasurer, self).get_noise()
-        return np.minimum(self.noise_0, noise_two_sided)
-
-    def __repr__(self):
-        return 'CNoise1(n0={:g},chi={:g},meas={})'.format(self.noise_0,
-                                                          self.chi,
-                                                          self.dc_dx_measurer)
-
-
-def chemo_noise_measurer_factory(onesided_flag, *args, **kwargs):
-    if onesided_flag:
-        return ChemoNoiseMeasurer(*args, **kwargs)
+def dc_dx_factory(spatial_chemo_flag,
+                  ds=None,
+                  ps=None, v_0=None, dt_mem=None, t_mem=None, p_0=None,
+                  Dr_0=None, time=None,
+                  c_field=None):
+    if spatial_chemo_flag:
+        return spatial_dc_dx_factory(ds, c_field, ps)
     else:
-        return OneSidedChemoNoiseMeasurer(*args, **kwargs)
+        return temporal_dc_dx_factory(ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
+                                      c_field)
 
 
-def noise_measurer_factory(chemo_flag, onesided_flag, *args, **kwargs):
-    if chemo_flag:
-        return chemo_noise_measurer_factory(onesided_flag, *args, **kwargs)
+def spatial_dc_dx_factory(ds, c_field=None, ps=None):
+    if c_field is None:
+        grad_c_measurer = ConstantGradCMeasurer(ds.n, ds.dim)
     else:
-        return NoiseMeasurer(*args, **kwargs)
+        grad_c_measurer = FieldGradCMeasurer(c_field, ps)
+    return SpatialDcDxMeasurer(ds, grad_c_measurer)
+
+
+def temporal_dc_dx_factory(ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
+                           c_field=None):
+    if c_field is None:
+        c_measurer = LinearCMeasurer(ps)
+    else:
+        c_measurer = FieldCMeasurer(c_field, ps)
+    D_rot_0 = p_0 + Dr_0
+    t_rot_0 = 1.0 / D_rot_0
+    return TemporalDcDxMeasurer(c_measurer, v_0, dt_mem, t_mem, t_rot_0, time)

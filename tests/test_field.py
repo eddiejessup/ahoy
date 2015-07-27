@@ -2,64 +2,61 @@ from __future__ import print_function, division
 from itertools import product
 import numpy as np
 from scipy.stats import multivariate_normal
-from ships import positions, field
+from ahoy import positions, field
+from ahoy.mesh import uniform_mesh_factory
 import test
 
 
 class TestMesh(test.TestBase):
 
     def test_uniform_mesh_1d(self):
-        dim = 1
-        L = np.array([1.7])
+        L = np.array([1.8])
         dx = np.array([0.1])
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
-        print(mesh.cellCenters.value)
-        self.assertTrue(mesh.cellCenters.value.max() < L[0])
-        self.assertTrue(np.isclose(mesh.cellCenters.value.min(),
-                        dx[0] / 2.0))
+        mesh = uniform_mesh_factory(L, dx)
+        self.assertTrue(mesh.cellCenters.value.max() < L[0] / 2.0)
+        self.assertTrue(mesh.cellCenters.value.min() > -L[0] / 2.0)
 
     def test_uniform_mesh_2d(self):
         dim = 2
         L = np.array([1.7, 3.0])
         dx = np.array([0.1, 0.2])
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
+        mesh = uniform_mesh_factory(L, dx)
         for i_dim in range(dim):
             self.assertTrue(mesh.cellCenters[i_dim, :].value.max() <
-                            L[i_dim])
-            self.assertTrue(np.isclose(mesh.cellCenters[i_dim, :].value.min(),
-                            dx[i_dim] / 2.0))
+                            L[i_dim] / 2.0)
+            self.assertTrue(mesh.cellCenters[i_dim, :].value.min()
+                            > -L[i_dim] / 2.0)
 
 
 def get_nearest_cell_ids_manual(f, ps):
-    rs = (ps.r + ps.L / 2.0).T
+    rs = ps.r_w().T
     ccs = f.mesh.cellCenters.value
-    drs = ccs[:, np.newaxis, :] - rs[:, :, np.newaxis]
+    drs = np.abs(ccs[:, np.newaxis, :] - rs[:, :, np.newaxis])
+    for i_dim in range(ps.dim):
+        drs[i_dim] = np.minimum(drs[i_dim], ps.L[i_dim] - drs[i_dim])
     dr_mags = np.sum(np.square(drs), axis=0)
-    cids = np.argmin(dr_mags, axis=1)
-    return cids
+    return np.argmin(dr_mags, axis=1)
 
 
 class TestField(test.TestBase):
 
     def test_field_1d(self):
-        dim = 1
         L = np.array([1.6])
+        dim = L.shape[0]
         dx = np.array([0.1])
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
+        mesh = uniform_mesh_factory(L, dx)
         f = field.Field(dim, mesh)
 
-        x_vals = [-L[0] / 2.0, -0.312, 0.01, 0.121, L[0] / 2.0]
+        x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
         rs_special = np.array(list(product(x_vals)))
-        rs = np.append(np.random.uniform(-0.5, 0.5, size=(100, dim)),
-                       rs_special, axis=0)
+        rs_random = positions.get_uniform_points(1, dim, L, rng=self.rng)
+        rs = np.append(rs_random, rs_special, axis=0)
         ps = positions.PeriodicPositions(L, rs)
         cids = f.get_nearest_cell_ids(ps)
         cids_manual = get_nearest_cell_ids_manual(f, ps)
-        print(cids)
-        print(cids_manual)
         self.assertTrue(np.allclose(cids, cids_manual))
 
     def test_field_2d(self):
@@ -67,19 +64,17 @@ class TestField(test.TestBase):
         L = np.array([1.6, 3.0])
         dx = np.array([0.1, 0.2])
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
+        mesh = uniform_mesh_factory(L, dx)
         f = field.Field(dim, mesh)
 
-        x_vals = [-L[0] / 2.0, -0.312, 0.01, 0.121, L[0] / 2.0]
-        y_vals = [-L[1] / 2.0, -0.312, 0.01, 0.121, L[1] / 2.0]
+        x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
+        y_vals = [-L[1] / 1.99632, -0.312, 0.01, 0.121, L[1] / 2.0021]
         rs_special = np.array(list(product(x_vals, y_vals)))
-        rs = np.append(np.random.uniform(-0.5, 0.5, size=(100, dim)),
+        rs = np.append(self.rng.uniform(-0.5, 0.5, size=(100, dim)),
                        rs_special, axis=0)
         ps = positions.PeriodicPositions(L, rs)
         cids = f.get_nearest_cell_ids(ps)
         cids_manual = get_nearest_cell_ids_manual(f, ps)
-        print(cids)
-        print(cids_manual)
         self.assertTrue(np.allclose(cids, cids_manual))
 
 
@@ -89,8 +84,8 @@ class TestFoodField(TestField):
         dim = len(L)
         rho_expected = np.product(dx)
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
-        r_centers = mesh.cellCenters.value.T - L / 2.0
+        mesh = uniform_mesh_factory(L, dx)
+        r_centers = mesh.cellCenters.value.T
         ps_centers = positions.PeriodicPositions(L, r_centers)
 
         dt = 1.0
@@ -115,8 +110,8 @@ class TestFoodField(TestField):
         dim = len(L)
         rho_expected = np.product(dx)
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
-        r_centers = mesh.cellCenters.value.T - L / 2.0
+        mesh = uniform_mesh_factory(L, dx)
+        r_centers = mesh.cellCenters.value.T
         ps_centers = positions.PeriodicPositions(L, r_centers)
 
         dt = 0.01
@@ -147,13 +142,13 @@ class TestFoodField(TestField):
         delta = 0.0
         c_0 = 1.0
 
-        mesh = field.uniform_mesh_factory(dim, L, dx)
-        r_centers = mesh.cellCenters.value.T - L / 2.0
+        mesh = uniform_mesh_factory(L, dx)
+        r_centers = mesh.cellCenters.value.T
         r_centers_mag = np.sqrt(np.sum(np.square(r_centers), axis=-1))
         i_center = np.argmin(r_centers_mag)
         c_0_array = np.zeros(mesh.cellCenters.shape[1])
         c_0_array[i_center] = c_0
-        ps = positions.PeriodicPositions(L, np.zeros((1, 1)))
+        ps = positions.PeriodicPositions(L, np.zeros((1, dim)))
 
         f = field.FoodField(dim, mesh, dt, D, delta, c_0_array)
         for t in np.arange(0.0, t_max, dt):

@@ -8,8 +8,18 @@ class Positions(object):
     def __init__(self, r_0):
         self.r = r_0
         self.r_0 = self.r.copy()
-        self.n, self.dim = self.r.shape
-        self.origin_flag = np.allclose(self.r_0, 0.0)
+
+    @property
+    def n(self):
+        return self.r.shape[0]
+
+    @property
+    def dim(self):
+        return self.r.shape[1]
+
+    @property
+    def origin_flag(self):
+        return np.allclose(self.r_0, 0.0)
 
     def r_mag(self):
         return vector.vector_mag(self.r)
@@ -27,7 +37,8 @@ class Positions(object):
         return vector.vector_mag(self.r_w())
 
     def __repr__(self):
-        return 'Pos(n={},origin={:d})'.format(self.n, self.origin_flag)
+        dct = {'n': self.n, 'dim': self.dim, 'origin_flag': self.origin_flag}
+        return '{}({})' % (self.__class__, dct)
 
 
 class PeriodicPositions(Positions):
@@ -35,7 +46,10 @@ class PeriodicPositions(Positions):
     def __init__(self, L, r_0):
         super(PeriodicPositions, self).__init__(r_0)
         self.L = L
-        self.volume = np.product(self.L)
+
+    @property
+    def volume(self):
+        return np.product(self.L)
 
     def get_density_field(self, dx):
         return fields.density(self.r_w(), self.L, dx)
@@ -61,31 +75,38 @@ class PeriodicPositions(Positions):
         return [format_inf(e) for e in self.L]
 
     def __repr__(self):
-        return 'PeriodPos(n={},L={},origin={:d})'.format(self.n, self.L_repr(),
-                                                         self.origin_flag)
+        dct = {'n': self.n, 'dim': self.dim, 'L': self.L,
+               'origin_flag': self.origin_flag}
+        return '{}({})' % (self.__class__, dct)
 
 
-def positions_factory(L, r_0):
+def positions_factory(n, dim, L=None, origin_flags=None, rng=None,
+                      obstructor=None):
     if L is None or np.all(np.isinf(L)):
+        r_0 = np.zeros([n, dim])
         return Positions(r_0)
     else:
+        r_0 = get_uniform_points(n, dim, L, origin_flags, rng, obstructor)
         return PeriodicPositions(L, r_0)
 
 
-def get_uniform_points(n, dim, L, rng=None, obstructors=None):
+def get_uniform_points(n, dim, L, origin_flags=None, rng=None,
+                       obstructor=None):
+    if origin_flags is None:
+        origin_flags = np.zeros([dim], dtype=np.bool)
     if rng is None:
         rng = np.random
     r = np.zeros([n, dim])
     for i_n in range(n):
         while True:
             for i_dim in range(dim):
-                if L is not None and np.isfinite(L[i_dim]):
+                if np.isinf(L[i_dim]) or origin_flags[i_dim]:
+                    r[i_n, i_dim] = 0.0
+                else:
                     r[i_n, i_dim] = rng.uniform(-L[i_dim] / 2.0,
                                                 L[i_dim] / 2.0)
-                else:
-                    r[i_n, i_dim] = 0.0
-            if obstructors is None:
+            if obstructor is None:
                 break
-            elif not obstructors.get_obstructeds(r[i_n]):
+            elif not obstructor.get_obstructeds(np.array([r[i_n]])):
                 break
     return r

@@ -4,5 +4,5 @@ import measurers
 import rudders
 import swimmers
 import agents
-import model
+import ships
 import stime

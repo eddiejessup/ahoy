@@ -2,8 +2,10 @@ from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
+from ciabatta.ejm_rcparams import reds_cmap
 from agaro import output_utils
 import utils
+from ahoy.utils.var_plot import VarPlot
 
 
 def plot_2d(dirname):
@@ -20,6 +22,10 @@ def plot_2d(dirname):
     ax_vis.set_aspect('equal')
 
     plt.subplots_adjust(left=0.25, bottom=0.25)
+    has_c_field = hasattr(m_0, 'c_field')
+    if has_c_field:
+        plot_c = VarPlot(m_0.c_field.c, cmap=reds_cmap, axes=ax_vis)
+    print(has_c_field)
     plot_p = ax_vis.quiver(m_0.agents.positions.r_w()[:, 0],
                            m_0.agents.positions.r_w()[:, 1],
                            m_0.agents.directions.u()[:, 0],
@@ -34,10 +40,13 @@ def plot_2d(dirname):
         fname_i = int(round(val))
         if 0 <= fname_i < len(fnames):
             m = output_utils.filename_to_model(fnames[fname_i])
+            if has_c_field:
+                plot_c.update(m.c_field.c)
             plot_p.set_offsets(m.agents.positions.r_w())
             plot_p.set_UVC(m.agents.directions.u()[:, 0],
                            m.agents.directions.u()[:, 1])
             t_time.set_text('Time: {:g}'.format(m.time.t))
+
             fig.canvas.draw_idle()
 
     t_slider.on_changed(update)
