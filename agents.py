@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+from ahoy.utils.meta import make_repr_str
 from ahoy import directions, measurers, rudders, positions, swimmers
 
 
@@ -18,8 +19,9 @@ class Agents(object):
                 return ruds.get_chi()
 
     def __repr__(self):
-        dct = {'directions': self.directions, 'rudder_sets': self.rudder_sets}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('directions', self.directions),
+              ('rudder_sets', self.rudder_sets)]
+        return make_repr_str(self, fs)
 
 
 class SpatialAgents(Agents):
@@ -35,9 +37,9 @@ class SpatialAgents(Agents):
         obstructor.obstruct(self.positions, dr, self.directions)
 
     def __repr__(self):
-        dct = {'directions': self.directions, 'positions': self.positions,
-               'rudder_sets': self.rudder_sets, 'swimmers': self.swimmers}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('directions', self.directions), ('positions', self.positions),
+              ('rudder_sets', self.rudder_sets), ('swimmers', self.swimmers)]
+        return make_repr_str(self, fs)
 
 
 def agents_factory(rng, dim, n, aligned_flag,

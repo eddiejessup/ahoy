@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from ciabatta.ejm_rcparams import reds_cmap
 from agaro import output_utils
-import utils
-from ahoy.utils.var_plot import VarPlot
+from ahoy.utils import utils
+from ahoy.plot.var_plot import VarPlot
 
 
 def plot_2d(dirname):
@@ -190,14 +190,61 @@ def plot_t_u_nets_vector(dirname):
     plt.show()
 
 
-def plot_chi_uds_scalar(dirnames):
+def plot_chi_uds_x(dirnames):
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    chis, uds = utils.chi_uds_scalar(dirnames)
+    chis, uds = utils.chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
     chis, uds = chis[i_sort], uds[i_sort]
-    ax.plot(chis, uds)
+    ax.scatter(chis, uds)
+    ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 1.1)
+
+    plt.show()
+
+
+def plot_pf_Ds_scalar(dirnames):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    pfs, Ds = utils.pf_Ds_scalar(dirnames)
+    i_sort = np.argsort(pfs)
+    pfs, Ds = pfs[i_sort], Ds[i_sort]
+    ax.scatter(pfs, Ds)
+    ax.set_xlim(-0.02, 1.0)
+    ax.set_ylim(0.0, 410.0)
+
+    plt.show()
+
+
+def plot_Dr_0_Ds_scalar(dirnames):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    Dr_0s, Ds = utils.Dr_0_Ds_scalar(dirnames)
+    i_sort = np.argsort(Dr_0s)
+    Dr_0s, Ds = Dr_0s[i_sort], Ds[i_sort]
+    ax.scatter(Dr_0s, Ds)
+    # ax.set_xlim(-0.02, 1.0)
+    # ax.set_ylim(0.0, 410.0)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    plt.show()
+
+
+def plot_p_0_Ds_scalar(dirnames):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    p_0s, Ds = utils.p_0_Ds_scalar(dirnames)
+    i_sort = np.argsort(p_0s)
+    p_0s, Ds = p_0s[i_sort], Ds[i_sort]
+    ax.scatter(p_0s, Ds)
+    # ax.set_xlim(-0.02, 1.0)
+    # ax.set_ylim(0.0, 410.0)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
 
     plt.show()

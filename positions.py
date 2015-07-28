@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import fields, vector
+from ahoy.utils.meta import make_repr_str
 
 
 class Positions(object):
@@ -37,8 +38,9 @@ class Positions(object):
         return vector.vector_mag(self.r_w())
 
     def __repr__(self):
-        dct = {'n': self.n, 'dim': self.dim, 'origin_flag': self.origin_flag}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('n', self.n), ('dim', self.dim),
+              ('origin_flag', self.origin_flag)]
+        return make_repr_str(self, fs)
 
 
 class PeriodicPositions(Positions):
@@ -75,9 +77,9 @@ class PeriodicPositions(Positions):
         return [format_inf(e) for e in self.L]
 
     def __repr__(self):
-        dct = {'n': self.n, 'dim': self.dim, 'L': self.L,
-               'origin_flag': self.origin_flag}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('n', self.n), ('dim', self.dim), ('L', self.L),
+              ('origin_flag', self.origin_flag)]
+        return make_repr_str(self, fs)
 
 
 def positions_factory(n, dim, L=None, origin_flags=None, rng=None,
@@ -107,6 +109,6 @@ def get_uniform_points(n, dim, L, origin_flags=None, rng=None,
                                                 L[i_dim] / 2.0)
             if obstructor is None:
                 break
-            elif not obstructor.get_obstructeds(np.array([r[i_n]])):
+            elif not obstructor.get_obstructeds(np.array([r[i_n]]))[0]:
                 break
     return r

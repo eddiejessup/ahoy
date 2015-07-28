@@ -3,6 +3,7 @@ from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
 from ahoy import noise_measurers
+from ahoy.utils.meta import make_repr_str
 from ahoy.noise_measurers import noise_measurer_factory
 
 
@@ -32,18 +33,8 @@ class Rudders(object):
             return None
 
     def __repr__(self):
-        dct = {'noise_measurer': self.noise_measurer, 'rng': self.rng}
-        return '{}({})' % (self.__class__, dct)
-
-
-class TumbleRudders(Rudders):
-
-    def _get_tumblers(self, directions, noise, dt):
-        return self.rng.uniform(size=directions.n) < noise * dt
-
-    def _rotate(self, directions, noise, dt):
-        tumblers = self._get_tumblers(directions, dt, noise)
-        return directions.tumble(tumblers, self.rng)
+        fs = [('noise_measurer', self.noise_measurer), ('rng', self.rng)]
+        return make_repr_str(self, fs)
 
 
 class RotationRudders(Rudders):
@@ -64,8 +55,15 @@ class RotationRudders2D(RotationRudders):
         return self.rng.normal(scale=np.sqrt(2.0 * noise * dt),
                                size=directions.n)
 
-    def __repr__(self):
-        return 'Rotors2D(noise={})'.format(self.noise_measurer)
+
+class TumbleRudders(Rudders):
+
+    def _get_tumblers(self, directions, noise, dt):
+        return self.rng.uniform(size=directions.n) < noise * dt
+
+    def _rotate(self, directions, noise, dt):
+        tumblers = self._get_tumblers(directions, dt, noise)
+        return directions.tumble(tumblers, self.rng)
 
 
 def rotation_rudders_factory(dim, *args, **kwargs):

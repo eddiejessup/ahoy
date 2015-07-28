@@ -2,6 +2,7 @@ from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
 from ciabatta import vector, pack, distance, geom
+from ahoy.utils.meta import make_repr_str
 from ahoy import mesh
 
 
@@ -17,8 +18,8 @@ class NoneObstructor(object):
         return mesh.uniform_mesh_factory(L, dx)
 
     def __repr__(self):
-        dct = {}
-        return '{}({})'.format(self.__class__, dct)
+        fs = []
+        return make_repr_str(self, fs)
 
 
 class BaseObstructor(NoneObstructor):
@@ -65,8 +66,8 @@ class SphereObstructor(BaseObstructor):
         self.turner.turn(obs, ds, normals)
 
     def __repr__(self):
-        dct = {'turner': self.turner, 'R': self.R}
-        return '{}({})'.format(self.__class__, dct)
+        fs = [('turner', self.turner), ('R', self.R)]
+        return make_repr_str(self, fs)
 
 
 class SphereObstructor2D(SphereObstructor):
@@ -90,7 +91,18 @@ class PorousObstructor(SphereObstructor2D):
     def __init__(self, turner, R, L, pf, rng):
         super(PorousObstructor, self).__init__(turner, R)
         self.L = L
-        self.rs, self.R = pack.pack_simple(self.R, self.L, pf=pf, rng=rng)
+        self.rs, self.R = pack.pack(self.R, self.L, pf=pf, rng=rng)
+
+    def obstruct(self, *args, **kwargs):
+        if self.rs.shape[0]:
+            super(PorousObstructor, self).obstruct(*args, **kwargs)
+
+    def get_obstructeds(self, *args, **kwargs):
+        if self.rs.shape[0]:
+            return super(PorousObstructor, self).get_obstructeds(*args,
+                                                                 **kwargs)
+        else:
+            return NoneObstructor.get_obstructeds(self, *args, **kwargs)
 
     @property
     def volume(self):
@@ -98,7 +110,7 @@ class PorousObstructor(SphereObstructor2D):
 
     @property
     def dim(self):
-        return self.rs.shape[1]
+        return self.L.shape[0]
 
     @property
     def n(self):
@@ -119,6 +131,6 @@ class PorousObstructor(SphereObstructor2D):
         return mesh.porous_mesh_factory(self.rs, self.R, dx[0], L)
 
     def __repr__(self):
-        dct = {'turner': self.turner, 'R': self.R, 'L': self.L,
-               'fraction_occupied': self.fraction_occupied, 'rng': self.rng}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('turner', self.turner), ('R', self.R), ('L', self.L),
+              ('fraction_occupied', self.fraction_occupied)]
+        return make_repr_str(self, fs)

@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import vector, crandom
+from ahoy.utils.meta import make_repr_str
 
 
 class Directions1D(object):
@@ -21,27 +22,21 @@ class Directions1D(object):
     def aligned_flag(self):
         return np.all(self.u()[:, 0] == 1)
 
-    def tumble(self, tumblers, rng=None):
-        if rng is None:
-            rng = np.random
-        self.sign[tumblers] = crandom.randbool(tumblers.sum(), rng=rng)
-        return self
-
     def u(self):
         return self.sign[:, np.newaxis].copy()
 
     def u_0(self):
         return self.sign_0[:, np.newaxis].copy()
 
-    def reverse(self, mask=None):
-        if mask is not None:
-            self.sign[mask] *= -1
-        else:
-            self.sign *= -1
+    def tumble(self, tumblers, rng=None):
+        if rng is None:
+            rng = np.random
+        self.sign[tumblers] = crandom.randbool(tumblers.sum(), rng=rng)
+        return self
 
     def __repr__(self):
-        dct = {'n': self.n, 'aligned_flag': self.aligned_flag}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('n', self.n), ('aligned_flag', self.aligned_flag)]
+        return make_repr_str(self, fs)
 
 
 class Directions2D(Directions1D):
@@ -49,6 +44,15 @@ class Directions2D(Directions1D):
     def __init__(self, u_0):
         self.th = np.arctan2(u_0[:, 1], u_0[:, 0])
         self.th_0 = self.th.copy()
+
+    def _th_to_u(self, th):
+        return np.array([np.cos(th), np.sin(th)]).T
+
+    def u(self):
+        return self._th_to_u(self.th)
+
+    def u_0(self):
+        return self._th_to_u(self.th_0)
 
     def tumble(self, tumblers, rng=None):
         if rng is None:
@@ -60,24 +64,9 @@ class Directions2D(Directions1D):
         self.th += dth
         return self
 
-    def _th_to_u(self, th):
-        return np.array([np.cos(th), np.sin(th)]).T
-
-    def u(self):
-        return self._th_to_u(self.th)
-
-    def u_0(self):
-        return self._th_to_u(self.th_0)
-
-    def reverse(self, mask=None):
-        if mask is not None:
-            self.th[mask] += np.pi
-        else:
-            self.th += np.pi
-
     def __repr__(self):
-        dct = {'n': self.n, 'aligned_flag': self.aligned_flag, 'rng': self.rng}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('n', self.n), ('aligned_flag', self.aligned_flag)]
+        return make_repr_str(self, fs)
 
 
 def directions_factory(u_0):

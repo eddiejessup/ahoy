@@ -1,12 +1,11 @@
 import numpy as np
 import fipy
 from fipy.meshes import gmshMesh
-import gmshpy
 
 # gmshpy.GmshSetOption('Mesh', 'ChacoSeed', 1.0)
 
 
-def get_rectangle_loop(m, L, dx):
+def _get_rectangle_loop(m, L, dx):
     p_nw = m.addVertex(-L[0] / 2, L[1] / 2, 0.0, dx)
     p_ne = m.addVertex(L[0] / 2, L[1] / 2, 0.0, dx)
     p_se = m.addVertex(L[0] / 2, -L[1] / 2, 0.0, dx)
@@ -24,7 +23,7 @@ def get_rectangle_loop(m, L, dx):
     return line_loop
 
 
-def get_circle_loop(m, r, R, dx):
+def _get_circle_loop(m, r, R, dx):
     p_w = m.addVertex(r[0] - R, r[1], 0, dx)
     p_n = m.addVertex(r[0], r[1] + R, 0, dx)
     p_e = m.addVertex(r[0] + R, r[1], 0, dx)
@@ -43,28 +42,30 @@ def get_circle_loop(m, r, R, dx):
     return line_loop
 
 
-def single_sphere_mesh_factory(r, R, dx, L):
+def _single_sphere_gmodel_factory(r, R, dx, L):
+    import gmshpy
     m = gmshpy.GModel()
-    outer_loop = get_rectangle_loop(m, L, dx)
-    circle_loop = get_circle_loop(m, r, R, dx)
+    outer_loop = _get_rectangle_loop(m, L, dx)
+    circle_loop = _get_circle_loop(m, r, R, dx)
     m.addPlanarFace([outer_loop, circle_loop])
-    return gmodel_to_fipy_mesh(m)
+    return m
 
 
-def porous_gmodel_factory(rs, R, dx, L):
+def _porous_gmodel_factory(rs, R, dx, L):
+    import gmshpy
     m = gmshpy.GModel()
-    outer_loop = get_rectangle_loop(m, L, dx)
+    outer_loop = _get_rectangle_loop(m, L, dx)
     edges = [outer_loop]
     for r in rs:
-        circle_loop = get_circle_loop(m, r, R, dx)
+        circle_loop = _get_circle_loop(m, r, R, dx)
         edges.append(circle_loop)
     m.addPlanarFace(edges)
     return m
 
 
-def porous_mesh_factory(rs, R, dx, L):
-    m = porous_gmodel_factory(rs, R, dx, L)
-    return gmodel_to_fipy_mesh(m)
+def _gmodel_to_fipy_mesh(m, temp_fname='temp.geo'):
+    m.writeGEO(temp_fname)
+    return gmshMesh.Gmsh2D(temp_fname)
 
 
 def uniform_mesh_factory(L, dx):
@@ -77,9 +78,14 @@ def uniform_mesh_factory(L, dx):
                            origin=((-L[0] / 2.0,), (-L[1] / 2.0,)))
 
 
-def gmodel_to_fipy_mesh(m, temp_fname='temp.geo'):
-    m.writeGEO(temp_fname)
-    return gmshMesh.Gmsh2D(temp_fname)
+def single_sphere_mesh_factory(r, R, dx, L):
+    m = _single_sphere_gmodel_factory(r, R, dx, L)
+    return _gmodel_to_fipy_mesh(m)
+
+
+def porous_mesh_factory(rs, R, dx, L):
+    m = _porous_gmodel_factory(rs, R, dx, L)
+    return _gmodel_to_fipy_mesh(m)
 
 
 if __name__ == '__main__':

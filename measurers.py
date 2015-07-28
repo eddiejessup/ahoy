@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from ahoy.utils.meta import make_repr_str
 from ahoy.ring_buffer import CylinderBuffer
 
 
@@ -36,8 +37,8 @@ class FieldCMeasurer(CMeasurer):
         return self.c_field.get_val_i(self.positions)
 
     def __repr__(self):
-        dct = {'c_field': self.c_field}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('c_field', self.c_field)]
+        return make_repr_str(self, fs)
 
 
 class LinearCMeasurer(CMeasurer):
@@ -49,8 +50,8 @@ class LinearCMeasurer(CMeasurer):
         return self.positions.r[:, 0]
 
     def __repr__(self):
-        dct = {}
-        return '{}({})' % (self.__class__, dct)
+        fs = []
+        return make_repr_str(self, fs)
 
 
 class GradCMeasurer(Measurer):
@@ -71,8 +72,8 @@ class FieldGradCMeasurer(GradCMeasurer):
         return self.c_field.get_grad_i(self.positions)
 
     def __repr__(self):
-        dct = {'c_field': self.c_field}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('c_field', self.c_field)]
+        return make_repr_str(self, fs)
 
 
 class ConstantGradCMeasurer(GradCMeasurer):
@@ -93,8 +94,8 @@ class ConstantGradCMeasurer(GradCMeasurer):
         return self.grad_c
 
     def __repr__(self):
-        dct = {}
-        return '{}({})' % (self.__class__, dct)
+        fs = []
+        return make_repr_str(self, fs)
 
 
 class DcDxMeasurer(Measurer):
@@ -116,8 +117,8 @@ class SpatialDcDxMeasurer(DcDxMeasurer):
         return np.sum(self.directions.u() * grad_c, axis=-1)
 
     def __repr__(self):
-        dct = {'grad_c_measurer': self.grad_c_measurer}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('grad_c_measurer', self.grad_c_measurer)]
+        return make_repr_str(self, fs)
 
 
 class TemporalDcDxMeasurer(DcDxMeasurer):
@@ -157,10 +158,10 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         return self.dc_dx_cache
 
     def __repr__(self):
-        dct = {'c_measurer': self.c_measurer, 'v_0': self.v_0,
-               'dt_mem': self.dt_mem, 't_mem': self.t_mem,
-               't_last_update': self.t_last_update}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('c_measurer', self.c_measurer), ('v_0', self.v_0),
+              ('dt_mem', self.dt_mem), ('t_mem', self.t_mem),
+              ('t_last_update', self.t_last_update)]
+        return make_repr_str(self, fs)
 
 
 def dc_dx_factory(spatial_chemo_flag,

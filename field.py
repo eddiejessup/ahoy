@@ -2,6 +2,7 @@ from __future__ import print_function, division
 import numpy as np
 import fipy
 from fipy.terms import TransientTerm, DiffusionTerm, ImplicitSourceTerm
+from ahoy.utils.meta import make_repr_str
 
 
 class Field(object):
@@ -47,8 +48,8 @@ class Field(object):
         return self._get_val_i(self._ps_to_rs(ps))
 
     def __repr__(self):
-        dct = {'dim': self.dim, 'mesh': self.mesh, 'c_0': self.c_0}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('dim', self.dim), ('mesh', self.mesh), ('c_0', self.c_0)]
+        return make_repr_str(self, fs)
 
 
 class FoodField(Field):
@@ -78,6 +79,6 @@ class FoodField(Field):
         self.eq.solve(dt=self.dt)
 
     def __repr__(self):
-        dct = {'dim': self.dim, 'mesh': self.mesh, 'c_0': self.c_0,
-               'dt': self.dt, 'D': self.D, 'delta': self.delta}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('dim', self.dim), ('mesh', self.mesh), ('c_0', self.c_0),
+              ('dt', self.dt), ('D', self.D), ('delta', self.delta)]
+        return make_repr_str(self, fs)

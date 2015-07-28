@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+from ahoy.utils.meta import make_repr_str
 
 
 class Time(object):
@@ -12,5 +13,5 @@ class Time(object):
         self.i += 1
 
     def __repr__(self):
-        dct = {'t': self.t, 'i': self.i, 'dt': self.dt}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('t', self.t), ('i', self.i), ('dt', self.dt)]
+        return make_repr_str(self, fs)

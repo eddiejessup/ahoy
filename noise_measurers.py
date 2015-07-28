@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
+from ahoy.utils.meta import make_repr_str
 from ahoy import measurers
 
 
@@ -12,8 +13,8 @@ class NoiseMeasurer(measurers.Measurer):
         return self.noise_0
 
     def __repr__(self):
-        dct = {'noise_0': self.noise_0}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('noise_0', self.noise_0)]
+        return make_repr_str(self, fs)
 
 
 class ChemoNoiseMeasurer(NoiseMeasurer):
@@ -28,9 +29,9 @@ class ChemoNoiseMeasurer(NoiseMeasurer):
         return self.noise_0 * (1.0 - self.chi * dc_dxs)
 
     def __repr__(self):
-        dct = {'noise_0': self.noise_0, 'chi': self.chi,
-               'dc_dx_measurer': self.dc_dx_measurer}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('noise_0', self.noise_0), ('chi', self.chi),
+              ('dc_dx_measurer', self.dc_dx_measurer)]
+        return make_repr_str(self, fs)
 
 
 class OneSidedChemoNoiseMeasurer(ChemoNoiseMeasurer):
@@ -42,9 +43,9 @@ class OneSidedChemoNoiseMeasurer(ChemoNoiseMeasurer):
 
 def chemo_noise_measurer_factory(onesided_flag, *args, **kwargs):
     if onesided_flag:
-        return ChemoNoiseMeasurer(*args, **kwargs)
-    else:
         return OneSidedChemoNoiseMeasurer(*args, **kwargs)
+    else:
+        return ChemoNoiseMeasurer(*args, **kwargs)
 
 
 def noise_measurer_factory(chemo_flag, onesided_flag, *args, **kwargs):

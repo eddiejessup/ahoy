@@ -7,29 +7,6 @@ from ahoy.mesh import uniform_mesh_factory
 import test
 
 
-class TestMesh(test.TestBase):
-
-    def test_uniform_mesh_1d(self):
-        L = np.array([1.8])
-        dx = np.array([0.1])
-
-        mesh = uniform_mesh_factory(L, dx)
-        self.assertTrue(mesh.cellCenters.value.max() < L[0] / 2.0)
-        self.assertTrue(mesh.cellCenters.value.min() > -L[0] / 2.0)
-
-    def test_uniform_mesh_2d(self):
-        dim = 2
-        L = np.array([1.7, 3.0])
-        dx = np.array([0.1, 0.2])
-
-        mesh = uniform_mesh_factory(L, dx)
-        for i_dim in range(dim):
-            self.assertTrue(mesh.cellCenters[i_dim, :].value.max() <
-                            L[i_dim] / 2.0)
-            self.assertTrue(mesh.cellCenters[i_dim, :].value.min()
-                            > -L[i_dim] / 2.0)
-
-
 def get_nearest_cell_ids_manual(f, ps):
     rs = ps.r_w().T
     ccs = f.mesh.cellCenters.value
@@ -40,53 +17,49 @@ def get_nearest_cell_ids_manual(f, ps):
     return np.argmin(dr_mags, axis=1)
 
 
-class TestField(test.TestBase):
+class TestField1D(test.TestBase):
+    L = np.array([1.6])
+    dx = np.array([0.1])
 
-    def test_field_1d(self):
-        L = np.array([1.6])
-        dim = L.shape[0]
-        dx = np.array([0.1])
+    x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
+    rs_special = np.array(list(product(x_vals)))
 
-        mesh = uniform_mesh_factory(L, dx)
-        f = field.Field(dim, mesh)
+    def test_field(self):
+        dim = self.L.shape[0]
+        n = 100
 
-        x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
-        rs_special = np.array(list(product(x_vals)))
-        rs_random = positions.get_uniform_points(1, dim, L, rng=self.rng)
-        rs = np.append(rs_random, rs_special, axis=0)
-        ps = positions.PeriodicPositions(L, rs)
-        cids = f.get_nearest_cell_ids(ps)
-        cids_manual = get_nearest_cell_ids_manual(f, ps)
-        self.assertTrue(np.allclose(cids, cids_manual))
+        mesh = uniform_mesh_factory(self.L, self.dx)
+        f = field.Field(dim, mesh, c_0=1.0)
 
-    def test_field_2d(self):
-        dim = 2
-        L = np.array([1.6, 3.0])
-        dx = np.array([0.1, 0.2])
+        rs_random = positions.get_uniform_points(n, dim, self.L, rng=self.rng)
+        rs = np.append(rs_random, self.rs_special, axis=0)
 
-        mesh = uniform_mesh_factory(L, dx)
-        f = field.Field(dim, mesh)
-
-        x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
-        y_vals = [-L[1] / 1.99632, -0.312, 0.01, 0.121, L[1] / 2.0021]
-        rs_special = np.array(list(product(x_vals, y_vals)))
-        rs = np.append(self.rng.uniform(-0.5, 0.5, size=(100, dim)),
-                       rs_special, axis=0)
-        ps = positions.PeriodicPositions(L, rs)
+        ps = positions.PeriodicPositions(self.L, rs)
         cids = f.get_nearest_cell_ids(ps)
         cids_manual = get_nearest_cell_ids_manual(f, ps)
         self.assertTrue(np.allclose(cids, cids_manual))
 
 
-class TestFoodField(TestField):
+class TestField2D(TestField1D):
+    L = np.array([1.6, 3.0])
+    dx = np.array([0.1, 0.2])
 
-    def do_rho_array_uniform(self, L, dx):
-        dim = len(L)
-        rho_expected = np.product(dx)
+    x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
+    y_vals = [-L[1] / 1.99632, -0.312, 0.01, 0.121, L[1] / 2.0021]
+    rs_special = np.array(list(product(x_vals, y_vals)))
 
-        mesh = uniform_mesh_factory(L, dx)
+
+class TestFoodField1D(test.TestBase):
+    L = np.array([4.0])
+    dx = np.array([0.005])
+
+    def test_rho_array_uniform(self):
+        dim = self.L.shape[0]
+        rho_expected = np.product(self.dx)
+
+        mesh = uniform_mesh_factory(self.L, self.dx)
         r_centers = mesh.cellCenters.value.T
-        ps_centers = positions.PeriodicPositions(L, r_centers)
+        ps_centers = positions.PeriodicPositions(self.L, r_centers)
 
         dt = 1.0
         D = 1.0
@@ -96,23 +69,13 @@ class TestFoodField(TestField):
         rho_array = f._get_rho_array(ps_centers)
         self.assertTrue(np.allclose(rho_array, rho_expected))
 
-    def test_get_rho_array_1d(self):
-        L = np.array([1.6])
-        dx = np.array([0.1])
-        self.do_rho_array_uniform(L, dx)
+    def test_decay_term(self):
+        dim = self.L.shape[0]
+        rho_expected = np.product(self.dx)
 
-    def test_get_rho_array_2d(self):
-        L = np.array([1.3, 3.1])
-        dx = np.array([0.1, 0.05])
-        self.do_rho_array_uniform(L, dx)
-
-    def do_decay_term(self, L, dx):
-        dim = len(L)
-        rho_expected = np.product(dx)
-
-        mesh = uniform_mesh_factory(L, dx)
+        mesh = uniform_mesh_factory(self.L, self.dx)
         r_centers = mesh.cellCenters.value.T
-        ps_centers = positions.PeriodicPositions(L, r_centers)
+        ps_centers = positions.PeriodicPositions(self.L, r_centers)
 
         dt = 0.01
         D = 0.0
@@ -123,18 +86,14 @@ class TestFoodField(TestField):
         c_expected = c_0 * np.exp(-delta * rho_expected * dt)
         self.assertTrue(np.allclose(f.c, c_expected))
 
-    def test_decay_term_2d(self):
-        L = np.array([1.3, 3.1])
-        dx = np.array([0.1, 0.05])
-        self.do_decay_term(L, dx)
+    def test_diff_term(self):
+        dim = self.L.shape[0]
 
-    def test_decay_term_1d(self):
-        L = np.array([1.2])
-        dx = np.array([0.3])
-        self.do_decay_term(L, dx)
-
-    def do_diff_term(self, L, dx):
-        dim = len(L)
+        mesh = uniform_mesh_factory(self.L, self.dx)
+        r_centers = mesh.cellCenters.value.T
+        r_centers_mag = np.sqrt(np.sum(np.square(r_centers), axis=-1))
+        i_center = np.argmin(r_centers_mag)
+        ps = positions.PeriodicPositions(self.L, np.zeros((1, dim)))
 
         dt = 0.0025
         t_max = 0.2
@@ -142,22 +101,18 @@ class TestFoodField(TestField):
         delta = 0.0
         c_0 = 1.0
 
-        mesh = uniform_mesh_factory(L, dx)
-        r_centers = mesh.cellCenters.value.T
-        r_centers_mag = np.sqrt(np.sum(np.square(r_centers), axis=-1))
-        i_center = np.argmin(r_centers_mag)
         c_0_array = np.zeros(mesh.cellCenters.shape[1])
         c_0_array[i_center] = c_0
-        ps = positions.PeriodicPositions(L, np.zeros((1, dim)))
 
         f = field.FoodField(dim, mesh, dt, D, delta, c_0_array)
+
         for t in np.arange(0.0, t_max, dt):
             f.iterate(ps)
         variance = 2.0 * D * t_max
         mean = dim * [0.0]
         cov = np.identity(dim) * variance
         mn = multivariate_normal(mean, cov)
-        c_expected = (c_0 * np.product(dx)) * mn.pdf(r_centers)
+        c_expected = (c_0 * np.product(self.dx)) * mn.pdf(r_centers)
         # print(c_expected)
         # print(f.c.value)
         # import matplotlib.pyplot as plt
@@ -167,12 +122,35 @@ class TestFoodField(TestField):
         # plt.show()
         self.assertTrue(np.allclose(f.c, c_expected, atol=1e-4))
 
-    def test_diff_term_1d(self):
-        L = np.array([4.0])
-        dx = np.array([0.005])
-        self.do_diff_term(L, dx)
+    def test_random_seeding(self):
+        dim = self.L.shape[0]
+        mesh = uniform_mesh_factory(self.L, self.dx)
 
-    def test_diff_term_2d(self):
-        L = np.array(2 * [4.0])
-        dx = np.array(2 * [0.05])
-        self.do_diff_term(L, dx)
+        dt = 0.0025
+        t_max = 0.2
+        D = 1.0
+        delta = 0.0
+        c_0 = 1.0
+
+        n = 1000
+        r_0 = np.zeros([n, dim])
+        ps = positions.PeriodicPositions(self.L, r_0)
+
+        np.random.seed(2)
+        f_1 = field.FoodField(dim, mesh, dt, D, delta, c_0, rng=None)
+        for t in np.arange(0.0, t_max, dt):
+            ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
+            f_1.iterate(ps)
+
+        np.random.seed(3)
+        f_2 = field.FoodField(dim, mesh, dt, D, delta, c_0, rng=None)
+        for t in np.arange(0.0, t_max, dt):
+            ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
+            f_2.iterate(ps)
+
+        self.assertTrue(np.allclose(f_1.c.value, f_2.c.value))
+
+
+class TestFoodField2D(TestFoodField1D):
+    L = np.array(2 * [4.0])
+    dx = np.array(2 * [0.05])

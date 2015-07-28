@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+from ahoy.utils.meta import make_repr_str
 
 
 class Swimmers(object):
@@ -13,5 +14,5 @@ class Swimmers(object):
         return positions, dr
 
     def __repr__(self):
-        dct = {'v_0': self.v_0}
-        return '{}({})' % (self.__class__, dct)
+        fs = [('v_0', self.v_0)]
+        return make_repr_str(self, fs)

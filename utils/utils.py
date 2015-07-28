@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import vector
+from ahoy import rudders
 from agaro.output_utils import get_filenames, filename_to_model
 from agaro.measure_utils import measures
 
@@ -53,6 +54,24 @@ def get_u_net_scalar(m):
 
 def get_chi(m):
     return m.agents.get_chi()
+
+
+def get_pf(m):
+    return m.obstructor.fraction_occupied
+
+
+def get_Dr_0(m):
+    for ruds in m.agents.rudder_sets:
+        if isinstance(ruds, rudders.RotationRudders):
+            return ruds.noise_measurer.noise_0
+    return 0.0
+
+
+def get_p_0(m):
+    for ruds in m.agents.rudder_sets:
+        if isinstance(ruds, rudders.TumbleRudders):
+            return ruds.noise_measurer.noise_0
+    return 0.0
 
 
 def _t_measures(dirname, measure_func):
@@ -216,26 +235,25 @@ def t_u_nets_vector(dirname):
     return _t_measures(dirname, get_u_net_vector)
 
 
-def chi_uds_scalar(dirnames, t_steady=None):
-    """Calculate the drift speed of a set of
-    model output directories, and their associated chis.
-
-    Parameters
-    ----------
-    dirnames: list[str]
-        Model output directory paths.
-    t_steady: None or float
-        Time to consider the model to be at steady-state.
-        The measure will be averaged over all later times.
-        `None` means just consider the latest time.
-
-    Returns
-    -------
-    chis: numpy.ndarray[dtype=float]
-        Chemotactic sensitivities
-    uds: numpy.ndarray[dtype=float]
-         Drift speeds, normalised by the swimmer speed.
-    """
+def chi_uds_x(dirnames, t_steady=None):
     chis = measures(dirnames, get_chi, t_steady)
     uds = measures(dirnames, get_ud_vector, t_steady)
-    return chis, uds
+    return chis, uds[:, 0]
+
+
+def pf_Ds_scalar(dirnames, t_steady=None):
+    pfs = measures(dirnames, get_pf, t_steady)
+    Ds = measures(dirnames, get_D_scalar, t_steady)
+    return pfs, Ds
+
+
+def Dr_0_Ds_scalar(dirnames, t_steady=None):
+    Dr_0s = measures(dirnames, get_Dr_0, t_steady)
+    Ds = measures(dirnames, get_D_scalar, t_steady)
+    return Dr_0s, Ds
+
+
+def p_0_Ds_scalar(dirnames, t_steady=None):
+    p_0s = measures(dirnames, get_p_0, t_steady)
+    Ds = measures(dirnames, get_D_scalar, t_steady)
+    return p_0s, Ds
