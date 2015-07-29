@@ -6,6 +6,25 @@ from agaro.output_utils import get_filenames, filename_to_model
 from agaro.measure_utils import measures
 
 
+def seg_intersect(p1, p2, yi):
+    x1, y1 = p1
+    x2, y2 = p2
+    m = (y2 - y1) / (x2 - x1)
+    c = y1 - m * x1
+    xi = (yi - c) / m
+    if x1 < xi < x2:
+        return xi
+    else:
+        raise ValueError
+
+
+def curve_intersect(xs, ys, yi):
+    i_big = np.where(ys > yi)[0][0]
+    p1 = [xs[i_big - 1], ys[i_big - 1]]
+    p2 = [xs[i_big], ys[i_big]]
+    return seg_intersect(p1, p2, yi)
+
+
 def get_vd_coeff(x, t):
     return x / t
 
@@ -257,3 +276,9 @@ def p_0_Ds_scalar(dirnames, t_steady=None):
     p_0s = measures(dirnames, get_p_0, t_steady)
     Ds = measures(dirnames, get_D_scalar, t_steady)
     return p_0s, Ds
+
+
+def pf_uds_x(dirnames, t_steady=None):
+    pfs = measures(dirnames, get_pf, t_steady)
+    uds = measures(dirnames, get_ud_vector, t_steady)
+    return pfs, uds[:, 0]

@@ -218,6 +218,20 @@ def plot_pf_Ds_scalar(dirnames):
     plt.show()
 
 
+def plot_pf_uds_x(dirnames):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    pfs, uds = utils.pf_uds_x(dirnames)
+    i_sort = np.argsort(pfs)
+    pfs, uds = pfs[i_sort], uds[i_sort]
+    ax.scatter(pfs, uds)
+    ax.set_xlim(-0.02, 1.0)
+    ax.set_ylim(0.0, 1.0)
+
+    plt.show()
+
+
 def plot_Dr_0_Ds_scalar(dirnames):
     fig = plt.figure()
     ax = fig.add_subplot(111)

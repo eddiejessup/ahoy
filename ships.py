@@ -79,7 +79,6 @@ class Ships(object):
                 rot_nm = rs.noise_measurer
                 Dr_0 = rot_nm.noise_0
                 rot_chemo = isinstance(rot_nm, ChemoNoiseMeasurer)
-                print('Rot Chemo: {}'.format(rot_chemo))
                 s += ',Dr={:g}'.format(Dr_0)
                 if rot_chemo:
                     rot_chi = rot_nm.chi

@@ -47,7 +47,7 @@ class LinearCMeasurer(CMeasurer):
         self.positions = positions
 
     def get_cs(self):
-        return self.positions.r[:, 0]
+        return self.positions.dr()[:, 0]
 
     def __repr__(self):
         fs = []
@@ -155,6 +155,12 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
 
     def get_dc_dxs(self):
         self.iterate()
+        if self.dc_dx_cache.max() > 1.0:
+            i_big = self.dc_dx_cache.argmax()
+            print(self.dc_dx_cache[i_big])
+            print(self.K_dt)
+            print(self.c_mem.a[i_big])
+            raw_input()
         return self.dc_dx_cache
 
     def __repr__(self):
