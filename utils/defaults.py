@@ -36,3 +36,14 @@ porous_obstructor_kwargs = {
     'L': L_porous,
     'R': R_porous,
 }
+
+combo_to_chi = {
+    ('Dr_0', False, False): 0.38747846573137146,
+    ('Dr_0', False, True): 0.91610356364005729,
+    ('Dr_0', True, False): 0.55171912452935623,
+    ('Dr_0', True, True): 0.95031324074045198,
+    ('p_0', False, False): 0.38527303561393739,
+    ('p_0', False, True): 0.85519056757936063,
+    ('p_0', True, False): 0.54788034865582758,
+    ('p_0', True, True): 0.88731933438050015
+}

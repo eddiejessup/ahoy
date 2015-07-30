@@ -6,7 +6,7 @@ from ahoy.obstructors import PorousObstructor
 import ahoy.turners
 from ahoy import ships
 from ahoy.utils.defaults import (default_ship_kwargs, porous_obstructor_kwargs,
-                                 rng)
+                                 rng, combo_to_chi)
 
 
 def run_spatial():
@@ -181,9 +181,9 @@ def run_pf_scan_drift():
     }
     ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
 
-    t_output_every = 50.0
+    t_output_every = 100.0
     t_upto = 500.0
-    pfs = np.linspace(0.0, 0.8, 9)
+    pfs = np.linspace(0.0, 0.8, 11)
     obstructors = [PorousObstructor(pf=pf, **obstructor_kwargs) for pf in pfs]
     force_resume = True
     parallel = True
@@ -193,18 +193,6 @@ def run_pf_scan_drift():
     temporal_chemo_flags = [True, False]
 
     combos = product(noise_vars, onesided_flags, temporal_chemo_flags)
-
-    # Values of chi that give equivalent drift speeds in empty space.
-    combo_to_chi = {
-        ('p_0', True, True): 0.330,
-        ('p_0', True, False): 0.802,
-        ('p_0', False, True): 0.492,
-        ('p_0', False, False): 0.844,
-        ('Dr_0', True, True): 0.333,
-        ('Dr_0', True, False): 0.858,
-        ('Dr_0', False, True): 0.492,
-        ('Dr_0', False, False): 0.909,
-    }
 
     for combo in combos:
         noise_var, onesided_flag, temporal_chemo_flag = combo
