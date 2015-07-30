@@ -5,46 +5,31 @@ from agaro import run_utils
 from ahoy.obstructors import PorousObstructor
 import ahoy.turners
 from ahoy import ships
+from ahot.utils.defaults import (default_ship_kwargs, porous_obstructor_kwargs,
+                                 rng)
 
 
 def run_spatial():
-    rng = np.random.RandomState(1)
-    L = np.array([200.0, 200.0])
-    obstructor_kwargs = {
+    extra_obstructor_kwargs = {
         'turner': ahoy.turners.AlignTurner(),
-        'R': 30.0,
         'pf': 0.0707,
-        'L': L,
-        'periodic': True,
-        'rng': rng,
     }
-    ship_kwargs = {
-        'rng': rng,
-
+    obstructor_kwargs = dict(porous_obstructor_kwargs,
+                             **extra_obstructor_kwargs)
+    extra_ship_kwargs = {
         'dim': 2,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': False,
-
-        'v_0': 20.0,
-
-        'L': L,
-        'origin_flags': np.array([False, False]),
+        'L': obstructor_kwargs['L'],
         'obstructor': PorousObstructor(**obstructor_kwargs),
 
         'chi': 0.858,
         'onesided_flag': True,
 
-        'p_0': 0.0,
-        'tumble_chemo_flag': False,
-
         'Dr_0': 1.0,
         'rotation_chemo_flag': True,
 
         'spatial_chemo_flag': False,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
     }
+    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
     shps = ships.spatial_ships_factory(**ship_kwargs)
 
     t_output_every = 100.0
@@ -56,33 +41,50 @@ def run_spatial():
                         force_resume=force_resume, t_upto=t_upto)
 
 
-def run_chi_scan():
-    ship_kwargs = {
-        'rng': np.random.RandomState(1),
-
-        'dim': 1,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': False,
-
-        'v_0': 20.0,
-
-        'L': None,
-        'origin_flags': None,
-        'obstructor': None,
-
-        'onesided_flag': False,
-
-        'p_0': 0.0,
-        'tumble_chemo_flag': False,
-
-        'Dr_0': 0.0,
-        'rotation_chemo_flag': False,
-
-        'spatial_chemo_flag': False,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
+def run_field():
+    L = np.array([1000.0, 1000.0])
+    obstructor_kwargs = {
+        'turner': ahoy.turners.AlignTurner(),
+        'R': 100.0,
+        'pf': 0.1,
+        'L': L,
+        'periodic': False,
+        'rng': rng,
     }
+    extra_ship_kwargs = {
+        'dim': 2,
+        'L': L,
+        'obstructor': PorousObstructor(**obstructor_kwargs),
+
+        'aligned_flag': True,
+
+        'chi': 0.9,
+
+        'p_0': 1.0,
+        'tumble_chemo_flag': True,
+
+        'spatial_chemo_flag': True,
+
+        'c_dx': np.array([50.0, 50.0]),
+        'c_D': 10.0,
+        'c_delta': 10.0,
+        'c_0': 10.0,
+    }
+    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+
+    shps = ships.c_field_ships_factory(**ship_kwargs)
+
+    t_output_every = 0.1
+    t_upto = 5.0
+    output_dir = None
+    force_resume = None
+
+    run_utils.run_model(t_output_every, output_dir, m=shps,
+                        force_resume=force_resume, t_upto=t_upto)
+
+
+def run_chi_scan():
+    ship_kwargs = default_ship_kwargs.copy()
 
     t_output_every = 100.0
     t_upto = 1000.0
@@ -119,43 +121,18 @@ def run_chi_scan():
 
 
 def run_Dr_scan():
-    rng = np.random.RandomState(1)
-    L = np.array([200.0, 200.0])
-    obstructor_kwargs = {
+    extra_obstructor_kwargs = {
         'turner': ahoy.turners.BounceBackTurner(),
-        'R': 30.0,
         'pf': 0.8,
-        'L': L,
-        'periodic': True,
-        'rng': rng,
     }
-    ship_kwargs = {
-        'rng': rng,
-
+    obstructor_kwargs = dict(porous_obstructor_kwargs,
+                             **extra_obstructor_kwargs)
+    extra_ship_kwargs = {
         'dim': 2,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': False,
-
-        'v_0': 20.0,
-
-        'L': L,
-        'origin_flags': np.array([False, False]),
+        'L': obstructor_kwargs['L'],
         'obstructor': PorousObstructor(**obstructor_kwargs),
-
-        'chi': 0.0,
-        'onesided_flag': False,
-
-        'p_0': 0.0,
-        'tumble_chemo_flag': False,
-
-        'Dr_0': 0.0,
-        'rotation_chemo_flag': False,
-
-        'spatial_chemo_flag': True,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
     }
+    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 5.0
     t_upto = 300.0
@@ -169,43 +146,16 @@ def run_Dr_scan():
 
 
 def run_pf_scan():
-    rng = np.random.RandomState(1)
-    L = np.array([200.0, 200.0])
-    obstructor_kwargs = {
+    extra_obstructor_kwargs = {
         'turner': ahoy.turners.ReflectTurner(),
-        'R': 30.0,
-        'pf': 0.0,
-        'L': L,
-        'periodic': True,
-        'rng': rng,
     }
-    ship_kwargs = {
-        'rng': rng,
-
+    obstructor_kwargs = dict(porous_obstructor_kwargs,
+                             **extra_obstructor_kwargs)
+    extra_ship_kwargs = {
         'dim': 2,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': False,
-
-        'v_0': 20.0,
-
-        'L': L,
-        'origin_flags': np.array([False, False]),
-        'obstructor': PorousObstructor(**obstructor_kwargs),
-
-        'chi': 0.0,
-        'onesided_flag': False,
-
-        'p_0': 1.0,
-        'tumble_chemo_flag': False,
-
-        'Dr_0': 0.0,
-        'rotation_chemo_flag': False,
-
-        'spatial_chemo_flag': True,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
+        'L': obstructor_kwargs['L'],
     }
+    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 100.0
     t_upto = 500.0
@@ -235,43 +185,16 @@ def run_pf_scan():
 
 
 def run_pf_scan_drift():
-    rng = np.random.RandomState(1)
-    L = np.array([200.0, 200.0])
-    obstructor_kwargs = {
+    extra_obstructor_kwargs = {
         'turner': ahoy.turners.AlignTurner(),
-        'R': 30.0,
-        'pf': 0.0,
-        'L': L,
-        'periodic': True,
-        'rng': rng,
     }
-    ship_kwargs = {
-        'rng': rng,
-
+    obstructor_kwargs = dict(porous_obstructor_kwargs,
+                             **extra_obstructor_kwargs)
+    extra_ship_kwargs = {
         'dim': 2,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': False,
-
-        'v_0': 20.0,
-
-        'L': L,
-        'origin_flags': np.array([False, False]),
-        'obstructor': PorousObstructor(**obstructor_kwargs),
-
-        'chi': 0.0,
-        'onesided_flag': False,
-
-        'p_0': 1.0,
-        'tumble_chemo_flag': False,
-
-        'Dr_0': 0.0,
-        'rotation_chemo_flag': False,
-
-        'spatial_chemo_flag': True,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
+        'L': obstructor_kwargs['L'],
     }
+    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 50.0
     t_upto = 500.0
@@ -318,61 +241,6 @@ def run_pf_scan_drift():
                                  t_output_every, t_upto,
                                  'obstructor', obstructors,
                                  force_resume=force_resume, parallel=parallel)
-
-
-def run_field():
-    rng = np.random.RandomState(1)
-    L = np.array([1000.0, 1000.0])
-    obstructor_kwargs = {
-        'turner': ahoy.turners.AlignTurner(),
-        'R': 100.0,
-        'pf': 0.1,
-        'L': L,
-        'periodic': False,
-        'rng': rng,
-    }
-    ship_kwargs = {
-        'rng': rng,
-
-        'dim': 2,
-        'dt': 0.01,
-        'n': 5000,
-        'aligned_flag': True,
-
-        'v_0': 20.0,
-
-        'L': L,
-        'origin_flags': np.array([False, False]),
-        'obstructor': PorousObstructor(**obstructor_kwargs),
-
-        'c_dx': np.array([50.0, 50.0]),
-        'c_D': 10.0,
-        'c_delta': 10.0,
-        'c_0': 10.0,
-
-        'chi': 0.9,
-        'onesided_flag': False,
-
-        'p_0': 1.0,
-        'tumble_chemo_flag': True,
-
-        'Dr_0': 0.0,
-        'rotation_chemo_flag': False,
-
-        'spatial_chemo_flag': True,
-        'dt_mem': 0.1,
-        't_mem': 5.0,
-    }
-
-    shps = ships.c_field_ships_factory(rng, **ship_kwargs)
-
-    t_output_every = 0.1
-    t_upto = 5.0
-    output_dir = None
-    force_resume = None
-
-    run_utils.run_model(t_output_every, output_dir, m=shps,
-                        force_resume=force_resume, t_upto=t_upto)
 
 
 if __name__ == '__main__':
