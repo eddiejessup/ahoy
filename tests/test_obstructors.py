@@ -8,9 +8,10 @@ class TestPorousObstructor(test.TestBase):
     def test_random_seeding(self):
         obstructor_kwargs = {
             'turner': turners.ReflectTurner(),
-            'R': 30.0,
+            'R': 50.0,
             'L': np.array([200.0, 200.0]),
-            'pf': 0.8,
+            'pf': 0.4,
+            'periodic': True,
         }
 
         rng_seed = 1

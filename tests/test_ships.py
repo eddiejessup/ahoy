@@ -22,7 +22,7 @@ class TestShips(test.TestBase):
             'rotation_chemo_flag': True,
         }
 
-        num_iterations = 1000
+        num_iterations = 100
         rng_seed = 1
 
         def get_ships(npy_seed):
@@ -46,6 +46,7 @@ class TestShips(test.TestBase):
             'R': 0.1,
             'pf': 0.1,
             'L': L,
+            'periodic': True,
         }
         ships_kwargs = {
             'dim': 2,
@@ -72,7 +73,7 @@ class TestShips(test.TestBase):
             't_mem': 5.0,
         }
 
-        num_iterations = 1000
+        num_iterations = 100
         rng_seed = 1
 
         def get_ships(npy_seed):
@@ -97,8 +98,10 @@ class TestShips(test.TestBase):
         L = np.array([2.0, 2.0])
         obstructor_kwargs = {
             'turner': turners.AlignTurner(),
-            'R': 0.1,
+            'R': 0.2,
+            'pf': 0.1,
             'L': L,
+            'periodic': False,
         }
         ships_kwargs = {
             'dim': 2,
@@ -109,7 +112,7 @@ class TestShips(test.TestBase):
             'v_0': 1.5,
             'L': L,
 
-            'c_dx': np.array([0.1, 0.1]),
+            'c_dx': np.array([0.2, 0.2]),
             'c_D': 10.0,
             'c_delta': 1000.0,
             'c_0': 1.3,
@@ -134,7 +137,7 @@ class TestShips(test.TestBase):
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
             rng = np.random.RandomState(rng_seed)
-            obstructor = SingleSphereObstructor2D(rng=rng, **obstructor_kwargs)
+            obstructor = PorousObstructor(rng=rng, **obstructor_kwargs)
             shps = ships.c_field_ships_factory(rng, obstructor=obstructor,
                                                **ships_kwargs)
             for _ in range(num_iterations):

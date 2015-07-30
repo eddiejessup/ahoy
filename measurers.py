@@ -155,7 +155,7 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
 
     def get_dc_dxs(self):
         self.iterate()
-        if self.dc_dx_cache.max() > 1.0:
+        if self.dc_dx_cache.max() > 1.001:
             i_big = self.dc_dx_cache.argmax()
             print(self.dc_dx_cache[i_big])
             print(self.K_dt)

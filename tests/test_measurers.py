@@ -56,6 +56,9 @@ class MockPositions(object):
     def iterate(self, dt):
         self.r += self.v_0 * self.u_0 * dt
 
+    def dr(self):
+        return self.r
+
 
 class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
 

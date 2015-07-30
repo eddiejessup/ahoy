@@ -41,7 +41,7 @@ class TestField1D(test.TestBase):
 
 
 class TestField2D(TestField1D):
-    L = np.array([1.6, 3.0])
+    L = np.array([1.0, 2.0])
     dx = np.array([0.1, 0.2])
 
     x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
@@ -95,7 +95,7 @@ class TestFoodField1D(test.TestBase):
         i_center = np.argmin(r_centers_mag)
         ps = positions.PeriodicPositions(self.L, np.zeros((1, dim)))
 
-        dt = 0.0025
+        dt = 0.01
         t_max = 0.2
         D = 1.0
         delta = 0.0
@@ -126,7 +126,7 @@ class TestFoodField1D(test.TestBase):
         dim = self.L.shape[0]
         mesh = uniform_mesh_factory(self.L, self.dx)
 
-        dt = 0.0025
+        dt = 0.01
         t_max = 0.2
         D = 1.0
         delta = 0.0
