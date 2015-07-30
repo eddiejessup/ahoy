@@ -5,7 +5,7 @@ from agaro import run_utils
 from ahoy.obstructors import PorousObstructor
 import ahoy.turners
 from ahoy import ships
-from ahot.utils.defaults import (default_ship_kwargs, porous_obstructor_kwargs,
+from ahoy.utils.defaults import (default_ship_kwargs, porous_obstructor_kwargs,
                                  rng)
 
 

@@ -282,3 +282,10 @@ def pf_uds_x(dirnames, t_steady=None):
     pfs = measures(dirnames, get_pf, t_steady)
     uds = measures(dirnames, get_ud_vector, t_steady)
     return pfs, uds[:, 0]
+
+
+def get_chi_0(ud_0, dirnames):
+    chis, uds = chi_uds_x(dirnames)
+    i_sort = np.argsort(chis)
+    chis, uds = chis[i_sort], uds[i_sort]
+    return curve_intersect(chis, uds, ud_0)
