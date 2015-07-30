@@ -89,6 +89,7 @@ class PorousObstructor(SphereObstructor2D):
 
     def __init__(self, turner, R, L, pf, rng, periodic):
         super(PorousObstructor, self).__init__(turner, R)
+        self.periodic = periodic
         self.L = L
         self.rs, self.R = pack.pack(self.R, self.L, pf=pf, rng=rng,
                                     periodic=periodic)
