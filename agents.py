@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from ahoy.utils.meta import make_repr_str
-from ahoy import directions, measurers, rudders, positions, swimmers
+from ahoy import (directions, measurers, rudders, positions,
+                  swimmers)
 
 
 class Agents(object):
@@ -17,6 +18,24 @@ class Agents(object):
         for ruds in self.rudder_sets:
             if ruds.is_chemotactic():
                 return ruds.get_chi()
+
+    def does_tumbling(self):
+        for rs in self.rudder_sets:
+            if isinstance(rs, rudders.TumbleRudders):
+                return True
+        return False
+
+    def does_rotation(self):
+        for rs in self.rudder_sets:
+            if isinstance(rs, rudders.RotationRudders):
+                return True
+        return False
+
+    def get_chemo_rudders(self):
+        for rs in self.rudder_sets:
+            if rs.is_chemotactic():
+                return rs
+        raise Exception
 
     def __repr__(self):
         fs = [('directions', self.directions),

@@ -2,7 +2,8 @@ from __future__ import print_function, division
 import numpy as np
 from ciabatta import vector
 from ahoy import rudders
-from agaro.output_utils import get_filenames, filename_to_model
+from agaro.output_utils import (get_filenames, filename_to_model,
+                                get_recent_model)
 from agaro.measure_utils import measures
 
 
@@ -284,8 +285,30 @@ def pf_uds_x(dirnames, t_steady=None):
     return pfs, uds[:, 0]
 
 
-def get_chi_0(ud_0, dirnames):
+def get_equiv_chi(ud_0, dirnames):
     chis, uds = chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
     chis, uds = chis[i_sort], uds[i_sort]
     return curve_intersect(chis, uds, ud_0)
+
+
+def get_equiv_chi_key(m):
+    noise_var_key = 'p_0' if m.agents.does_tumbling() else 'Dr_0'
+    chemo_ruds = m.agents.get_chemo_rudders()
+    key = (noise_var_key, chemo_ruds.is_onesided(),
+           chemo_ruds.noise_measurer.is_temporal())
+    return key
+
+
+def get_equiv_chi_item(ud_0, dirnames):
+    key = get_equiv_chi_key(get_recent_model(dirnames[0]))
+    chi_equiv = get_equiv_chi(ud_0, dirnames)
+    return key, chi_equiv
+
+
+def get_equiv_chi_dict(ud_0, dirname_sets):
+    params_to_chi = {}
+    for dirnames in dirname_sets:
+        key, chi_equiv = get_equiv_chi_item(ud_0, dirnames)
+        params_to_chi[key] = chi_equiv
+    return params_to_chi

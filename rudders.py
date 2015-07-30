@@ -25,6 +25,10 @@ class Rudders(object):
         return isinstance(self.noise_measurer,
                           noise_measurers.ChemoNoiseMeasurer)
 
+    def is_onesided(self):
+        return isinstance(self.noise_measurer,
+                          noise_measurers.OneSidedChemoNoiseMeasurer)
+
     def get_chi(self):
         if self.is_chemotactic():
             return self.noise_measurer.chi
