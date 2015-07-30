@@ -23,18 +23,27 @@ class TestUniformMesh2D(TestUniformMesh1D):
     dx = np.array([0.1, 0.2])
 
 
-class TestSingleSphereMesh(test.TestBase):
+class TestPorousMesh(test.TestBase):
 
-    def test_single_sphere_random_seeding(self):
+    def test_porous_random_seeding(self):
+        # Note, this is testing the reproducibility of the meshing.
+
         L = np.array([2.0, 2.0])
         R = 0.1
         dx = 0.1
+        rs = np.array([
+            [-0.5, 0.5],
+            [0.0, 0.0],
+            [0.1, 0.4],
+            [0.88, 0.88],
+            [0.88, 0.0],
+        ])
 
         np.random.seed(2)
-        mesh_1 = mesh.single_sphere_mesh_factory(np.zeros_like(L), R, dx, L)
+        mesh_1 = mesh.porous_mesh_factory(rs, R, dx, L)
 
         np.random.seed(3)
-        mesh_2 = mesh.single_sphere_mesh_factory(np.zeros_like(L), R, dx, L)
+        mesh_2 = mesh.porous_mesh_factory(rs, R, dx, L)
 
         self.assertTrue(np.allclose(mesh_1.cellCenters.value,
                                     mesh_2.cellCenters.value))

@@ -1,71 +1,61 @@
-import numpy as np
 import fipy
-from fipy.meshes import gmshMesh
-
-# gmshpy.GmshSetOption('Mesh', 'ChacoSeed', 1.0)
 
 
-def _get_rectangle_loop(m, L, dx):
-    p_nw = m.addVertex(-L[0] / 2, L[1] / 2, 0.0, dx)
-    p_ne = m.addVertex(L[0] / 2, L[1] / 2, 0.0, dx)
-    p_se = m.addVertex(L[0] / 2, -L[1] / 2, 0.0, dx)
-    p_sw = m.addVertex(-L[0] / 2, -L[1] / 2, 0.0, dx)
-    l_nw_ne = m.addLine(p_nw, p_ne)
-    l_ne_se = m.addLine(p_ne, p_se)
-    l_se_sw = m.addLine(p_se, p_sw)
-    l_sw_nw = m.addLine(p_sw, p_nw)
+gmsh_text_box = '''
+// Define the square that acts as the system boundary.
 
-    line_loop = gmshpy.GEdgeVector()
-    line_loop.append(l_nw_ne)
-    line_loop.append(l_ne_se)
-    line_loop.append(l_se_sw)
-    line_loop.append(l_sw_nw)
-    return line_loop
+dx = %(dx)g;
+Lx = %(Lx)g;
+Ly = %(Ly)g;
+p_n_w = newp; Point(p_n_w) = {-Lx / 2.0, Ly / 2.0, 0, dx};
+p_n_e = newp; Point(p_n_e) = {Lx / 2.0, Ly / 2.0, 0, dx};
+p_s_e = newp; Point(p_s_e) = {Lx / 2.0, -Ly / 2.0, 0, dx};
+p_s_w = newp; Point(p_s_w) = {-Lx / 2.0, -Ly / 2.0, 0, dx};
+l_n = newl; Line(l_n) = {p_n_w, p_n_e};
+l_e = newl; Line(l_e) = {p_n_e, p_s_e};
+l_s = newl; Line(l_s) = {p_s_e, p_s_w};
+l_w = newl; Line(l_w) = {p_s_w, p_n_w};
+ll = newll; Line Loop(ll) = {l_n, l_e, l_s, l_w};
 
+'''
 
-def _get_circle_loop(m, r, R, dx):
-    p_w = m.addVertex(r[0] - R, r[1], 0, dx)
-    p_n = m.addVertex(r[0], r[1] + R, 0, dx)
-    p_e = m.addVertex(r[0] + R, r[1], 0, dx)
-    p_s = m.addVertex(r[0], r[1] - R, 0, dx)
+gmsh_text_circle = '''
+// Define a circle that acts as an obstacle
+x = %(x)g;
+y = %(y)g;
+R = %(R)g;
+p_c = newp; Point(p_c) = {x, y, 0};
+p_w = newp; Point(p_w) = {x - R, y, 0};
+p_n = newp; Point(p_n) = {x, y + R, 0};
+p_e = newp; Point(p_e) = {x + R, y, 0};
+p_s = newp; Point(p_s) = {x, y - R, 0};
+c_w_n = newreg; Circle(c_w_n) = {p_w, p_c, p_n};
+c_n_e = newreg; Circle(c_n_e) = {p_n, p_c, p_e};
+c_e_s = newreg; Circle(c_e_s) = {p_e, p_c, p_s};
+c_s_w = newreg; Circle(c_s_w) = {p_s, p_c, p_w};
+Line Loop(%(i)d) = {c_w_n, c_n_e, c_e_s, c_s_w};
 
-    c_w_n = m.addCircleArcCenter(r[0], r[1], 0.0, p_w, p_n)
-    c_n_e = m.addCircleArcCenter(r[0], r[1], 0.0, p_n, p_e)
-    c_e_s = m.addCircleArcCenter(r[0], r[1], 0.0, p_e, p_s)
-    c_s_w = m.addCircleArcCenter(r[0], r[1], 0.0, p_s, p_w)
+'''
 
-    line_loop = gmshpy.GEdgeVector()
-    line_loop.append(c_w_n)
-    line_loop.append(c_n_e)
-    line_loop.append(c_e_s)
-    line_loop.append(c_s_w)
-    return line_loop
-
-
-def _single_sphere_gmodel_factory(r, R, dx, L):
-    import gmshpy
-    m = gmshpy.GModel()
-    outer_loop = _get_rectangle_loop(m, L, dx)
-    circle_loop = _get_circle_loop(m, r, R, dx)
-    m.addPlanarFace([outer_loop, circle_loop])
-    return m
+gmsh_text_surface = '''
+// The first argument is the outer loop boundary.
+// The remainder are holes in it.
+Plane Surface(1) = {ll, %(args)s};
+'''
 
 
-def _porous_gmodel_factory(rs, R, dx, L):
-    import gmshpy
-    m = gmshpy.GModel()
-    outer_loop = _get_rectangle_loop(m, L, dx)
-    edges = [outer_loop]
-    for r in rs:
-        circle_loop = _get_circle_loop(m, r, R, dx)
-        edges.append(circle_loop)
-    m.addPlanarFace(edges)
-    return m
-
-
-def _gmodel_to_fipy_mesh(m, temp_fname='temp.geo'):
-    m.writeGEO(temp_fname)
-    return gmshMesh.Gmsh2D(temp_fname)
+def _porous_mesh_geo_factory(rs, R, dx, L):
+    gmsh_text = gmsh_text_box % {'dx': dx, 'Lx': L[0], 'Ly': L[1]}
+    circle_loop_indexes = []
+    if rs is not None and len(rs) and R:
+        for i in range(len(rs)):
+            index = 10 * (i + 1)
+            gmsh_text += gmsh_text_circle % {'x': rs[i][0], 'y': rs[i][1],
+                                             'R': R, 'i': index}
+            circle_loop_indexes += [index]
+    surface_args = ', '.join([str(i) for i in circle_loop_indexes])
+    gmsh_text += gmsh_text_surface % {'args': surface_args}
+    return gmsh_text
 
 
 def uniform_mesh_factory(L, dx):
@@ -78,24 +68,5 @@ def uniform_mesh_factory(L, dx):
                            origin=((-L[0] / 2.0,), (-L[1] / 2.0,)))
 
 
-def single_sphere_mesh_factory(r, R, dx, L):
-    m = _single_sphere_gmodel_factory(r, R, dx, L)
-    return _gmodel_to_fipy_mesh(m)
-
-
 def porous_mesh_factory(rs, R, dx, L):
-    m = _porous_gmodel_factory(rs, R, dx, L)
-    return _gmodel_to_fipy_mesh(m)
-
-
-if __name__ == '__main__':
-    r = np.array([0.0, 0.0])
-    R = 0.1
-    dx = 0.05
-    L = np.array([1.0, 1.0])
-    m = single_sphere_mesh_factory(r, R, dx, L)
-
-    phi = fipy.CellVariable(m)
-    v = fipy.Viewer(vars=phi, xmin=-L[0] / 2.0, xmax=L[0] / 2.0)
-    v.plotMesh()
-    raw_input()
+    return fipy.Gmsh2D(_porous_mesh_geo_factory(rs, R, dx, L))
