@@ -15,6 +15,7 @@ def run_spatial():
         'R': 30.0,
         'pf': 0.0707,
         'L': L,
+        'periodic': True,
         'rng': rng,
     }
     ship_kwargs = {
@@ -125,6 +126,7 @@ def run_Dr_scan():
         'R': 30.0,
         'pf': 0.8,
         'L': L,
+        'periodic': True,
         'rng': rng,
     }
     ship_kwargs = {
@@ -172,7 +174,9 @@ def run_pf_scan():
     obstructor_kwargs = {
         'turner': ahoy.turners.ReflectTurner(),
         'R': 30.0,
+        'pf': 0.0,
         'L': L,
+        'periodic': True,
         'rng': rng,
     }
     ship_kwargs = {
@@ -187,6 +191,7 @@ def run_pf_scan():
 
         'L': L,
         'origin_flags': np.array([False, False]),
+        'obstructor': PorousObstructor(**obstructor_kwargs),
 
         'chi': 0.0,
         'onesided_flag': False,
@@ -235,7 +240,9 @@ def run_pf_scan_drift():
     obstructor_kwargs = {
         'turner': ahoy.turners.AlignTurner(),
         'R': 30.0,
+        'pf': 0.0,
         'L': L,
+        'periodic': True,
         'rng': rng,
     }
     ship_kwargs = {
@@ -250,7 +257,7 @@ def run_pf_scan_drift():
 
         'L': L,
         'origin_flags': np.array([False, False]),
-        'obstructor': None,
+        'obstructor': PorousObstructor(**obstructor_kwargs),
 
         'chi': 0.0,
         'onesided_flag': False,
@@ -321,9 +328,9 @@ def run_field():
         'R': 100.0,
         'pf': 0.1,
         'L': L,
+        'periodic': False,
         'rng': rng,
     }
-    obstructor = PorousObstructor(**obstructor_kwargs)
     ship_kwargs = {
         'rng': rng,
 
@@ -336,7 +343,7 @@ def run_field():
 
         'L': L,
         'origin_flags': np.array([False, False]),
-        'obstructor': obstructor,
+        'obstructor': PorousObstructor(**obstructor_kwargs),
 
         'c_dx': np.array([50.0, 50.0]),
         'c_D': 10.0,

@@ -1,5 +1,5 @@
 import numpy as np
-from ahoy.obstructors import PorousObstructor, NoneObstructor, SingleSphereObstructor2D
+from ahoy.obstructors import PorousObstructor
 from ahoy import ships, turners
 import test
 
