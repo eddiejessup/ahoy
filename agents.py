@@ -80,11 +80,11 @@ def spatial_agents_factory(rng, dim, n, aligned_flag,
                            chi, onesided_flag,
                            p_0, tumble_chemo_flag,
                            Dr_0, rotation_chemo_flag,
-                           spatial_chemo_flag, dt_mem, t_mem, time,
+                           temporal_chemo_flag, dt_mem, t_mem, time,
                            c_field=None):
     ds = directions.make_directions(n, dim, aligned_flag=aligned_flag, rng=rng)
     ps = positions.positions_factory(n, dim, L, origin_flags, rng, obstructor)
-    dc_dx_measurer = measurers.dc_dx_factory(spatial_chemo_flag,
+    dc_dx_measurer = measurers.dc_dx_factory(temporal_chemo_flag,
                                              ds,
                                              ps, v_0, dt_mem, t_mem, p_0, Dr_0,
                                              time,

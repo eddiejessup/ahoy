@@ -170,16 +170,16 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
         return make_repr_str(self, fs)
 
 
-def dc_dx_factory(spatial_chemo_flag,
+def dc_dx_factory(temporal_chemo_flag,
                   ds=None,
                   ps=None, v_0=None, dt_mem=None, t_mem=None, p_0=None,
                   Dr_0=None, time=None,
                   c_field=None):
-    if spatial_chemo_flag:
-        return spatial_dc_dx_factory(ds, c_field, ps)
-    else:
+    if temporal_chemo_flag:
         return temporal_dc_dx_factory(ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
                                       c_field)
+    else:
+        return spatial_dc_dx_factory(ds, c_field, ps)
 
 
 def spatial_dc_dx_factory(ds, c_field=None, ps=None):

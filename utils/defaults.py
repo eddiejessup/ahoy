@@ -25,7 +25,7 @@ default_ship_kwargs = {
     'Dr_0': 0.0,
     'rotation_chemo_flag': False,
 
-    'spatial_chemo_flag': True,
+    'temporal_chemo_flag': False,
     'dt_mem': 0.1,
     't_mem': 5.0,
 }

@@ -87,7 +87,7 @@ def rudder_set_factory(onesided_flag, chi, dc_dx_measurer, rng,
                                                        dc_dx_measurer)
         rudder_sets.append(TumbleRudders(tumble_noise_measurer, rng))
 
-    if Dr_0 and dim > 1:
+    if Dr_0:
         rotation_noise_measurer = noise_measurer_factory(rotation_chemo_flag,
                                                          onesided_flag, Dr_0,
                                                          chi, dc_dx_measurer)

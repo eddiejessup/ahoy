@@ -82,8 +82,7 @@ class SingleSphereObstructor2D(SphereObstructor2D):
         return rs
 
     def get_mesh(self, L, dx):
-        return mesh.single_sphere_mesh_factory(np.zeros_like(L), self.R, dx[0],
-                                               L)
+        raise NotImplementedError
 
 
 class PorousObstructor(SphereObstructor2D):

@@ -68,7 +68,7 @@ class TestShips(test.TestBase):
             # Must have rotational diffusion to test rot diff function.
             'Dr_0': 1.3,
             'rotation_chemo_flag': True,
-            'spatial_chemo_flag': False,
+            'temporal_chemo_flag': True,
             'dt_mem': 0.05,
             't_mem': 5.0,
         }
@@ -128,7 +128,7 @@ class TestShips(test.TestBase):
             'Dr_0': 1.3,
             'rotation_chemo_flag': True,
 
-            'spatial_chemo_flag': True,
+            'temporal_chemo_flag': True,
         }
 
         num_iterations = 100

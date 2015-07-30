@@ -39,60 +39,36 @@ class Ships(object):
         return make_repr_str(self, fs)
 
     def _get_output_dirname_agent_part(self):
-        align = self.agents.directions.aligned_flag
-        spatial = isinstance(self.agents, ahoy.agents.SpatialAgents)
-        s = 'n={},align={:d}'.format(self.agents.positions.n, align)
-        if spatial:
-            origin_flag = self.agents.positions.origin_flag
-            v = self.agents.swimmers.v_0
-            s += ',origin={:d},v={:g}'.format(origin_flag, v)
-            periodic = isinstance(self.agents.positions,
-                                  ahoy.positions.PeriodicPositions)
-            if periodic:
-                s += ',L={}'.format(tuple(self.agents.positions.L_repr()))
+        ags = self.agents
 
-        for rs in self.agents.rudder_sets:
+        s = 'n={},align={:d}'.format(ags.positions.n,
+                                     ags.directions.aligned_flag)
+
+        # Space and swimming
+        if isinstance(ags, ahoy.agents.SpatialAgents):
+            s += ',origin={:d},v={:g}'.format(ags.positions.origin_flag,
+                                              ags.swimmers.v_0)
+            if isinstance(ags.positions, ahoy.positions.PeriodicPositions):
+                s += ',L={}'.format(tuple(ags.positions.L_repr()))
+
+        # Rudders
+        for rs in ags.rudder_sets:
+            nm = rs.noise_measurer
             if isinstance(rs, ahoy.rudders.TumbleRudders):
-                tumb_nm = rs.noise_measurer
-                p_0 = tumb_nm.noise_0
-                s += ',p={:g}'.format(p_0)
-
-                tumb_chemo = isinstance(tumb_nm, ChemoNoiseMeasurer)
-                if tumb_chemo:
-                    tumb_chi = tumb_nm.chi
-                    tumb_sided = 1 + isinstance(tumb_nm,
-                                                OneSidedChemoNoiseMeasurer)
-                    tumb_chemo_temp = isinstance(tumb_nm.dc_dx_measurer,
-                                                 TemporalDcDxMeasurer)
-                    tumb_type_s = 'T' if tumb_chemo_temp else 'S'
-                    s += ',pChi={:g},pSide={:d},pType={}'.format(tumb_chi,
-                                                                 tumb_sided,
-                                                                 tumb_type_s)
-
-                    if tumb_chemo_temp:
-                        tumb_chemo_dt_mem = tumb_nm.dc_dx_measurer.dt_mem
-                        tumb_chemo_t_mem = tumb_nm.dc_dx_measurer.t_mem
-                        s += ',dtMem={:g},ptMem={:g}'.format(tumb_chemo_dt_mem,
-                                                             tumb_chemo_t_mem)
-
+                noise_str = 'p'
             elif isinstance(rs, ahoy.rudders.RotationRudders):
-                rot_nm = rs.noise_measurer
-                Dr_0 = rot_nm.noise_0
-                rot_chemo = isinstance(rot_nm, ChemoNoiseMeasurer)
-                s += ',Dr={:g}'.format(Dr_0)
-                if rot_chemo:
-                    rot_chi = rot_nm.chi
-                    rot_sided = 1 + isinstance(rot_nm,
-                                               OneSidedChemoNoiseMeasurer)
-                    rot_chemo_temp = isinstance(rot_nm.dc_dx_measurer,
-                                                TemporalDcDxMeasurer)
-                    rot_type_s = 'T' if rot_chemo_temp else 'S'
-                    s += ',DChi={:g},DSide={:d},DType={}'.format(rot_chi,
-                                                                 rot_sided,
-                                                                 rot_type_s)
-                    if rot_chemo_temp:
-                        rot_chemo_t_mem = rot_nm.dc_dx_measurer.t_mem
-                        s += ',DtMem={:g}'.format(rot_chemo_t_mem)
+                noise_str = 'Dr'
+            s += ',{}={:g}'.format(noise_str, nm.noise_0)
+            if rs.is_chemotactic():
+                chemo_temp = nm.is_temporal()
+                type_s = 'T' if chemo_temp else 'S'
+                s += ',chi={:g},side={:d},type={}'.format(nm.chi,
+                                                          2 - rs.is_onesided(),
+                                                          type_s)
+                if chemo_temp:
+                    measurer = nm.dc_dx_measurer
+                    s += ',dtMem={:g},tMem={:g}'.format(measurer.dt_mem,
+                                                        measurer.t_mem)
         return s
 
     def get_output_dirname(self):
@@ -116,29 +92,34 @@ class SpatialShips(Ships):
               ('obstructor', self.obstructor)]
         return make_repr_str(self, fs)
 
-    def get_output_dirname_obstruction_part(self):
+    def _get_output_dirname_obstruction_part(self):
+        obs = self.obstructor
         s = ''
-        if self.obstructor.__class__ is obstructors.NoneObstructor:
+
+        if obs.__class__ is obstructors.NoneObstructor:
             return 'noObs'
-        if self.obstructor.turner.__class__ is turners.Turner:
+
+        if obs.turner.__class__ is turners.Turner:
             s_turner = 'stall'
-        elif self.obstructor.turner.__class__ is turners.BounceBackTurner:
+        elif obs.turner.__class__ is turners.BounceBackTurner:
             s_turner = 'bback'
-        elif self.obstructor.turner.__class__ is turners.ReflectTurner:
+        elif obs.turner.__class__ is turners.ReflectTurner:
             s_turner = 'reflect'
-        elif self.obstructor.turner.__class__ is turners.AlignTurner:
+        elif obs.turner.__class__ is turners.AlignTurner:
             s_turner = 'align'
         s += 'turn={}'.format(s_turner)
-        if self.obstructor.__class__ is obstructors.SingleSphereObstructor2D:
-            s += ',ss_R={:g}'.format(self.obstructor.R)
-        elif self.obstructor.__class__ is obstructors.PorousObstructor:
-            s += ',pore_R={:g},pf={:g}'.format(self.obstructor.R,
-                                               self.obstructor.fraction_occupied)
+
+        if obs.__class__ is obstructors.SingleSphereObstructor2D:
+            s += ',ss_R={:g}'.format(obs.R)
+        elif obs.__class__ is obstructors.PorousObstructor:
+            s += ',pore_R={:g},pf={:g},period={}'.format(obs.R,
+                                                         obs.fraction_occupied,
+                                                         obs.periodic)
         return s
 
     def get_output_dirname(self):
         s = super(SpatialShips, self).get_output_dirname()
-        s += ',{}'.format(self.get_output_dirname_obstruction_part())
+        s += ',{}'.format(self._get_output_dirname_obstruction_part())
         return s
 
 
@@ -157,6 +138,16 @@ class CFieldShips(SpatialShips):
               ('obstructor', self.obstructor), ('c_field', self.c_field)]
         return make_repr_str(self, fs)
 
+    def _get_output_dirname_field_part(self):
+        field = self.field
+        s = 'c0={:g},cD={:g},cDelta={:g}'.format(field.c_0, field.D,
+                                                 field.delta)
+        return s
+
+    def get_output_dirname(self):
+        s = super(SpatialShips, self).get_output_dirname()
+        s += ',{}'.format(self._get_output_dirname_field_part())
+        return s
 
 def ships_factory(rng, dim, dt, n, aligned_flag,
                   chi=None, onesided_flag=None,
@@ -176,7 +167,7 @@ def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
                           chi=None, onesided_flag=None,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
-                          spatial_chemo_flag=None, dt_mem=None, t_mem=None):
+                          temporal_chemo_flag=None, dt_mem=None, t_mem=None):
     time = ahoy.stime.Time(dt)
     if obstructor is None:
         obstructor = obstructors.NoneObstructor()
@@ -186,7 +177,7 @@ def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
                                         chi, onesided_flag,
                                         p_0, tumble_chemo_flag,
                                         Dr_0, rotation_chemo_flag,
-                                        spatial_chemo_flag, dt_mem, t_mem,
+                                        temporal_chemo_flag, dt_mem, t_mem,
                                         time)
     return SpatialShips(time, ags, obstructor)
 
@@ -199,7 +190,7 @@ def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
                           chi=None, onesided_flag=None,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
-                          spatial_chemo_flag=None, dt_mem=None, t_mem=None):
+                          temporal_chemo_flag=None, dt_mem=None, t_mem=None):
     time = ahoy.stime.Time(dt)
     if obstructor is None:
         obstructor = ahoy.obstructors.NoneObstructor()
@@ -211,7 +202,7 @@ def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
                                         chi, onesided_flag,
                                         p_0, tumble_chemo_flag,
                                         Dr_0, rotation_chemo_flag,
-                                        spatial_chemo_flag, dt_mem, t_mem,
+                                        temporal_chemo_flag, dt_mem, t_mem,
                                         time,
                                         c_field)
     return CFieldShips(time, ags, obstructor, c_field)

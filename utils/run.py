@@ -20,14 +20,6 @@ def run_spatial():
         'dim': 2,
         'L': obstructor_kwargs['L'],
         'obstructor': PorousObstructor(**obstructor_kwargs),
-
-        'chi': 0.858,
-        'onesided_flag': True,
-
-        'Dr_0': 1.0,
-        'rotation_chemo_flag': True,
-
-        'spatial_chemo_flag': False,
     }
     ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
     shps = ships.spatial_ships_factory(**ship_kwargs)
@@ -58,13 +50,6 @@ def run_field():
 
         'aligned_flag': True,
 
-        'chi': 0.9,
-
-        'p_0': 1.0,
-        'tumble_chemo_flag': True,
-
-        'spatial_chemo_flag': True,
-
         'c_dx': np.array([50.0, 50.0]),
         'c_D': 10.0,
         'c_delta': 10.0,
@@ -86,19 +71,19 @@ def run_field():
 def run_chi_scan():
     ship_kwargs = default_ship_kwargs.copy()
 
-    t_output_every = 100.0
-    t_upto = 1000.0
-    chis = np.linspace(0.0, 0.95, 9)
+    t_output_every = 1.0
+    t_upto = 10.0
+    chis = np.linspace(0.0, 0.95, 3)
     force_resume = True
     parallel = True
 
     dims = [1, 2]
     noise_vars = ['Dr_0', 'p_0']
     onesided_flags = [True, False]
-    spatial_chemo_flags = [True, False]
+    temporal_chemo_flags = [True, False]
 
-    combos = product(noise_vars, dims, onesided_flags, spatial_chemo_flags)
-    for noise_var, dim, onesided_flag, spatial_chemo_flag in combos:
+    combos = product(noise_vars, dims, onesided_flags, temporal_chemo_flags)
+    for noise_var, dim, onesided_flag, temporal_chemo_flag in combos:
         if noise_var == 'Dr_0':
             if dim == 1:
                 continue
@@ -113,7 +98,7 @@ def run_chi_scan():
             ship_kwargs['tumble_chemo_flag'] = True
         ship_kwargs['dim'] = dim
         ship_kwargs['onesided_flag'] = onesided_flag
-        ship_kwargs['spatial_chemo_flag'] = spatial_chemo_flag
+        ship_kwargs['temporal_chemo_flag'] = temporal_chemo_flag
 
         run_utils.run_field_scan(ships.spatial_ships_factory, ship_kwargs,
                                  t_output_every, t_upto, 'chi', chis,
@@ -205,9 +190,9 @@ def run_pf_scan_drift():
 
     noise_vars = ['Dr_0', 'p_0']
     onesided_flags = [True, False]
-    spatial_chemo_flags = [True, False]
+    temporal_chemo_flags = [True, False]
 
-    combos = product(noise_vars, onesided_flags, spatial_chemo_flags)
+    combos = product(noise_vars, onesided_flags, temporal_chemo_flags)
 
     # Values of chi that give equivalent drift speeds in empty space.
     combo_to_chi = {
@@ -222,7 +207,7 @@ def run_pf_scan_drift():
     }
 
     for combo in combos:
-        noise_var, onesided_flag, spatial_chemo_flag = combo
+        noise_var, onesided_flag, temporal_chemo_flag = combo
         if noise_var == 'Dr_0':
             ship_kwargs['Dr_0'] = 1.0
             ship_kwargs['rotation_chemo_flag'] = True
@@ -234,7 +219,7 @@ def run_pf_scan_drift():
             ship_kwargs['p_0'] = 1.0
             ship_kwargs['tumble_chemo_flag'] = True
         ship_kwargs['onesided_flag'] = onesided_flag
-        ship_kwargs['spatial_chemo_flag'] = spatial_chemo_flag
+        ship_kwargs['temporal_chemo_flag'] = temporal_chemo_flag
         ship_kwargs['chi'] = combo_to_chi[combo]
 
         run_utils.run_field_scan(ships.spatial_ships_factory, ship_kwargs,
