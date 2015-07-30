@@ -296,7 +296,7 @@ def get_equiv_chi_key(m):
     noise_var_key = 'p_0' if m.agents.does_tumbling() else 'Dr_0'
     chemo_ruds = m.agents.get_chemo_rudders()
     key = (noise_var_key, chemo_ruds.is_onesided(),
-           chemo_ruds.noise_measurer.is_temporal())
+           not chemo_ruds.noise_measurer.is_temporal())
     return key
 
 
