@@ -7,7 +7,6 @@ from ahoy.utils.meta import make_repr_str
 
 class Field(object):
     def __init__(self, dim, mesh, c_0, rng=None):
-        # fipy.numerix.random.set_state(rng.get_state())
         self.mesh = mesh
         self.c_0 = c_0
         self.c = fipy.CellVariable(mesh=self.mesh, value=self.c_0)
