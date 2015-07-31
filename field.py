@@ -7,7 +7,6 @@ from ahoy.utils.meta import make_repr_str
 
 class Field(object):
     def __init__(self, dim, mesh, c_0, rng=None):
-        # fipy.numerix.random.set_state(rng.get_state())
         self.mesh = mesh
         self.c_0 = c_0
         self.c = fipy.CellVariable(mesh=self.mesh, value=self.c_0)
@@ -70,7 +69,7 @@ class FoodField(Field):
         rho_array = np.zeros(self.rho.shape)
         cids = self.get_nearest_cell_ids(ps)
         for i in cids:
-            rho_array[i] += self.rho.mesh.cellVolumes[i]
+            rho_array[i] += 1.0 / self.rho.mesh.cellVolumes[i]
         return rho_array
 
     def iterate(self, ps):

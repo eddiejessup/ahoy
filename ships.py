@@ -3,9 +3,6 @@ import numpy as np
 from ahoy.utils.meta import make_repr_str
 import ahoy
 from ahoy import obstructors, agents, field, turners
-from ahoy.measurers import TemporalDcDxMeasurer
-from ahoy.noise_measurers import (ChemoNoiseMeasurer,
-                                  OneSidedChemoNoiseMeasurer)
 
 
 class Ships(object):
@@ -112,9 +109,9 @@ class SpatialShips(Ships):
         if obs.__class__ is obstructors.SingleSphereObstructor2D:
             s += ',ss_R={:g}'.format(obs.R)
         elif obs.__class__ is obstructors.PorousObstructor:
-            s += ',pore_R={:g},pf={:g},period={}'.format(obs.R,
-                                                         obs.fraction_occupied,
-                                                         obs.periodic)
+            pf = obs.fraction_occupied
+            s += ',pore_R={:g},pf={:g},period={:d}'.format(obs.R, pf,
+                                                           obs.periodic)
         return s
 
     def get_output_dirname(self):
@@ -139,15 +136,16 @@ class CFieldShips(SpatialShips):
         return make_repr_str(self, fs)
 
     def _get_output_dirname_field_part(self):
-        field = self.field
-        s = 'c0={:g},cD={:g},cDelta={:g}'.format(field.c_0, field.D,
-                                                 field.delta)
+        c_field = self.c_field
+        s = 'c0={:g},cD={:g},cDelta={:g}'.format(c_field.c_0, c_field.D,
+                                                 c_field.delta)
         return s
 
     def get_output_dirname(self):
-        s = super(SpatialShips, self).get_output_dirname()
+        s = super(CFieldShips, self).get_output_dirname()
         s += ',{}'.format(self._get_output_dirname_field_part())
         return s
+
 
 def ships_factory(rng, dim, dt, n, aligned_flag,
                   chi=None, onesided_flag=None,

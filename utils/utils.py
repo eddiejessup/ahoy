@@ -312,3 +312,53 @@ def get_equiv_chi_dict(ud_0, dirname_sets):
         key, chi_equiv = get_equiv_chi_item(ud_0, dirnames)
         params_to_chi[key] = chi_equiv
     return params_to_chi
+
+
+def circle_segment_angle(d, R):
+    return 2.0 * np.arccos(d / R)
+
+
+def circle_segment_area(d, R):
+    if d > R:
+        return 0.0
+    elif d < -R:
+        return np.pi * R ** 2.0
+    else:
+        theta = circle_segment_angle(d, R)
+        return ((R ** 2) / 2.0) * (theta - np.sin(theta))
+
+
+def circle_cross_section_area(d_1, d_2, R):
+    return np.abs(circle_segment_area(d_1, R) - circle_segment_area(d_2, R))
+
+
+def linear_areas(rs, R, Lx, Ly, nx):
+    x = np.linspace(-Lx / 2.0, Lx / 2.0, nx)
+    linear_areas = np.full_like(x, Lx * Ly / nx)
+    for i_r in range(rs.shape[0]):
+        for i in range(nx - 1):
+            d_1 = rs[i_r] - x[i]
+            d_2 = rs[i_r] - x[i + 1]
+            cross_section_area = circle_cross_section_area(d_1, d_2, R)
+            linear_areas[i] -= cross_section_area
+    return linear_areas
+
+
+def linear_density(xs, xcs, R, Lx, Ly, dx):
+    nx = int(round(Lx / dx))
+    ns, x_bins = np.histogram(xs, bins=nx, range=(-Lx / 2.0, Lx / 2.0))
+    areas = linear_areas(xcs, R, Lx, Ly, nx)
+    densities = ns.astype(np.float) / areas
+    return densities, x_bins
+
+
+def get_linear_density(m, dx):
+    xs = m.agents.positions.r[:, 0]
+    try:
+        xcs = m.obstructor.rs[:, 0]
+        R = m.obstructor.R
+    except AttributeError:
+        xcs = np.array([])
+        R = 0.0
+    Lx, Ly = m.agents.positions.L
+    return linear_density(xs, xcs, R, Lx, Ly, dx)

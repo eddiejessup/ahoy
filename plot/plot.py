@@ -25,7 +25,6 @@ def plot_2d(dirname):
     has_c_field = hasattr(m_0, 'c_field')
     if has_c_field:
         plot_c = VarPlot(m_0.c_field.c, cmap=reds_cmap, axes=ax_vis)
-    print(has_c_field)
     plot_p = ax_vis.quiver(m_0.agents.positions.r_w()[:, 0],
                            m_0.agents.positions.r_w()[:, 1],
                            m_0.agents.directions.u()[:, 0],
@@ -54,20 +53,63 @@ def plot_2d(dirname):
     plt.show()
 
 
+def plot_linear_density(dirname):
+    fig = plt.figure()
+    ax_d = fig.add_subplot(211)
+    ax_c = fig.add_subplot(212)
+
+    fnames = output_utils.get_filenames(dirname)
+    m_0 = output_utils.filename_to_model(fnames[0])
+
+    L = m_0.agents.positions.L
+
+    dx = L[0] / 100.0
+
+    plt.subplots_adjust(left=0.25, bottom=0.25)
+
+    ds, xbs = utils.get_linear_density(m_0, dx)
+
+    plot_d = ax_d.bar(xbs[:-1], ds, width=xbs[1] - xbs[0])
+    c_field = m_0.c_field.c
+    plot_c = ax_c.scatter(c_field.mesh.cellCenters[0, :], c_field.value)
+    ax_slide = plt.axes([0.25, 0.1, 0.65, 0.03])
+    t_slider = Slider(ax_slide, 'Index', 0, len(fnames), valinit=0)
+
+    ax_d.set_xlim(-L[0] / 2.0, L[0] / 2.0)
+    ax_c.set_xlim(-L[0] / 2.0, L[0] / 2.0)
+    ax_c.set_ylim(0.0, m_0.c_field.c_0)
+
+    def update(val):
+        fname_i = int(round(val))
+        if 0 <= fname_i < len(fnames):
+            m = output_utils.filename_to_model(fnames[fname_i])
+            ds, xbs = utils.get_linear_density(m, dx)
+            for rect, d in zip(plot_d, ds):
+                rect.set_height(d)
+            c_field = m.c_field.c
+            plot_c.set_offsets(np.array([c_field.mesh.cellCenters[0, :],
+                                         c_field.value]).T)
+            fig.canvas.draw_idle()
+
+    t_slider.on_changed(update)
+
+    plt.show()
+
+
 def plot_1d(dirname):
     fig = plt.figure()
     ax_vis = fig.add_subplot(211)
     ax_d = fig.add_subplot(212)
 
     fnames = output_utils.get_filenames(dirname)
-
     m_0 = output_utils.filename_to_model(fnames[0])
 
     L = m_0.agents.positions.L
-    dx = L / 100.0
 
     ax_vis.set_xlim(-L[0] / 2.0, L[0] / 2.0)
     ax_d.set_xlim(-L[0] / 2.0, L[0] / 2.0)
+
+    dx = L / 100.0
 
     plt.subplots_adjust(left=0.25, bottom=0.25)
     plot_p = ax_vis.scatter(m_0.agents.positions.r_w()[:, 0],

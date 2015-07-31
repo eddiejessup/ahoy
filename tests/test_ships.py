@@ -112,7 +112,7 @@ class TestShips(test.TestBase):
             'v_0': 1.5,
             'L': L,
 
-            'c_dx': np.array([0.2, 0.2]),
+            'c_dx': 0.2,
             'c_D': 10.0,
             'c_delta': 1000.0,
             'c_0': 1.3,
@@ -129,6 +129,8 @@ class TestShips(test.TestBase):
             'rotation_chemo_flag': True,
 
             'temporal_chemo_flag': True,
+            'dt_mem': 0.1,
+            't_mem': 5.0
         }
 
         num_iterations = 100

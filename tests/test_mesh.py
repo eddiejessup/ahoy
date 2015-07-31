@@ -6,7 +6,7 @@ import test
 class TestUniformMesh1D(test.TestBase):
     dim = 1
     L = np.array([1.8])
-    dx = np.array([0.1])
+    dx = 0.1
 
     def test_uniform_mesh(self):
         msh = mesh.uniform_mesh_factory(self.L, self.dx)
@@ -20,7 +20,6 @@ class TestUniformMesh1D(test.TestBase):
 class TestUniformMesh2D(TestUniformMesh1D):
     dim = 2
     L = np.array([1.7, 3.0])
-    dx = np.array([0.1, 0.2])
 
 
 class TestPorousMesh(test.TestBase):
