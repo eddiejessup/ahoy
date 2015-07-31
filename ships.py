@@ -3,9 +3,6 @@ import numpy as np
 from ahoy.utils.meta import make_repr_str
 import ahoy
 from ahoy import obstructors, agents, field, turners
-from ahoy.measurers import TemporalDcDxMeasurer
-from ahoy.noise_measurers import (ChemoNoiseMeasurer,
-                                  OneSidedChemoNoiseMeasurer)
 
 
 class Ships(object):
