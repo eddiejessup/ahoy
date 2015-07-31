@@ -51,7 +51,7 @@ class SphereObstructor(BaseObstructor):
         return geom.sphere_volume(self.R, self.dim)
 
     @abstractmethod
-    def _get_normals(self, seps):
+    def _get_th_normals(self, seps):
         return
 
     @abstractmethod
@@ -62,8 +62,8 @@ class SphereObstructor(BaseObstructor):
         seps = self.get_seps(ps.r_w())
         obs = self._is_obstructed(seps)
         self._push(obs, ps.r, drs)
-        normals = self._get_normals(seps[obs])
-        self.turner.turn(obs, ds, normals, rng)
+        th_normals = self._get_th_normals(seps[obs])
+        self.turner.turn(obs, ds, th_normals, rng)
 
     def __repr__(self):
         fs = [('turner', self.turner), ('R', self.R)]
@@ -72,7 +72,7 @@ class SphereObstructor(BaseObstructor):
 
 class SphereObstructor2D(SphereObstructor):
 
-    def _get_normals(self, seps):
+    def _get_th_normals(self, seps):
         return np.arctan2(seps[:, 1], seps[:, 0])
 
 
