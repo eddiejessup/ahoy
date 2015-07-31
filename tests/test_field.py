@@ -55,7 +55,7 @@ class TestFoodField1D(test.TestBase):
 
     def test_rho_array_uniform(self):
         dim = self.L.shape[0]
-        rho_expected = np.product(self.dx)
+        rho_expected = 1.0 / np.product(self.dx)
 
         mesh = uniform_mesh_factory(self.L, self.dx)
         r_centers = mesh.cellCenters.value.T

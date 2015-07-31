@@ -63,7 +63,7 @@ def uniform_mesh_factory(L, dx):
     if dim == 1:
         return fipy.Grid1D(dx=dx[0], Lx=L[0]) - L[0] / 2.0
     elif dim == 2:
-        return (fipy.Grid2D(dx=dx[0], dy=dx[1], Lx=L[0], Ly=L[1]) -
+        return (fipy.Grid2D(dx=dx, dy=dx, Lx=L[0], Ly=L[1]) -
                 ((L[0] / 2.0,), (L[1] / 2.0,)))
 
 

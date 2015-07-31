@@ -129,7 +129,7 @@ class PorousObstructor(SphereObstructor2D):
         return distance.csep_periodic_close(rs, self.rs, self.L)[0]
 
     def get_mesh(self, L, dx):
-        return mesh.porous_mesh_factory(self.rs, self.R, dx[0], L)
+        return mesh.porous_mesh_factory(self.rs, self.R, dx, L)
 
     def __repr__(self):
         fs = [('turner', self.turner), ('R', self.R), ('L', self.L),
