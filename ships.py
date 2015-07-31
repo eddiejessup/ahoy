@@ -109,9 +109,9 @@ class SpatialShips(Ships):
         if obs.__class__ is obstructors.SingleSphereObstructor2D:
             s += ',ss_R={:g}'.format(obs.R)
         elif obs.__class__ is obstructors.PorousObstructor:
-            s += ',pore_R={:g},pf={:g},period={}'.format(obs.R,
-                                                         obs.fraction_occupied,
-                                                         obs.periodic)
+            pf = obs.fraction_occupied
+            s += ',pore_R={:g},pf={:g},period={:d}'.format(obs.R, pf,
+                                                           obs.periodic)
         return s
 
     def get_output_dirname(self):
@@ -145,6 +145,7 @@ class CFieldShips(SpatialShips):
         s = super(CFieldShips, self).get_output_dirname()
         s += ',{}'.format(self._get_output_dirname_field_part())
         return s
+
 
 def ships_factory(rng, dim, dt, n, aligned_flag,
                   chi=None, onesided_flag=None,
