@@ -125,6 +125,14 @@ class PorousObstructor(SphereObstructor2D):
     def fraction_occupied(self):
         return self.volume_occupied / self.volume
 
+    @property
+    def volume_free(self):
+        return self.volume - self.volume_occupied
+
+    @property
+    def fraction_free(self):
+        return self.volume_free / self.volume
+
     def get_seps(self, rs):
         return distance.csep_periodic_close(rs, self.rs, self.L)[0]
 
