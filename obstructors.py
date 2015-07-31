@@ -51,19 +51,19 @@ class SphereObstructor(BaseObstructor):
         return geom.sphere_volume(self.R, self.dim)
 
     @abstractmethod
-    def _get_normals(self, seps):
+    def _get_th_normals(self, seps):
         return
 
     @abstractmethod
     def get_seps(self, rs):
         return rs
 
-    def obstruct(self, ps, drs, ds):
+    def obstruct(self, ps, drs, ds, rng=None):
         seps = self.get_seps(ps.r_w())
         obs = self._is_obstructed(seps)
         self._push(obs, ps.r, drs)
-        normals = self._get_normals(seps[obs])
-        self.turner.turn(obs, ds, normals)
+        th_normals = self._get_th_normals(seps[obs])
+        self.turner.turn(obs, ds, th_normals, rng)
 
     def __repr__(self):
         fs = [('turner', self.turner), ('R', self.R)]
@@ -72,7 +72,7 @@ class SphereObstructor(BaseObstructor):
 
 class SphereObstructor2D(SphereObstructor):
 
-    def _get_normals(self, seps):
+    def _get_th_normals(self, seps):
         return np.arctan2(seps[:, 1], seps[:, 0])
 
 
@@ -124,6 +124,14 @@ class PorousObstructor(SphereObstructor2D):
     @property
     def fraction_occupied(self):
         return self.volume_occupied / self.volume
+
+    @property
+    def volume_free(self):
+        return self.volume - self.volume_occupied
+
+    @property
+    def fraction_free(self):
+        return self.volume_free / self.volume
 
     def get_seps(self, rs):
         return distance.csep_periodic_close(rs, self.rs, self.L)[0]
