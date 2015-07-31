@@ -139,13 +139,13 @@ class CFieldShips(SpatialShips):
         return make_repr_str(self, fs)
 
     def _get_output_dirname_field_part(self):
-        field = self.field
-        s = 'c0={:g},cD={:g},cDelta={:g}'.format(field.c_0, field.D,
-                                                 field.delta)
+        c_field = self.c_field
+        s = 'c0={:g},cD={:g},cDelta={:g}'.format(c_field.c_0, c_field.D,
+                                                 c_field.delta)
         return s
 
     def get_output_dirname(self):
-        s = super(SpatialShips, self).get_output_dirname()
+        s = super(CFieldShips, self).get_output_dirname()
         s += ',{}'.format(self._get_output_dirname_field_part())
         return s
 
