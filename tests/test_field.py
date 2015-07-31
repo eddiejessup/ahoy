@@ -19,7 +19,7 @@ def get_nearest_cell_ids_manual(f, ps):
 
 class TestField1D(test.TestBase):
     L = np.array([1.6])
-    dx = np.array([0.1])
+    dx = 0.1
 
     x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
     rs_special = np.array(list(product(x_vals)))
@@ -42,7 +42,6 @@ class TestField1D(test.TestBase):
 
 class TestField2D(TestField1D):
     L = np.array([1.0, 2.0])
-    dx = np.array([0.1, 0.2])
 
     x_vals = [-L[0] / 2.012, -0.312, 0.01, 0.121, L[0] / 1.976]
     y_vals = [-L[1] / 1.99632, -0.312, 0.01, 0.121, L[1] / 2.0021]
@@ -51,11 +50,11 @@ class TestField2D(TestField1D):
 
 class TestFoodField1D(test.TestBase):
     L = np.array([4.0])
-    dx = np.array([0.005])
+    dx = 0.005
 
     def test_rho_array_uniform(self):
         dim = self.L.shape[0]
-        rho_expected = 1.0 / np.product(self.dx)
+        rho_expected = 1.0 / (self.dx ** dim)
 
         mesh = uniform_mesh_factory(self.L, self.dx)
         r_centers = mesh.cellCenters.value.T
@@ -71,13 +70,13 @@ class TestFoodField1D(test.TestBase):
 
     def test_decay_term(self):
         dim = self.L.shape[0]
-        rho_expected = np.product(self.dx)
+        rho_expected = 1.0 / (self.dx ** dim)
 
         mesh = uniform_mesh_factory(self.L, self.dx)
         r_centers = mesh.cellCenters.value.T
         ps_centers = positions.PeriodicPositions(self.L, r_centers)
 
-        dt = 0.01
+        dt = 0.00001
         D = 0.0
         delta = 1.0
         c_0 = 1.0
@@ -112,7 +111,7 @@ class TestFoodField1D(test.TestBase):
         mean = dim * [0.0]
         cov = np.identity(dim) * variance
         mn = multivariate_normal(mean, cov)
-        c_expected = (c_0 * np.product(self.dx)) * mn.pdf(r_centers)
+        c_expected = (c_0 * self.dx ** dim) * mn.pdf(r_centers)
         # print(c_expected)
         # print(f.c.value)
         # import matplotlib.pyplot as plt
@@ -153,4 +152,4 @@ class TestFoodField1D(test.TestBase):
 
 class TestFoodField2D(TestFoodField1D):
     L = np.array(2 * [4.0])
-    dx = np.array(2 * [0.05])
+    dx = 0.05

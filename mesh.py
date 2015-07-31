@@ -61,7 +61,7 @@ def _porous_mesh_geo_factory(rs, R, dx, L):
 def uniform_mesh_factory(L, dx):
     dim = len(L)
     if dim == 1:
-        return fipy.Grid1D(dx=dx[0], Lx=L[0]) - L[0] / 2.0
+        return fipy.Grid1D(dx=dx, Lx=L[0]) - L[0] / 2.0
     elif dim == 2:
         return (fipy.Grid2D(dx=dx, dy=dx, Lx=L[0], Ly=L[1]) -
                 ((L[0] / 2.0,), (L[1] / 2.0,)))
