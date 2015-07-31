@@ -24,11 +24,11 @@ gmsh_text_circle = '''
 x = %(x)g;
 y = %(y)g;
 R = %(R)g;
-p_c = newp; Point(p_c) = {x, y, 0};
-p_w = newp; Point(p_w) = {x - R, y, 0};
-p_n = newp; Point(p_n) = {x, y + R, 0};
-p_e = newp; Point(p_e) = {x + R, y, 0};
-p_s = newp; Point(p_s) = {x, y - R, 0};
+p_c = newp; Point(p_c) = {x, y, 0, dx};
+p_w = newp; Point(p_w) = {x - R, y, 0, dx};
+p_n = newp; Point(p_n) = {x, y + R, 0, dx};
+p_e = newp; Point(p_e) = {x + R, y, 0, dx};
+p_s = newp; Point(p_s) = {x, y - R, 0, dx};
 c_w_n = newreg; Circle(c_w_n) = {p_w, p_c, p_n};
 c_n_e = newreg; Circle(c_n_e) = {p_n, p_c, p_e};
 c_e_s = newreg; Circle(c_e_s) = {p_e, p_c, p_s};
