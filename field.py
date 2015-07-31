@@ -69,7 +69,7 @@ class FoodField(Field):
         rho_array = np.zeros(self.rho.shape)
         cids = self.get_nearest_cell_ids(ps)
         for i in cids:
-            rho_array[i] += self.rho.mesh.cellVolumes[i]
+            rho_array[i] += 1.0 / self.rho.mesh.cellVolumes[i]
         return rho_array
 
     def iterate(self, ps):
