@@ -129,6 +129,8 @@ class TestShips(test.TestBase):
             'rotation_chemo_flag': True,
 
             'temporal_chemo_flag': True,
+            'dt_mem': 0.1,
+            't_mem': 5.0
         }
 
         num_iterations = 100
