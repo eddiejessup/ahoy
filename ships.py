@@ -156,10 +156,11 @@ class CFieldShips(SpatialShips):
         return s
 
 
-def ships_factory(rng, dim, dt, n, aligned_flag,
+def ships_factory(seed, dim, dt, n, aligned_flag,
                   chi=None, onesided_flag=None,
                   p_0=None, tumble_chemo_flag=None,
                   Dr_0=None, rotation_chemo_flag=None):
+    rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
     ags = agents.agents_factory(rng, dim, n, aligned_flag,
                                 chi, onesided_flag,
@@ -168,13 +169,14 @@ def ships_factory(rng, dim, dt, n, aligned_flag,
     return Ships(rng, time, ags)
 
 
-def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
+def spatial_ships_factory(seed, dim, dt, n, aligned_flag,
                           v_0,
                           L=None, origin_flags=None, obstructor=None,
                           chi=None, onesided_flag=None,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
                           temporal_chemo_flag=None, dt_mem=None, t_mem=None):
+    rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
     if obstructor is None:
         obstructor = obstructors.NoneObstructor()
@@ -189,7 +191,7 @@ def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
     return SpatialShips(rng, time, ags, obstructor)
 
 
-def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
+def c_field_ships_factory(seed, dim, dt, rho_0, aligned_flag,
                           v_0,
                           L,
                           c_dx, c_D, c_delta, c_0,
@@ -198,6 +200,7 @@ def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
                           temporal_chemo_flag=None, dt_mem=None, t_mem=None):
+    rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
     if obstructor is None:
         obstructor = ahoy.obstructors.NoneObstructor()

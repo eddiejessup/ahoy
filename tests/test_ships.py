@@ -7,6 +7,7 @@ import test
 class TestShips(test.TestBase):
     def test_ships_random_seeding(self):
         ships_kwargs = {
+            'seed': 1,
             'dim': 2,
             'dt': 0.01,
             'n': 10,
@@ -27,8 +28,7 @@ class TestShips(test.TestBase):
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            rng = np.random.RandomState(rng_seed)
-            shps = ships.ships_factory(rng, **ships_kwargs)
+            shps = ships.ships_factory(**ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
             return shps
@@ -49,6 +49,7 @@ class TestShips(test.TestBase):
             'periodic': True,
         }
         ships_kwargs = {
+            'seed': 1,
             'dim': 2,
             'dt': 0.01,
             'n': 10,
@@ -74,13 +75,11 @@ class TestShips(test.TestBase):
         }
 
         num_iterations = 100
-        rng_seed = 1
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            rng = np.random.RandomState(rng_seed)
             obstructor = PorousObstructor(rng=rng, **obstructor_kwargs)
-            shps = ships.spatial_ships_factory(rng, obstructor=obstructor,
+            shps = ships.spatial_ships_factory(obstructor=obstructor,
                                                **ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
@@ -104,6 +103,7 @@ class TestShips(test.TestBase):
             'periodic': False,
         }
         ships_kwargs = {
+            'seed': 1,
             'dim': 2,
             'dt': 0.01,
             'n': 10,
@@ -134,13 +134,11 @@ class TestShips(test.TestBase):
         }
 
         num_iterations = 100
-        rng_seed = 1
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            rng = np.random.RandomState(rng_seed)
             obstructor = PorousObstructor(rng=rng, **obstructor_kwargs)
-            shps = ships.c_field_ships_factory(rng, obstructor=obstructor,
+            shps = ships.c_field_ships_factory(obstructor=obstructor,
                                                **ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
