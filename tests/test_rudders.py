@@ -20,13 +20,13 @@ class TestRotationRudders2D(test.TestBase):
         t_max = 0.5
 
         ds = directions.make_directions(n, self.dim, aligned_flag=True)
-        rudders = self.rudders_cls(self.noise_measurer, self.rng)
+        rudders = self.rudders_cls(self.noise_measurer)
 
         u_0 = ds.u()
         ts = np.arange(0.0, t_max, self.dt)
         mean_dots = []
         for t in ts:
-            ds = rudders.rotate(ds, self.dt)
+            ds = rudders.rotate(ds, self.dt, self.rng)
             mean_dot = np.mean(np.sum(u_0 * ds.u(), axis=-1))
             mean_dots.append(mean_dot)
 
@@ -42,19 +42,17 @@ class TestRotationRudders2D(test.TestBase):
         num_iterations = 100
         rng_seed = 1
 
-        rng = np.random.RandomState(rng_seed)
-        np.random.seed(2)
-        ds_1 = directions.make_directions(n, self.dim, aligned_flag=True)
-        ruds_1 = self.rudders_cls(self.noise_measurer, rng)
-        for _ in range(num_iterations):
-            ds_1 = ruds_1.rotate(ds_1, self.dt)
+        def get_ds(npy_seed):
+            rng = np.random.RandomState(rng_seed)
+            np.random.seed(npy_seed)
+            ds = directions.make_directions(n, self.dim, aligned_flag=True)
+            ruds = self.rudders_cls(self.noise_measurer)
+            for _ in range(num_iterations):
+                ds = ruds.rotate(ds, self.dt, rng)
+            return ds
 
-        rng = np.random.RandomState(rng_seed)
-        np.random.seed(3)
-        ds_2 = directions.make_directions(n, self.dim, aligned_flag=True)
-        ruds_2 = self.rudders_cls(self.noise_measurer, rng)
-        for _ in range(num_iterations):
-            ds_2 = ruds_2.rotate(ds_2, self.dt)
+        ds_1 = get_ds(2)
+        ds_2 = get_ds(3)
 
         self.assertTrue(np.allclose(ds_1.u(), ds_2.u()))
 
@@ -76,8 +74,8 @@ class TestTumbleRudders1D(TestRotationRudders2D):
         ds = directions.make_directions(n, self.dim, aligned_flag=False,
                                         rng=self.rng)
         u_0 = ds.u()
-        ruds = rudders.TumbleRudders(noise_measurer, self.rng)
-        ds_rot = ruds.rotate(ds, dt)
+        ruds = rudders.TumbleRudders(noise_measurer)
+        ds_rot = ruds.rotate(ds, dt, self.rng)
         u_change = np.not_equal(u_0, ds_rot.u())
         n_actual = np.any(u_change, axis=-1).sum()
         err = np.abs(n_expected - n_actual) / n_expected

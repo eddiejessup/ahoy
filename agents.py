@@ -10,9 +10,9 @@ class Agents(object):
         self.directions = directions
         self.rudder_sets = rudder_sets
 
-    def iterate(self, dt):
+    def iterate(self, dt, rng):
         for ruds in self.rudder_sets:
-            self.directions = ruds.rotate(self.directions, dt)
+            self.directions = ruds.rotate(self.directions, dt, rng)
 
     def get_chi(self):
         for ruds in self.rudder_sets:
@@ -50,8 +50,8 @@ class SpatialAgents(Agents):
         self.positions = positions
         self.swimmers = swimmers
 
-    def iterate(self, dt, obstructor):
-        super(SpatialAgents, self).iterate(dt)
+    def iterate(self, dt, rng, obstructor):
+        super(SpatialAgents, self).iterate(dt, rng)
         self.positions, dr = self.swimmers.displace(self.positions, dt)
         obstructor.obstruct(self.positions, dr, self.directions)
 
@@ -68,7 +68,7 @@ def agents_factory(rng, dim, n, aligned_flag,
     ds = directions.make_directions(n, dim, aligned_flag=aligned_flag, rng=rng)
     dc_dx_measurer = measurers.spatial_dc_dx_factory(ds)
     rudder_sets = rudders.rudder_set_factory(onesided_flag, chi,
-                                             dc_dx_measurer, rng,
+                                             dc_dx_measurer,
                                              tumble_chemo_flag, p_0,
                                              rotation_chemo_flag, Dr_0, dim)
     return Agents(ds, rudder_sets)
@@ -90,7 +90,7 @@ def spatial_agents_factory(rng, dim, n, aligned_flag,
                                              time,
                                              c_field)
     rudder_sets = rudders.rudder_set_factory(onesided_flag, chi,
-                                             dc_dx_measurer, rng,
+                                             dc_dx_measurer,
                                              tumble_chemo_flag, p_0,
                                              rotation_chemo_flag, Dr_0, dim)
     swims = swimmers.Swimmers(v_0, ds)

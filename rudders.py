@@ -8,17 +8,14 @@ from ahoy.noise_measurers import noise_measurer_factory
 
 class Rudders(object):
 
-    def __init__(self, noise_measurer, rng=None):
+    def __init__(self, noise_measurer):
         self.noise_measurer = noise_measurer
-        if rng is None:
-            rng = np.random.RandomState()
-        self.rng = rng
 
-    def rotate(self, directions, dt):
+    def rotate(self, directions, dt, rng=None):
         noise = self.noise_measurer.get_noise()
-        return self._rotate(directions, noise, dt)
+        return self._rotate(directions, noise, dt, rng)
 
-    def _rotate(self, directions, noise, dt):
+    def _rotate(self, directions, noise, dt, rng):
         return directions
 
     def is_chemotactic(self):
@@ -36,7 +33,7 @@ class Rudders(object):
             return None
 
     def __repr__(self):
-        fs = [('noise_measurer', self.noise_measurer), ('rng', self.rng)]
+        fs = [('noise_measurer', self.noise_measurer)]
         return make_repr_str(self, fs)
 
 
@@ -47,26 +44,29 @@ class RotationRudders(Rudders):
     def _get_dth(self, directions, noise, dt):
         return
 
-    def _rotate(self, directions, noise, dt):
-        dth = self._get_dth(directions, noise, dt)
+    def _rotate(self, directions, noise, dt, rng):
+        dth = self._get_dth(directions, noise, dt, rng)
         return directions.rotate(dth)
 
 
 class RotationRudders2D(RotationRudders):
 
-    def _get_dth(self, directions, noise, dt):
-        return self.rng.normal(scale=np.sqrt(2.0 * noise * dt),
-                               size=directions.n)
+    def _get_dth(self, directions, noise, dt, rng):
+        if rng is None:
+            rng = np.random
+        return rng.normal(scale=np.sqrt(2.0 * noise * dt), size=directions.n)
 
 
 class TumbleRudders(Rudders):
 
-    def _get_tumblers(self, directions, noise, dt):
-        return self.rng.uniform(size=directions.n) < noise * dt
+    def _get_tumblers(self, directions, noise, dt, rng):
+        if rng is None:
+            rng = np.random
+        return rng.uniform(size=directions.n) < noise * dt
 
-    def _rotate(self, directions, noise, dt):
-        tumblers = self._get_tumblers(directions, dt, noise)
-        return directions.tumble(tumblers, self.rng)
+    def _rotate(self, directions, noise, dt, rng):
+        tumblers = self._get_tumblers(directions, noise, dt, rng)
+        return directions.tumble(tumblers, rng)
 
 
 def rotation_rudders_factory(dim, *args, **kwargs):
@@ -77,7 +77,7 @@ def rotation_rudders_factory(dim, *args, **kwargs):
                                   ' dimension')
 
 
-def rudder_set_factory(onesided_flag, chi, dc_dx_measurer, rng,
+def rudder_set_factory(onesided_flag, chi, dc_dx_measurer,
                        tumble_chemo_flag, p_0,
                        rotation_chemo_flag, Dr_0, dim):
     rudder_sets = []
@@ -85,13 +85,12 @@ def rudder_set_factory(onesided_flag, chi, dc_dx_measurer, rng,
         tumble_noise_measurer = noise_measurer_factory(tumble_chemo_flag,
                                                        onesided_flag, p_0, chi,
                                                        dc_dx_measurer)
-        rudder_sets.append(TumbleRudders(tumble_noise_measurer, rng))
+        rudder_sets.append(TumbleRudders(tumble_noise_measurer))
 
     if Dr_0:
         rotation_noise_measurer = noise_measurer_factory(rotation_chemo_flag,
                                                          onesided_flag, Dr_0,
                                                          chi, dc_dx_measurer)
         rudder_sets.append(rotation_rudders_factory(dim,
-                                                    rotation_noise_measurer,
-                                                    rng))
+                                                    rotation_noise_measurer))
     return rudder_sets

@@ -26,7 +26,7 @@ class TestTurner(test.TestBase):
         print('In: {:g}'.format(th_in))
         th_in = np.array([th_in])
         th_normal = np.array([th_normal])
-        th_out = self.turner.get_norm_angle(th_in, th_normal)
+        th_out = self.turner.get_norm_angle(th_in, th_normal, self.rng)
         print('Out: {:g}'.format(th_out[0]))
         print('Expected: {:g}'.format(th_out_expected))
         self.assertTrue(np.allclose(angle_dist(th_out, th_out_expected), 0.0))
@@ -47,7 +47,7 @@ class TestTurner(test.TestBase):
         for i in range(-2, 2):
             th_normal = np.pi + i * 2.0 * np.pi
             th_normal = np.array([th_normal])
-            th_out = self.turner.get_norm_angle(th_in, th_normal)
+            th_out = self.turner.get_norm_angle(th_in, th_normal, self.rng)
             th_outs.append(th_out[0])
         print(th_outs)
         dths = angle_dist(th_outs, th_outs[0])
@@ -148,12 +148,12 @@ class TestAlignTurner(TestTurner):
         self.do_turning(self.right, self.SW, self.down)
 
     def do_antiparallel(self, th_in, th_normal, th_out_1, th_out_2):
-        self.turner = self.turner_cls(rng=self.rng)
+        self.turner = self.turner_cls()
         n = 1000
         th_in = np.full([n], th_in)
         th_normal = np.full([n], th_normal)
 
-        th_out = self.turner.get_norm_angle(th_in, th_normal)
+        th_out = self.turner.get_norm_angle(th_in, th_normal, self.rng)
         print(th_out)
 
         frac_1 = np.isclose(angle_dist(th_out, th_out_1), 0.0).sum() / float(n)

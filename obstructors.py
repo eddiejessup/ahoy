@@ -58,12 +58,12 @@ class SphereObstructor(BaseObstructor):
     def get_seps(self, rs):
         return rs
 
-    def obstruct(self, ps, drs, ds):
+    def obstruct(self, ps, drs, ds, rng=None):
         seps = self.get_seps(ps.r_w())
         obs = self._is_obstructed(seps)
         self._push(obs, ps.r, drs)
         normals = self._get_normals(seps[obs])
-        self.turner.turn(obs, ds, normals)
+        self.turner.turn(obs, ds, normals, rng)
 
     def __repr__(self):
         fs = [('turner', self.turner), ('R', self.R)]

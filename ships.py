@@ -7,12 +7,13 @@ from ahoy import obstructors, agents, field, turners
 
 class Ships(object):
 
-    def __init__(self, time, ags, *args, **kwargs):
+    def __init__(self, rng, time, ags, *args, **kwargs):
+        self.rng = rng
         self.time = time
         self.agents = ags
 
     def iterate(self):
-        self.agents.iterate(self.time.dt)
+        self.agents.iterate(self.time.dt, self.rng)
         self.time.iterate()
 
     @property
@@ -32,7 +33,7 @@ class Ships(object):
         return self.time.i
 
     def __repr__(self):
-        fs = [('time', self.time), ('agents', self.agents)]
+        fs = [('rng', self.rng), ('time', self.time), ('agents', self.agents)]
         return make_repr_str(self, fs)
 
     def _get_output_dirname_agent_part(self):
@@ -69,19 +70,20 @@ class Ships(object):
         return s
 
     def get_output_dirname(self):
-        s = 'ships_{}D,dt={:g}'.format(self.dim, self.time.dt)
+        s = 'ships_{}D,dt={:g},rng={}'.format(self.dim, self.time.dt,
+                                              hash(self.rng))
         s += ',{}'.format(self._get_output_dirname_agent_part())
         return s
 
 
 class SpatialShips(Ships):
 
-    def __init__(self, time, ags, obstructor):
-        super(SpatialShips, self).__init__(time, ags)
+    def __init__(self, rng, time, ags, obstructor):
+        super(SpatialShips, self).__init__(rng, time, ags)
         self.obstructor = obstructor
 
     def iterate(self):
-        self.agents.iterate(self.time.dt, self.obstructor)
+        self.agents.iterate(self.time.dt, self.rng, self.obstructor)
         self.time.iterate()
 
     def __repr__(self):
@@ -122,8 +124,8 @@ class SpatialShips(Ships):
 
 class CFieldShips(SpatialShips):
 
-    def __init__(self, time, ags, obstructor, c_field):
-        super(CFieldShips, self).__init__(time, ags, obstructor)
+    def __init__(self, rng, time, ags, obstructor, c_field):
+        super(CFieldShips, self).__init__(rng, time, ags, obstructor)
         self.c_field = c_field
 
     def iterate(self):
@@ -156,7 +158,7 @@ def ships_factory(rng, dim, dt, n, aligned_flag,
                                 chi, onesided_flag,
                                 p_0, tumble_chemo_flag,
                                 Dr_0, rotation_chemo_flag)
-    return Ships(time, ags)
+    return Ships(rng, time, ags)
 
 
 def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
@@ -177,7 +179,7 @@ def spatial_ships_factory(rng, dim, dt, n, aligned_flag,
                                         Dr_0, rotation_chemo_flag,
                                         temporal_chemo_flag, dt_mem, t_mem,
                                         time)
-    return SpatialShips(time, ags, obstructor)
+    return SpatialShips(rng, time, ags, obstructor)
 
 
 def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
@@ -203,4 +205,4 @@ def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
                                         temporal_chemo_flag, dt_mem, t_mem,
                                         time,
                                         c_field)
-    return CFieldShips(time, ags, obstructor, c_field)
+    return CFieldShips(rng, time, ags, obstructor, c_field)
