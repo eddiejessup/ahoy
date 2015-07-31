@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+from hashlib import sha224
 import numpy as np
 from ahoy.utils.meta import make_repr_str
 import ahoy
@@ -9,6 +10,8 @@ class Ships(object):
 
     def __init__(self, rng, time, ags, *args, **kwargs):
         self.rng = rng
+        init_rng_state = self.rng.get_state()[1]
+        self.init_rng_state_hash = sha224(str(init_rng_state)).hexdigest()
         self.time = time
         self.agents = ags
 
@@ -69,9 +72,13 @@ class Ships(object):
                                                         measurer.t_mem)
         return s
 
+    @property
+    def init_rng_state_summary(self):
+        return self.init_rng_state_hash[:5]
+
     def get_output_dirname(self):
         s = 'ships_{}D,dt={:g},rng={}'.format(self.dim, self.time.dt,
-                                              hash(self.rng))
+                                              self.init_rng_state_summary)
         s += ',{}'.format(self._get_output_dirname_agent_part())
         return s
 
