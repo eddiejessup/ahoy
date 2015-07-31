@@ -1,6 +1,6 @@
 import numpy as np
 
-L_porous = np.array([200.0, 200.0])
+L_porous = np.array([300.0, 300.0])
 R_porous = 30.0
 rng = np.random.RandomState(1)
 

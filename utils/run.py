@@ -182,8 +182,8 @@ def run_pf_scan_drift():
     ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 100.0
-    t_upto = 500.0
-    pfs = np.linspace(0.0, 0.8, 11)
+    t_upto = 400.0
+    pfs = np.linspace(0.0, 0.8, 22)
     obstructors = [PorousObstructor(pf=pf, **obstructor_kwargs) for pf in pfs]
     force_resume = True
     parallel = True
