@@ -11,7 +11,7 @@ class TestPorousObstructor(test.TestBase):
             'R': 50.0,
             'L': np.array([200.0, 200.0]),
             'pf': 0.4,
-            'periodic': True,
+            'periodic_flag': True,
         }
 
         rng_seed = 1

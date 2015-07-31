@@ -112,8 +112,8 @@ class SpatialShips(Ships):
             s += ',ss_R={:g}'.format(obs.R)
         elif obs.__class__ is obstructors.PorousObstructor:
             pf = obs.fraction_occupied
-            s += ',pore_R={:g},pf={:g},period={:d}'.format(obs.R, pf,
-                                                           obs.periodic)
+            s += ',pore_R={:g},pf={:g},periodic={:d}'.format(obs.R, pf,
+                                                             obs.periodic_flag)
         return s
 
     def get_output_dirname(self):
