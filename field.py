@@ -6,7 +6,7 @@ from ahoy.utils.meta import make_repr_str
 
 
 class Field(object):
-    def __init__(self, dim, mesh, c_0, rng=None):
+    def __init__(self, dim, mesh, c_0):
         self.mesh = mesh
         self.c_0 = c_0
         self.c = fipy.CellVariable(mesh=self.mesh, value=self.c_0)
@@ -53,8 +53,8 @@ class Field(object):
 
 class FoodField(Field):
 
-    def __init__(self, dim, mesh, dt, D, delta, c_0, rng=None):
-        super(FoodField, self).__init__(dim, mesh, c_0, rng)
+    def __init__(self, dim, mesh, dt, D, delta, c_0):
+        super(FoodField, self).__init__(dim, mesh, c_0)
         self.dt = dt
         self.D = D
         self.delta = delta

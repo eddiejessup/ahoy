@@ -136,13 +136,13 @@ class TestFoodField1D(test.TestBase):
         ps = positions.PeriodicPositions(self.L, r_0)
 
         np.random.seed(2)
-        f_1 = field.FoodField(dim, mesh, dt, D, delta, c_0, rng=None)
+        f_1 = field.FoodField(dim, mesh, dt, D, delta, c_0)
         for t in np.arange(0.0, t_max, dt):
             ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
             f_1.iterate(ps)
 
         np.random.seed(3)
-        f_2 = field.FoodField(dim, mesh, dt, D, delta, c_0, rng=None)
+        f_2 = field.FoodField(dim, mesh, dt, D, delta, c_0)
         for t in np.arange(0.0, t_max, dt):
             ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
             f_2.iterate(ps)

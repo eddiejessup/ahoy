@@ -195,7 +195,7 @@ def c_field_ships_factory(rng, dim, dt, n, aligned_flag,
     if obstructor is None:
         obstructor = ahoy.obstructors.NoneObstructor()
     mesh = obstructor.get_mesh(L, c_dx)
-    c_field = field.FoodField(dim, mesh, dt, c_D, c_delta, c_0, rng)
+    c_field = field.FoodField(dim, mesh, dt, c_D, c_delta, c_0)
     ags = agents.spatial_agents_factory(rng, dim, n, aligned_flag,
                                         v_0,
                                         L, origin_flags, obstructor,
