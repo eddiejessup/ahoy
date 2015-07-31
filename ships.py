@@ -171,15 +171,18 @@ def ships_factory(seed, dim, dt, n, aligned_flag,
 
 def spatial_ships_factory(seed, dim, dt, n, aligned_flag,
                           v_0,
-                          L=None, origin_flags=None, obstructor=None,
+                          L=None, origin_flags=None,
+                          pore_flag=None, pore_turner=None, pore_R=None,
+                          pore_pf=None,
                           chi=None, onesided_flag=None,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
                           temporal_chemo_flag=None, dt_mem=None, t_mem=None):
     rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
-    if obstructor is None:
-        obstructor = obstructors.NoneObstructor()
+    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
+                                                L, pore_pf, rng,
+                                                periodic_flag=True)
     ags = agents.spatial_agents_factory(rng, dim, n, aligned_flag,
                                         v_0,
                                         L, origin_flags, obstructor,
@@ -195,17 +198,23 @@ def c_field_ships_factory(seed, dim, dt, rho_0, aligned_flag,
                           v_0,
                           L,
                           c_dx, c_D, c_delta, c_0,
-                          origin_flags=None, obstructor=None,
+                          origin_flags=None,
+                          pore_flag=None, pore_turner=None, pore_R=None,
+                          pore_pf=None,
                           chi=None, onesided_flag=None,
                           p_0=None, tumble_chemo_flag=None,
                           Dr_0=None, rotation_chemo_flag=None,
                           temporal_chemo_flag=None, dt_mem=None, t_mem=None):
     rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
-    if obstructor is None:
-        obstructor = ahoy.obstructors.NoneObstructor()
+    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
+                                                L, pore_pf, rng,
+                                                periodic_flag=False)
     mesh = obstructor.get_mesh(L, c_dx)
     c_field = field.FoodField(dim, mesh, dt, c_D, c_delta, c_0)
+
+    volume_free = mesh.cellVolumes.sum()
+    n = int(round(rho_0 * volume_free))
     ags = agents.spatial_agents_factory(rng, dim, n, aligned_flag,
                                         v_0,
                                         L, origin_flags, obstructor,

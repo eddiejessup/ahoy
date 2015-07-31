@@ -1,19 +1,19 @@
 import numpy as np
 
-L_porous = np.array([200.0, 200.0])
-R_porous = 30.0
+pore_L = np.array([200.0, 200.0])
+pore_R = 30.0
 
 default_ship_kwargs = {
     'seed': 1,
+    'dim': 2,
     'dt': 0.01,
-    'aligned_flag': False,
-
     'n': 5000,
+
+    'aligned_flag': False,
     'v_0': 20.0,
 
     'L': None,
     'origin_flags': None,
-    'obstructor': None,
 
     'chi': 0.0,
     'onesided_flag': False,
@@ -27,14 +27,17 @@ default_ship_kwargs = {
     'temporal_chemo_flag': False,
     'dt_mem': 0.1,
     't_mem': 5.0,
+
+    'pore_flag': False,
 }
 
-porous_obstructor_kwargs = {
-    'rng': rng,
-    'periodic': True,
-    'L': L_porous,
-    'R': R_porous,
-}
+default_pore_ship_kwargs = default_ship_kwargs.copy()
+default_pore_ship_kwargs['pore_flag'] = True
+default_pore_ship_kwargs['L'] = pore_L
+default_pore_ship_kwargs['pore_R'] = pore_R
+
+default_field_ship_kwargs = default_pore_ship_kwargs.copy()
+del default_field_ship_kwargs['n']
 
 combo_to_chi = {
     ('Dr_0', False, False): 0.38747846573137146,

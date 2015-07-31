@@ -1,5 +1,4 @@
 import numpy as np
-from ahoy.obstructors import PorousObstructor
 from ahoy import ships, turners
 import test
 
@@ -40,14 +39,6 @@ class TestShips(test.TestBase):
                                     ships_2.agents.directions.u()))
 
     def test_spatial_ships_random_seeding(self):
-        L = np.array([2.0, 2.0])
-        obstructor_kwargs = {
-            'turner': turners.AlignTurner(),
-            'R': 0.1,
-            'pf': 0.1,
-            'L': L,
-            'periodic': True,
-        }
         ships_kwargs = {
             'seed': 1,
             'dim': 2,
@@ -58,8 +49,12 @@ class TestShips(test.TestBase):
             'v_0': 1.5,
             # Must have at least one periodic axis to test uniform points
             # function.
-            'L': np.array([1.5, np.inf]),
+            'L': np.array([2.0, 2.2]),
             'origin_flags': np.array([False, False]),
+
+            'pore_turner': turners.AlignTurner(),
+            'pore_R': 0.1,
+            'pore_pf': 0.1,
 
             'chi': 0.1,
             'onesided_flag': True,
@@ -78,9 +73,7 @@ class TestShips(test.TestBase):
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            obstructor = PorousObstructor(rng=rng, **obstructor_kwargs)
-            shps = ships.spatial_ships_factory(obstructor=obstructor,
-                                               **ships_kwargs)
+            shps = ships.spatial_ships_factory(**ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
             return shps
@@ -94,23 +87,15 @@ class TestShips(test.TestBase):
                                     ships_2.agents.directions.u()))
 
     def test_c_field_ships_random_seeding(self):
-        L = np.array([2.0, 2.0])
-        obstructor_kwargs = {
-            'turner': turners.AlignTurner(),
-            'R': 0.2,
-            'pf': 0.1,
-            'L': L,
-            'periodic': False,
-        }
         ships_kwargs = {
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
-            'n': 10,
+            'rho_0': 10.0,
             # Must have aligned flag False to test uniform directions function.
             'aligned_flag': False,
             'v_0': 1.5,
-            'L': L,
+            'L': np.array([2.0, 2.2]),
 
             'c_dx': 0.2,
             'c_D': 10.0,
@@ -118,6 +103,10 @@ class TestShips(test.TestBase):
             'c_0': 1.3,
 
             'origin_flags': np.array([False, False]),
+
+            'pore_turner': turners.AlignTurner(),
+            'pore_R': 0.2,
+            'pore_pf': 0.1,
 
             'chi': 0.3,
             'onesided_flag': True,
@@ -137,9 +126,7 @@ class TestShips(test.TestBase):
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            obstructor = PorousObstructor(rng=rng, **obstructor_kwargs)
-            shps = ships.c_field_ships_factory(obstructor=obstructor,
-                                               **ships_kwargs)
+            shps = ships.c_field_ships_factory(**ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
             return shps

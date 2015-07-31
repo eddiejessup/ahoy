@@ -2,26 +2,20 @@ from __future__ import print_function, division
 from itertools import product
 import numpy as np
 from agaro import run_utils
-from ahoy.obstructors import PorousObstructor
 import ahoy.turners
 from ahoy import ships
-from ahoy.utils.defaults import (default_ship_kwargs, porous_obstructor_kwargs,
-                                 rng, combo_to_chi)
+from ahoy.utils.defaults import (default_ship_kwargs, default_pore_ship_kwargs,
+                                 default_field_ship_kwargs, combo_to_chi,
+                                 pore_L)
 
 
 def run_spatial():
-    extra_obstructor_kwargs = {
-        'turner': ahoy.turners.AlignTurner(),
-        'pf': 0.0707,
-    }
-    obstructor_kwargs = dict(porous_obstructor_kwargs,
-                             **extra_obstructor_kwargs)
     extra_ship_kwargs = {
-        'dim': 2,
-        'L': obstructor_kwargs['L'],
-        'obstructor': PorousObstructor(**obstructor_kwargs),
+        'pore_turner': ahoy.turners.AlignTurner(),
+        'pore_pf': 0.0707,
     }
-    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+    ship_kwargs = dict(default_pore_ship_kwargs, **extra_ship_kwargs)
+
     shps = ships.spatial_ships_factory(**ship_kwargs)
 
     t_output_every = 100.0
@@ -34,18 +28,11 @@ def run_spatial():
 
 
 def run_Dr_scan():
-    extra_obstructor_kwargs = {
-        'turner': ahoy.turners.BounceBackTurner(),
-        'pf': 0.8,
-    }
-    obstructor_kwargs = dict(porous_obstructor_kwargs,
-                             **extra_obstructor_kwargs)
     extra_ship_kwargs = {
-        'dim': 2,
-        'L': obstructor_kwargs['L'],
-        'obstructor': PorousObstructor(**obstructor_kwargs),
+        'pore_turner': ahoy.turners.BounceBackTurner(),
+        'pore_pf': 0.8,
     }
-    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+    ship_kwargs = dict(default_pore_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 5.0
     t_upto = 300.0
@@ -59,21 +46,14 @@ def run_Dr_scan():
 
 
 def run_pf_scan():
-    extra_obstructor_kwargs = {
-        'turner': ahoy.turners.ReflectTurner(),
-    }
-    obstructor_kwargs = dict(porous_obstructor_kwargs,
-                             **extra_obstructor_kwargs)
     extra_ship_kwargs = {
-        'dim': 2,
-        'L': obstructor_kwargs['L'],
+        'pore_turner': ahoy.turners.ReflectTurner(),
     }
-    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+    ship_kwargs = dict(default_pore_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 100.0
     t_upto = 500.0
     pfs = np.linspace(0.0, 0.8, 9)
-    obstructors = [PorousObstructor(pf=pf, **obstructor_kwargs) for pf in pfs]
     force_resume = True
     parallel = True
 
@@ -88,12 +68,11 @@ def run_pf_scan():
         else:
             ship_kwargs['Dr_0'] = 0.0
             ship_kwargs['p_0'] = 1.0
-        for obs in obstructors:
-            obs.turner = turner
+        ship_kwargs['pore_turner'] = turner
 
         run_utils.run_field_scan(ships.spatial_ships_factory, ship_kwargs,
                                  t_output_every, t_upto,
-                                 'obstructor', obstructors,
+                                 'pore_pf', pfs,
                                  force_resume=force_resume, parallel=parallel)
 
 
@@ -135,21 +114,14 @@ def run_chi_scan():
 
 
 def run_pf_scan_drift():
-    extra_obstructor_kwargs = {
-        'turner': ahoy.turners.AlignTurner(),
-    }
-    obstructor_kwargs = dict(porous_obstructor_kwargs,
-                             **extra_obstructor_kwargs)
     extra_ship_kwargs = {
-        'dim': 2,
-        'L': obstructor_kwargs['L'],
+        'pore_turner': ahoy.turners.AlignTurner(),
     }
-    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+    ship_kwargs = dict(default_pore_ship_kwargs, **extra_ship_kwargs)
 
     t_output_every = 100.0
     t_upto = 500.0
-    pfs = np.linspace(0.0, 0.8, 11)
-    obstructors = [PorousObstructor(pf=pf, **obstructor_kwargs) for pf in pfs]
+    pore_pfs = np.linspace(0.0, 0.8, 11)
     force_resume = True
     parallel = True
 
@@ -177,38 +149,36 @@ def run_pf_scan_drift():
 
         run_utils.run_field_scan(ships.spatial_ships_factory, ship_kwargs,
                                  t_output_every, t_upto,
-                                 'obstructor', obstructors,
+                                 'pore_pf', pore_pfs,
                                  force_resume=force_resume, parallel=parallel)
 
 
 def run_field():
-    L = np.array([250.0, 200.0])
-    extra_obstructor_kwargs = {
-        'turner': ahoy.turners.AlignTurner(),
-        'pf': 0.4,
-        'L': L,
-        'periodic': False,
-    }
-    obstructor_kwargs = dict(porous_obstructor_kwargs,
-                             **extra_obstructor_kwargs)
+    rho_0 = 0.04
+    c_delta_0 = 0.1
+    c_delta = c_delta_0 / rho_0
+
     extra_ship_kwargs = {
-        'n': 1000,
-        'dim': 2,
-        'L': L,
-        'obstructor': PorousObstructor(**obstructor_kwargs),
-        # 'obstructor': None,
+        'rho_0': rho_0,
+        'L': np.array([250.0, 200.0]),
         'origin_flags': np.array([True, False]),
         'aligned_flag': False,
+
+        'pore_flag': True,
+        'pore_turner': ahoy.turners.AlignTurner(),
+        'pore_pf': 0.4,
+        'pore_R': 20.0,
+
         'c_dx': 20.0,
         'c_D': 10.0,
-        'c_delta': 100.0,
+        'c_delta': c_delta,
         'c_0': 1.0,
 
-        'chi': 50.0,
+        'chi': 15.0,
         'p_0': 1.0,
         'tumble_chemo_flag': True,
     }
-    ship_kwargs = dict(default_ship_kwargs, **extra_ship_kwargs)
+    ship_kwargs = dict(default_field_ship_kwargs, **extra_ship_kwargs)
 
     shps = ships.c_field_ships_factory(**ship_kwargs)
 
