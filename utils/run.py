@@ -64,23 +64,26 @@ def run_pf_scan():
     force_resume = True
     parallel = True
 
+    ships_kwarg_sets = []
+
     noise_vars = ['Dr_0', 'p_0']
     turners = [ahoy.turners.Turner(), ahoy.turners.BounceBackTurner(),
                ahoy.turners.ReflectTurner(), ahoy.turners.AlignTurner()]
-    combos = product(noise_vars, turners)
-    for noise_var, turner in combos:
+    for noise_var, turner, pf in product(noise_vars, turners, pfs):
+        ship_kwargs_cur = ship_kwargs.copy()
         if noise_var == 'Dr_0':
-            ship_kwargs['Dr_0'] = 1.0
-            ship_kwargs['p_0'] = 0.0
+            ship_kwargs_cur['Dr_0'] = 1.0
+            ship_kwargs_cur['p_0'] = 0.0
         else:
-            ship_kwargs['Dr_0'] = 0.0
-            ship_kwargs['p_0'] = 1.0
-        ship_kwargs['pore_turner'] = turner
+            ship_kwargs_cur['Dr_0'] = 0.0
+            ship_kwargs_cur['p_0'] = 1.0
+        ship_kwargs_cur['pore_turner'] = turner
+        ship_kwargs_cur['pore_pf'] = pf
+        ships_kwarg_sets.append(ship_kwargs_cur)
 
-        run_utils.run_field_scan(ships.ships_factory, ship_kwargs,
-                                 t_output_every, t_upto,
-                                 'pore_pf', pfs,
-                                 force_resume=force_resume, parallel=parallel)
+    run_utils.run_kwarg_scan(ships.ships_factory, ships_kwarg_sets,
+                             t_output_every, t_upto,
+                             force_resume=force_resume, parallel=parallel)
 
 
 def run_chi_scan():
@@ -95,32 +98,37 @@ def run_chi_scan():
     force_resume = True
     parallel = True
 
+    ships_kwarg_sets = []
+
     dims = [1, 2]
     noise_vars = ['Dr_0', 'p_0']
     onesided_flags = [True, False]
     temporal_chemo_flags = [True, False]
-
-    combos = product(noise_vars, dims, onesided_flags, temporal_chemo_flags)
-    for noise_var, dim, onesided_flag, temporal_chemo_flag in combos:
+    combos = product(noise_vars, dims, onesided_flags, temporal_chemo_flags,
+                     chis)
+    for noise_var, dim, onesided_flag, temporal_chemo_flag, chi in combos:
+        ship_kwargs_cur = ship_kwargs.copy()
         if noise_var == 'Dr_0':
             if dim == 1:
                 continue
-            ship_kwargs['Dr_0'] = 1.0
-            ship_kwargs['rotation_chemo_flag'] = True
-            ship_kwargs['p_0'] = 0.0
-            ship_kwargs['tumble_chemo_flag'] = False
+            ship_kwargs_cur['Dr_0'] = 1.0
+            ship_kwargs_cur['rotation_chemo_flag'] = True
+            ship_kwargs_cur['p_0'] = 0.0
+            ship_kwargs_cur['tumble_chemo_flag'] = False
         else:
-            ship_kwargs['Dr_0'] = 0.0
-            ship_kwargs['rotation_chemo_flag'] = False
-            ship_kwargs['p_0'] = 1.0
-            ship_kwargs['tumble_chemo_flag'] = True
-        ship_kwargs['dim'] = dim
-        ship_kwargs['onesided_flag'] = onesided_flag
-        ship_kwargs['temporal_chemo_flag'] = temporal_chemo_flag
+            ship_kwargs_cur['Dr_0'] = 0.0
+            ship_kwargs_cur['rotation_chemo_flag'] = False
+            ship_kwargs_cur['p_0'] = 1.0
+            ship_kwargs_cur['tumble_chemo_flag'] = True
+        ship_kwargs_cur['dim'] = dim
+        ship_kwargs_cur['onesided_flag'] = onesided_flag
+        ship_kwargs_cur['temporal_chemo_flag'] = temporal_chemo_flag
+        ship_kwargs_cur['chi'] = chi
+        ships_kwarg_sets.append(ship_kwargs_cur)
 
-        run_utils.run_field_scan(ships.ships_factory, ship_kwargs,
-                                 t_output_every, t_upto, 'chi', chis,
-                                 force_resume=force_resume, parallel=parallel)
+    run_utils.run_kwarg_scan(ships.ships_factory, ships_kwarg_sets,
+                             t_output_every, t_upto,
+                             force_resume=force_resume, parallel=parallel)
 
 
 def run_pf_scan_drift():
@@ -138,32 +146,35 @@ def run_pf_scan_drift():
     force_resume = True
     parallel = True
 
+    ships_kwarg_sets = []
+
     noise_vars = ['Dr_0', 'p_0']
     onesided_flags = [True, False]
     temporal_chemo_flags = [True, False]
+    combos = product(noise_vars, onesided_flags, temporal_chemo_flags, pfs)
+    for noise_var, onesided_flag, temporal_chemo_flag, pf in combos:
+        ship_kwargs_cur = ship_kwargs.copy()
 
-    combos = product(noise_vars, onesided_flags, temporal_chemo_flags)
-
-    for combo in combos:
-        noise_var, onesided_flag, temporal_chemo_flag = combo
         if noise_var == 'Dr_0':
-            ship_kwargs['Dr_0'] = 1.0
-            ship_kwargs['rotation_chemo_flag'] = True
-            ship_kwargs['p_0'] = 0.0
-            ship_kwargs['tumble_chemo_flag'] = False
+            ship_kwargs_cur['Dr_0'] = 1.0
+            ship_kwargs_cur['rotation_chemo_flag'] = True
+            ship_kwargs_cur['p_0'] = 0.0
+            ship_kwargs_cur['tumble_chemo_flag'] = False
         else:
-            ship_kwargs['Dr_0'] = 0.0
-            ship_kwargs['rotation_chemo_flag'] = False
-            ship_kwargs['p_0'] = 1.0
-            ship_kwargs['tumble_chemo_flag'] = True
-        ship_kwargs['onesided_flag'] = onesided_flag
-        ship_kwargs['temporal_chemo_flag'] = temporal_chemo_flag
-        ship_kwargs['chi'] = combo_to_chi[combo]
+            ship_kwargs_cur['Dr_0'] = 0.0
+            ship_kwargs_cur['rotation_chemo_flag'] = False
+            ship_kwargs_cur['p_0'] = 1.0
+            ship_kwargs_cur['tumble_chemo_flag'] = True
+        ship_kwargs_cur['onesided_flag'] = onesided_flag
+        ship_kwargs_cur['temporal_chemo_flag'] = temporal_chemo_flag
+        key = noise_var, onesided_flag, temporal_chemo_flag
+        ship_kwargs_cur['chi'] = combo_to_chi[key]
+        ship_kwargs_cur['pf'] = pf
+        ships_kwarg_sets.append(ship_kwargs_cur)
 
-        run_utils.run_field_scan(ships.ships_factory, ship_kwargs,
-                                 t_output_every, t_upto,
-                                 'pore_pf', pore_pfs,
-                                 force_resume=force_resume, parallel=parallel)
+    run_utils.run_kwarg_scan(ships.ships_factory, ships_kwarg_sets,
+                             t_output_every, t_upto,
+                             force_resume=force_resume, parallel=parallel)
 
 
 def run_field():
