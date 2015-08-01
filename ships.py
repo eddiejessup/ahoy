@@ -170,8 +170,10 @@ def ships_factory(seed, dim, dt,
     rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
 
-    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
-                                                L, pore_pf, rng, c_field_flag)
+    periodic_flag = not c_field_flag
+    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner,
+                                                pore_R, L, pore_pf, rng,
+                                                periodic_flag)
 
     if c_field_flag:
         c_field = field.food_field_factory(L, c_dx, c_D, c_delta,
