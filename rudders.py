@@ -18,16 +18,19 @@ class Rudders(object):
     def _rotate(self, directions, noise, dt, rng):
         return directions
 
+    @property
     def is_chemotactic(self):
         return isinstance(self.noise_measurer,
                           noise_measurers.ChemoNoiseMeasurer)
 
+    @property
     def is_onesided(self):
         return isinstance(self.noise_measurer,
                           noise_measurers.OneSidedChemoNoiseMeasurer)
 
-    def get_chi(self):
-        if self.is_chemotactic():
+    @property
+    def chi(self):
+        if self.is_chemotactic:
             return self.noise_measurer.chi
         else:
             return None

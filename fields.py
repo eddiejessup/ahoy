@@ -16,7 +16,7 @@ class Field(object):
         return self.mesh.dim
 
     def _ps_to_rs(self, ps):
-        return ps.r_w().T
+        return ps.r_w.T
 
     def _get_nearest_cell_ids(self, rs):
         return self.mesh._getNearestCellID(rs)

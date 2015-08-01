@@ -59,7 +59,7 @@ class SphereObstructor(BaseObstructor):
         return rs
 
     def obstruct(self, ps, drs, ds, rng=None):
-        seps = self.get_seps(ps.r_w())
+        seps = self.get_seps(ps.r_w)
         obs = self._is_obstructed(seps)
         self._push(obs, ps.r, drs)
         th_normals = self._get_th_normals(seps[obs])

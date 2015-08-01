@@ -24,7 +24,7 @@ class Model(object):
 
     @property
     def aligned_flags(self):
-        return np.all(self.ships.agents.directions.u_0() == 0.0, axis=0)
+        return np.all(self.ships.agents.directions.u_0 == 0.0, axis=0)
 
     @property
     def origin_flags(self):
@@ -57,13 +57,12 @@ class Model(object):
             elif isinstance(rs, ahoy.rudders.RotationRudders):
                 noise_str = 'Dr'
             s += ',{}={:g}'.format(noise_str, nm.noise_0)
-            if rs.is_chemotactic():
-                chemo_temp = nm.is_temporal()
-                type_s = 'T' if chemo_temp else 'S'
-                s += ',chi={:g},side={:d},type={}'.format(nm.chi,
-                                                          2 - rs.is_onesided(),
-                                                          type_s)
-                if chemo_temp:
+            if rs.is_chemotactic:
+                type_s = 'T' if nm.is_temporal else 'S'
+                side = 2 - rs.is_onesided
+                s += ',chi={:3g},side={:d},type={}'.format(nm.chi, side,
+                                                           type_s)
+                if nm.is_temporal:
                     measurer = nm.dc_dx_measurer
                     s += ',dtMem={:g},tMem={:g}'.format(measurer.dt_mem,
                                                         measurer.t_mem)

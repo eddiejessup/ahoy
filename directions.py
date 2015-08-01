@@ -12,15 +12,17 @@ class Directions1D(object):
 
     @property
     def n(self):
-        return self.u().shape[0]
+        return self.u.shape[0]
 
     @property
     def dim(self):
-        return self.u().shape[1]
+        return self.u.shape[1]
 
+    @property
     def u(self):
         return self.sign[:, np.newaxis].copy()
 
+    @property
     def u_0(self):
         return self.sign_0[:, np.newaxis].copy()
 
@@ -44,9 +46,11 @@ class Directions2D(Directions1D):
     def _th_to_u(self, th):
         return np.array([np.cos(th), np.sin(th)]).T
 
+    @property
     def u(self):
         return self._th_to_u(self.th)
 
+    @property
     def u_0(self):
         return self._th_to_u(self.th_0)
 

@@ -37,8 +37,8 @@ class TestModel(test.TestBase):
         model_1 = get_model(2)
         model_2 = get_model(3)
 
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))
 
     def test_spatial_model_random_seeding(self):
         model_kwargs = {
@@ -89,8 +89,8 @@ class TestModel(test.TestBase):
 
         self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
                                     model_2.ships.agents.positions.r))
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))
 
     def test_c_field_model_random_seeding(self):
         model_kwargs = {
@@ -146,5 +146,5 @@ class TestModel(test.TestBase):
 
         self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
                                     model_2.ships.agents.positions.r))
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))

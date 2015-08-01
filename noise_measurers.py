@@ -24,14 +24,16 @@ class ChemoNoiseMeasurer(NoiseMeasurer):
         self.chi = chi
         self.dc_dx_measurer = dc_dx_measurer
 
+    @property
+    def is_temporal(self):
+        return isinstance(self.dc_dx_measurer,
+                          dc_dx_measurers.TemporalDcDxMeasurer)
+
     def get_noise(self):
         dc_dxs = self.dc_dx_measurer.get_dc_dxs()
         print(self.chi * dc_dxs.max(), self.chi * dc_dxs.min(),
               self.chi * dc_dxs.mean())
         return self.noise_0 * (1.0 - self.chi * dc_dxs)
-
-    def is_temporal(self):
-        return isinstance(self.dc_dx_measurer, measurers.TemporalDcDxMeasurer)
 
     def __repr__(self):
         fs = [('noise_0', self.noise_0), ('chi', self.chi),

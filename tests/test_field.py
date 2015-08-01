@@ -8,7 +8,7 @@ import test
 
 
 def get_nearest_cell_ids_manual(f, ps):
-    rs = ps.r_w().T
+    rs = ps.r_w.T
     ccs = f.mesh.cellCenters.value
     drs = np.abs(ccs[:, np.newaxis, :] - rs[:, :, np.newaxis])
     for i_dim in range(ps.dim):

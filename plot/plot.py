@@ -26,10 +26,10 @@ def plot_2d(dirname):
     has_c_field = isinstance(m_0.ships.c_field, ahoy.fields.FoodField)
     if has_c_field:
         plot_c = VarPlot(m_0.ships.c_field.c, cmap=reds_cmap, axes=ax_vis)
-    plot_p = ax_vis.quiver(m_0.ships.agents.positions.r_w()[:, 0],
-                           m_0.ships.agents.positions.r_w()[:, 1],
-                           m_0.ships.agents.directions.u()[:, 0],
-                           m_0.ships.agents.directions.u()[:, 1])
+    plot_p = ax_vis.quiver(m_0.ships.agents.positions.r_w[:, 0],
+                           m_0.ships.agents.positions.r_w[:, 1],
+                           m_0.ships.agents.directions.u[:, 0],
+                           m_0.ships.agents.directions.u[:, 1])
 
     ax_slide = plt.axes([0.25, 0.1, 0.65, 0.03])
     t_slider = Slider(ax_slide, 'Time', 0, len(fnames), valinit=0)
@@ -42,9 +42,9 @@ def plot_2d(dirname):
             m = output_utils.filename_to_model(fnames[fname_i])
             if has_c_field:
                 plot_c.update(m.ships.c_field.c)
-            plot_p.set_offsets(m.ships.agents.positions.r_w())
-            plot_p.set_UVC(m.ships.agents.directions.u()[:, 0],
-                           m.ships.agents.directions.u()[:, 1])
+            plot_p.set_offsets(m.ships.agents.positions.r_w)
+            plot_p.set_UVC(m.ships.agents.directions.u[:, 0],
+                           m.ships.agents.directions.u[:, 1])
             t_time.set_text('Time: {:g}'.format(m.ships.time.t))
 
             fig.canvas.draw_idle()
@@ -113,7 +113,7 @@ def plot_1d(dirname):
     dx = L / 100.0
 
     plt.subplots_adjust(left=0.25, bottom=0.25)
-    plot_p = ax_vis.scatter(m_0.ships.agents.positions.r_w()[:, 0],
+    plot_p = ax_vis.scatter(m_0.ships.agents.positions.r_w[:, 0],
                             np.zeros([m_0.ships.agents.n]))
 
     d = m_0.ships.agents.positions.get_density_field(dx)
@@ -128,7 +128,7 @@ def plot_1d(dirname):
         fname_i = int(round(val))
         if 0 <= fname_i < len(fnames):
             m = output_utils.filename_to_model(fnames[fname_i])
-            plot_p.set_offsets(np.array([m.ships.agents.positions.r_w()[:, 0],
+            plot_p.set_offsets(np.array([m.ships.agents.positions.r_w[:, 0],
                                          np.zeros([m.ships.agents.n])]).T)
             ds = m.ships.agents.positions.get_density_field(dx)
             for rect, d in zip(plot_d, ds):

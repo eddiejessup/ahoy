@@ -56,6 +56,7 @@ class MockPositions(object):
     def iterate(self, dt):
         self.r += self.v_0 * self.u_0 * dt
 
+    @property
     def dr(self):
         return self.r
 
