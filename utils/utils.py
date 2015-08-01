@@ -35,37 +35,37 @@ def get_diff_coeff(x, t):
 
 
 def get_ud_vector(m):
-    dr = m.agents.positions.dr()
-    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.agents.swimmers.v_0
+    dr = m.ships.agents.positions.dr()
+    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.ships.agents.swimmers.v_0
 
 
 def get_ud_scalar(m):
-    dr = m.agents.positions.dr_mag()
-    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.agents.swimmers.v_0
+    dr = m.ships.agents.positions.dr_mag()
+    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.ships.agents.swimmers.v_0
 
 
 def get_D_vector(m):
-    dr = m.agents.positions.dr()
+    dr = m.ships.agents.positions.dr()
     return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
 
 
 def get_D_scalar(m):
-    dr = m.agents.positions.dr_mag()
+    dr = m.ships.agents.positions.dr_mag()
     return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
 
 
 def get_r_vector(m):
-    dr = m.agents.positions.dr()
+    dr = m.ships.agents.positions.dr()
     return np.mean(dr, axis=0)
 
 
 def get_r_scalar(m):
-    dr = m.agents.positions.dr_mag()
+    dr = m.ships.agents.positions.dr_mag()
     return np.mean(dr, axis=0)
 
 
 def get_u_net_vector(m):
-    return np.mean(m.agents.directions.u(), axis=0)
+    return np.mean(m.ships.agents.directions.u(), axis=0)
 
 
 def get_u_net_scalar(m):
@@ -73,22 +73,22 @@ def get_u_net_scalar(m):
 
 
 def get_chi(m):
-    return m.agents.get_chi()
+    return m.ships.agents.get_chi()
 
 
 def get_pf(m):
-    return m.obstructor.fraction_occupied
+    return m.ships.obstructor.fraction_occupied
 
 
 def get_Dr_0(m):
-    for ruds in m.agents.rudder_sets:
+    for ruds in m.ships.agents.rudder_sets:
         if isinstance(ruds, rudders.RotationRudders):
             return ruds.noise_measurer.noise_0
     return 0.0
 
 
 def get_p_0(m):
-    for ruds in m.agents.rudder_sets:
+    for ruds in m.ships.agents.rudder_sets:
         if isinstance(ruds, rudders.TumbleRudders):
             return ruds.noise_measurer.noise_0
     return 0.0
@@ -98,7 +98,7 @@ def _t_measures(dirname, measure_func):
     ts, measures = [], []
     for fname in get_filenames(dirname):
         m = filename_to_model(fname)
-        ts.append(m.t)
+        ts.append(m.ships.time.t)
         measures.append(measure_func(m))
     return np.array(ts), np.array(measures)
 
@@ -293,8 +293,8 @@ def get_equiv_chi(ud_0, dirnames):
 
 
 def get_equiv_chi_key(m):
-    noise_var_key = 'p_0' if m.agents.does_tumbling() else 'Dr_0'
-    chemo_ruds = m.agents.get_chemo_rudders()
+    noise_var_key = 'p_0' if m.ships.agents.does_tumbling() else 'Dr_0'
+    chemo_ruds = m.ships.agents.get_chemo_rudders()
     key = (noise_var_key, chemo_ruds.is_onesided(),
            chemo_ruds.noise_measurer.is_temporal())
     return key
@@ -353,12 +353,12 @@ def linear_density(xs, xcs, R, Lx, Ly, dx):
 
 
 def get_linear_density(m, dx):
-    xs = m.agents.positions.r[:, 0]
+    xs = m.ships.agents.positions.r[:, 0]
     try:
-        xcs = m.obstructor.rs[:, 0]
-        R = m.obstructor.R
+        xcs = m.ships.obstructor.rs[:, 0]
+        R = m.ships.obstructor.R
     except AttributeError:
         xcs = np.array([])
         R = 0.0
-    Lx, Ly = m.agents.positions.L
+    Lx, Ly = m.ships.agents.positions.L
     return linear_density(xs, xcs, R, Lx, Ly, dx)

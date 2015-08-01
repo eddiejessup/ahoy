@@ -25,13 +25,12 @@ class TestField1D(test.TestBase):
     rs_special = np.array(list(product(x_vals)))
 
     def test_field(self):
-        dim = self.L.shape[0]
         n = 100
 
         mesh = uniform_mesh_factory(self.L, self.dx)
-        f = field.Field(dim, mesh, c_0=1.0)
+        f = field.Field(mesh, c_0=1.0)
 
-        rs_random = positions.get_uniform_points(n, dim, self.L, rng=self.rng)
+        rs_random = positions.get_uniform_points(n, self.L, rng=self.rng)
         rs = np.append(rs_random, self.rs_special, axis=0)
 
         ps = positions.PeriodicPositions(self.L, rs)
@@ -60,11 +59,10 @@ class TestFoodField1D(test.TestBase):
         r_centers = mesh.cellCenters.value.T
         ps_centers = positions.PeriodicPositions(self.L, r_centers)
 
-        dt = 1.0
         D = 1.0
         delta = 1.0
         c_0 = 1.0
-        f = field.FoodField(dim, mesh, dt, D, delta, c_0)
+        f = field.FoodField(mesh, D, delta, c_0)
         rho_array = f._get_rho_array(ps_centers)
         self.assertTrue(np.allclose(rho_array, rho_expected))
 
@@ -80,8 +78,8 @@ class TestFoodField1D(test.TestBase):
         D = 0.0
         delta = 1.0
         c_0 = 1.0
-        f = field.FoodField(dim, mesh, dt, D, delta, c_0)
-        f.iterate(ps_centers)
+        f = field.FoodField(mesh, D, delta, c_0)
+        f.iterate(ps_centers, dt)
         c_expected = c_0 * np.exp(-delta * rho_expected * dt)
         self.assertTrue(np.allclose(f.c, c_expected))
 
@@ -103,10 +101,10 @@ class TestFoodField1D(test.TestBase):
         c_0_array = np.zeros(mesh.cellCenters.shape[1])
         c_0_array[i_center] = c_0
 
-        f = field.FoodField(dim, mesh, dt, D, delta, c_0_array)
+        f = field.FoodField(mesh, D, delta, c_0_array)
 
         for t in np.arange(0.0, t_max, dt):
-            f.iterate(ps)
+            f.iterate(ps, dt)
         variance = 2.0 * D * t_max
         mean = dim * [0.0]
         cov = np.identity(dim) * variance
@@ -135,17 +133,16 @@ class TestFoodField1D(test.TestBase):
         r_0 = np.zeros([n, dim])
         ps = positions.PeriodicPositions(self.L, r_0)
 
-        np.random.seed(2)
-        f_1 = field.FoodField(dim, mesh, dt, D, delta, c_0)
-        for t in np.arange(0.0, t_max, dt):
-            ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
-            f_1.iterate(ps)
+        def get_f(npy_seed):
+            np.random.seed(npy_seed)
+            f = field.FoodField(mesh, D, delta, c_0)
+            for t in np.arange(0.0, t_max, dt):
+                ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
+                f.iterate(ps, dt)
+            return f
 
-        np.random.seed(3)
-        f_2 = field.FoodField(dim, mesh, dt, D, delta, c_0)
-        for t in np.arange(0.0, t_max, dt):
-            ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
-            f_2.iterate(ps)
+        f_1 = get_f(2)
+        f_2 = get_f(3)
 
         self.assertTrue(np.allclose(f_1.c.value, f_2.c.value))
 

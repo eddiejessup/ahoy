@@ -10,7 +10,7 @@ class TestLinearSpatialDcDxMeasurer(test.TestBase):
         super(TestLinearSpatialDcDxMeasurer, self).setUp()
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
-        ds = directions.directions_factory(u_0)
+        ds = directions.directions_nd(u_0)
         grad_c_measurer = measurers.ConstantGradCMeasurer(self.n, dim)
         dc_dx_measurer = measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
         dc_dxs = dc_dx_measurer.get_dc_dxs()
@@ -71,7 +71,7 @@ class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
         self.t_rot_0 = 1.0
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
-        time = stime.Time(self.dt)
+        time = stime.Time()
         ps = MockPositions(dim, self.n, self.v_0, u_0)
         c_measurer = measurers.LinearCMeasurer(ps)
         dc_dx_measurer = measurers.TemporalDcDxMeasurer(c_measurer, self.v_0,
@@ -79,7 +79,7 @@ class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
                                                         self.t_mem,
                                                         self.t_rot_0, time)
         while time.t < 2.0 * self.t_mem:
-            ps.iterate(time.dt)
+            ps.iterate(self.dt)
             dc_dxs = dc_dx_measurer.get_dc_dxs()
-            time.iterate()
+            time.iterate(self.dt)
         self.assertTrue(np.allclose(dc_dxs, dc_dxs_expected))

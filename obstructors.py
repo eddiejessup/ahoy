@@ -87,12 +87,12 @@ class SingleSphereObstructor2D(SphereObstructor2D):
 
 class PorousObstructor(SphereObstructor2D):
 
-    def __init__(self, turner, R, L, pf, rng, periodic):
+    def __init__(self, turner, R, L, pf, rng, periodic_flag):
         super(PorousObstructor, self).__init__(turner, R)
-        self.periodic = periodic
+        self.periodic_flag = periodic_flag
         self.L = L
         self.rs, self.R = pack.pack(self.R, self.L, pf=pf, rng=rng,
-                                    periodic=periodic)
+                                    periodic=periodic_flag)
 
     def obstruct(self, *args, **kwargs):
         if self.rs.shape[0]:
@@ -143,3 +143,10 @@ class PorousObstructor(SphereObstructor2D):
         fs = [('turner', self.turner), ('R', self.R), ('L', self.L),
               ('fraction_occupied', self.fraction_occupied)]
         return make_repr_str(self, fs)
+
+
+def obstructor_factory(pore_flag, turner, R, L, pf, rng, periodic_flag):
+    if pore_flag:
+        return PorousObstructor(turner, R, L, pf, rng, periodic_flag)
+    else:
+        return NoneObstructor()

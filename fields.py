@@ -6,7 +6,7 @@ from ahoy.utils.meta import make_repr_str
 
 
 class Field(object):
-    def __init__(self, dim, mesh, c_0):
+    def __init__(self, mesh, c_0):
         self.mesh = mesh
         self.c_0 = c_0
         self.c = fipy.CellVariable(mesh=self.mesh, value=self.c_0)
@@ -25,20 +25,10 @@ class Field(object):
         return self._get_nearest_cell_ids(self._ps_to_rs(ps))
 
     def _get_grad_i(self, rs):
-        grad = self.c.grad
-        grad_i = np.empty(rs.T.shape)
-        near_cell_ids = self._get_nearest_cell_ids(rs)
-        for i in range(rs.shape[1]):
-            grad_i[i] = grad[:, near_cell_ids[i]]
-        return grad_i
+        return self.c.grad[:, self._get_nearest_cell_ids(rs)].value.T
 
     def _get_val_i(self, rs):
-        val = self.c
-        val_i = np.empty(rs.shape[1])
-        near_cell_ids = self._get_nearest_cell_ids(rs)
-        for i in range(rs.shape[1]):
-            val_i[i] = val[near_cell_ids[i]]
-        return val_i
+        return self.c[:, self._get_nearest_cell_ids(rs)].value.T
 
     def get_grad_i(self, ps):
         return self._get_grad_i(self._ps_to_rs(ps))
@@ -53,9 +43,8 @@ class Field(object):
 
 class FoodField(Field):
 
-    def __init__(self, dim, mesh, dt, D, delta, c_0):
-        super(FoodField, self).__init__(dim, mesh, c_0)
-        self.dt = dt
+    def __init__(self, mesh, D, delta, c_0):
+        super(FoodField, self).__init__(mesh, c_0)
         self.D = D
         self.delta = delta
 
@@ -72,12 +61,31 @@ class FoodField(Field):
             rho_array[i] += 1.0 / self.rho.mesh.cellVolumes[i]
         return rho_array
 
-    def iterate(self, ps):
+    def iterate(self, ps, dt):
         rho_array = self._get_rho_array(ps)
         self.rho.setValue(rho_array)
-        self.eq.solve(dt=self.dt)
+        self.eq.solve(dt=dt)
 
     def __repr__(self):
         fs = [('dim', self.dim), ('mesh', self.mesh), ('c_0', self.c_0),
-              ('dt', self.dt), ('D', self.D), ('delta', self.delta)]
+              ('D', self.D), ('delta', self.delta)]
         return make_repr_str(self, fs)
+
+
+class NoneFoodField(object):
+
+    def iterate(self, ps, dt):
+        return
+
+    def __repr__(self):
+        fs = []
+        return make_repr_str(self, fs)
+
+
+def food_field_factory(c_field_flag, L, c_dx, c_D, c_delta, c_0, obstructor):
+    if c_field_flag:
+        mesh = obstructor.get_mesh(L, c_dx)
+        c_field = FoodField(mesh, c_D, c_delta, c_0)
+    else:
+        c_field = NoneFoodField()
+    return c_field

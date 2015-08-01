@@ -31,7 +31,7 @@ class CylinderBuffer(RingBuffer):
         self.a = np.zeros([self.n_l, self.n_p])
         self.i_zero = 0
 
-        # Optimisation.
+        # Optimisation
         self.inds_p = np.arange(0, self.n_p, dtype=np.uint)
         self.inds_a = self.inds_p.copy()
         self.b = np.empty([self.n_l], dtype=np.float)
