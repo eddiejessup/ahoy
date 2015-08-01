@@ -1,11 +1,13 @@
 import numpy as np
-from ahoy import ships, turners
+from ahoy import turners
+from ahoy.model import Model
 import test
 
 
-class TestShips(test.TestBase):
-    def test_ships_random_seeding(self):
-        ships_kwargs = {
+class TestModel(test.TestBase):
+
+    def test_model_random_seeding(self):
+        model_kwargs = {
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
@@ -25,21 +27,21 @@ class TestShips(test.TestBase):
 
         num_iterations = 100
 
-        def get_ships(npy_seed):
+        def get_model(npy_seed):
             np.random.seed(npy_seed)
-            shps = ships.ships_factory(**ships_kwargs)
+            model = Model(**model_kwargs)
             for _ in range(num_iterations):
-                shps.iterate()
-            return shps
+                model.iterate()
+            return model
 
-        ships_1 = get_ships(2)
-        ships_2 = get_ships(3)
+        model_1 = get_model(2)
+        model_2 = get_model(3)
 
-        self.assertTrue(np.allclose(ships_1.agents.directions.u(),
-                                    ships_2.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
+                                    model_2.ships.agents.directions.u()))
 
-    def test_spatial_ships_random_seeding(self):
-        ships_kwargs = {
+    def test_spatial_model_random_seeding(self):
+        model_kwargs = {
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
@@ -75,23 +77,23 @@ class TestShips(test.TestBase):
 
         num_iterations = 100
 
-        def get_ships(npy_seed):
+        def get_model(npy_seed):
             np.random.seed(npy_seed)
-            shps = ships.ships_factory(**ships_kwargs)
+            model = Model(**model_kwargs)
             for _ in range(num_iterations):
-                shps.iterate()
-            return shps
+                model.iterate()
+            return model
 
-        ships_1 = get_ships(2)
-        ships_2 = get_ships(3)
+        model_1 = get_model(2)
+        model_2 = get_model(3)
 
-        self.assertTrue(np.allclose(ships_1.agents.positions.r,
-                                    ships_2.agents.positions.r))
-        self.assertTrue(np.allclose(ships_1.agents.directions.u(),
-                                    ships_2.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
+                                    model_2.ships.agents.positions.r))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
+                                    model_2.ships.agents.directions.u()))
 
-    def test_c_field_ships_random_seeding(self):
-        ships_kwargs = {
+    def test_c_field_model_random_seeding(self):
+        model_kwargs = {
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
@@ -132,17 +134,17 @@ class TestShips(test.TestBase):
 
         num_iterations = 100
 
-        def get_ships(npy_seed):
+        def get_model(npy_seed):
             np.random.seed(npy_seed)
-            shps = ships.ships_factory(**ships_kwargs)
+            model = Model(**model_kwargs)
             for _ in range(num_iterations):
-                shps.iterate()
-            return shps
+                model.iterate()
+            return model
 
-        ships_1 = get_ships(2)
-        ships_2 = get_ships(3)
+        model_1 = get_model(2)
+        model_2 = get_model(3)
 
-        self.assertTrue(np.allclose(ships_1.agents.positions.r,
-                                    ships_2.agents.positions.r))
-        self.assertTrue(np.allclose(ships_1.agents.directions.u(),
-                                    ships_2.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
+                                    model_2.ships.agents.positions.r))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
+                                    model_2.ships.agents.directions.u()))

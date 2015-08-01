@@ -72,6 +72,20 @@ class FoodField(Field):
         return make_repr_str(self, fs)
 
 
-def food_field_factory(L, c_dx, c_D, c_delta, c_0, obstructor):
-    mesh = obstructor.get_mesh(L, c_dx)
-    return FoodField(mesh, c_D, c_delta, c_0)
+class NoneFoodField(object):
+
+    def iterate(self, ps, dt):
+        return
+
+    def __repr__(self):
+        fs = []
+        return make_repr_str(self, fs)
+
+
+def food_field_factory(c_field_flag, L, c_dx, c_D, c_delta, c_0, obstructor):
+    if c_field_flag:
+        mesh = obstructor.get_mesh(L, c_dx)
+        c_field = FoodField(mesh, c_D, c_delta, c_0)
+    else:
+        c_field = NoneFoodField()
+    return c_field

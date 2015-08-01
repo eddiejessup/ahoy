@@ -155,12 +155,6 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
 
     def get_dc_dxs(self):
         self.iterate()
-        if self.dc_dx_cache.max() > 1.001:
-            i_big = self.dc_dx_cache.argmax()
-            print(self.dc_dx_cache[i_big])
-            print(self.K_dt)
-            print(self.c_mem.a[i_big])
-            raw_input()
         return self.dc_dx_cache
 
     def __repr__(self):
@@ -174,16 +168,16 @@ def dc_dx_factory(temporal_chemo_flag,
                   ds=None,
                   ps=None, v_0=None, dt_mem=None, t_mem=None, p_0=None,
                   Dr_0=None, time=None,
-                  c_field=None):
+                  c_field_flag=None, c_field=None):
     if temporal_chemo_flag:
         return temporal_dc_dx_factory(ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
-                                      c_field)
+                                      c_field_flag, c_field)
     else:
-        return spatial_dc_dx_factory(ds, c_field, ps)
+        return spatial_dc_dx_factory(ds, c_field_flag, c_field, ps)
 
 
-def spatial_dc_dx_factory(ds, c_field=None, ps=None):
-    if c_field is None:
+def spatial_dc_dx_factory(ds, c_field_flag=None, c_field=None, ps=None):
+    if not c_field_flag:
         grad_c_measurer = ConstantGradCMeasurer(ds.n, ds.dim)
     else:
         grad_c_measurer = FieldGradCMeasurer(c_field, ps)
@@ -191,8 +185,8 @@ def spatial_dc_dx_factory(ds, c_field=None, ps=None):
 
 
 def temporal_dc_dx_factory(ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
-                           c_field=None):
-    if c_field is None:
+                           c_field_flag=None, c_field=None):
+    if not c_field_flag:
         c_measurer = LinearCMeasurer(ps)
     else:
         c_measurer = FieldCMeasurer(c_field, ps)

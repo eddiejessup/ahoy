@@ -18,10 +18,6 @@ class Directions1D(object):
     def dim(self):
         return self.u().shape[1]
 
-    @property
-    def aligned_flag(self):
-        return np.all(self.u()[:, 0] == 1)
-
     def u(self):
         return self.sign[:, np.newaxis].copy()
 
@@ -35,7 +31,7 @@ class Directions1D(object):
         return self
 
     def __repr__(self):
-        fs = [('n', self.n), ('aligned_flag', self.aligned_flag)]
+        fs = [('n', self.n)]
         return make_repr_str(self, fs)
 
 
@@ -65,11 +61,11 @@ class Directions2D(Directions1D):
         return self
 
     def __repr__(self):
-        fs = [('n', self.n), ('aligned_flag', self.aligned_flag)]
+        fs = [('n', self.n)]
         return make_repr_str(self, fs)
 
 
-def directions_factory(u_0):
+def directions_nd(u_0):
     dim = u_0.shape[1]
     if dim == 1:
         return Directions1D(u_0)
@@ -77,20 +73,19 @@ def directions_factory(u_0):
         return Directions2D(u_0)
 
 
-def make_directions(n, dim, aligned_flag=False, rng=None):
+def directions_factory(n, dim, aligned_flag=False, rng=None):
     if aligned_flag:
-        u_0 = np.zeros([n, dim])
-        u_0[:, 0] = 1.0
+        u_0 = get_aligned_vectors(n, dim)
     else:
-        u_0 = get_uniform_directions(n, dim, rng)
-    return directions_factory(u_0)
+        u_0 = get_uniform_vectors(n, dim, rng)
+    return directions_nd(u_0)
 
 
-def get_uniform_directions(n, dim, rng=None):
+def get_uniform_vectors(n, dim, rng=None):
     return vector.sphere_pick(n=n, d=dim, rng=rng)
 
 
-def get_aligned_directions(n, dim):
+def get_aligned_vectors(n, dim):
     u = np.zeros([n, dim])
     u[:, 0] = 1.0
     return u

@@ -25,12 +25,12 @@ class TestChemoNoiseMeasurer1D(test.TestBase):
     def get_ds_parallel(self):
         u_0 = np.zeros([self.n, self.dim])
         u_0[:, 0] = 1.0
-        return directions.directions_factory(u_0)
+        return directions.directions_nd(u_0)
 
     def get_ds_antiparallel(self):
         u_0 = np.zeros([self.n, self.dim])
         u_0[:, 0] = -1.0
-        return directions.directions_factory(u_0)
+        return directions.directions_nd(u_0)
 
     def test_parallel_nochemo(self):
         ds = self.get_ds_parallel()
@@ -64,7 +64,7 @@ class TestChemoNoiseMeasurer2D(TestChemoNoiseMeasurer1D):
     def get_ds_perp(self):
         u_0 = np.zeros([self.n, self.dim])
         u_0[:, 1] = 1.0
-        return directions.directions_factory(u_0)
+        return directions.directions_nd(u_0)
 
     def test_perp_nochemo(self):
         ds = self.get_ds_perp()

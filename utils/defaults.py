@@ -1,7 +1,7 @@
 import numpy as np
 
 
-default_ship_kwargs = {
+default_model_kwargs = {
     'seed': 1,
     'dim': 2,
     'dt': 0.01,

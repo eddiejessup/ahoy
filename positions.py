@@ -18,10 +18,6 @@ class Positions(object):
     def dim(self):
         return self.r.shape[1]
 
-    @property
-    def origin_flag(self):
-        return np.allclose(self.r_0, 0.0)
-
     def r_mag(self):
         return vector.vector_mag(self.r)
 
@@ -38,8 +34,7 @@ class Positions(object):
         return vector.vector_mag(self.r_w())
 
     def __repr__(self):
-        fs = [('n', self.n), ('dim', self.dim),
-              ('origin_flag', self.origin_flag)]
+        fs = [('n', self.n), ('dim', self.dim)]
         return make_repr_str(self, fs)
 
 
@@ -77,15 +72,23 @@ class PeriodicPositions(Positions):
         return [format_inf(e) for e in self.L]
 
     def __repr__(self):
-        fs = [('n', self.n), ('dim', self.dim), ('L', self.L),
-              ('origin_flag', self.origin_flag)]
+        fs = [('n', self.n), ('dim', self.dim), ('L', self.L)]
         return make_repr_str(self, fs)
 
 
-def positions_factory(periodic_flag, n, dim=None,
+class NonePositions(object):
+
+    def __repr__(self):
+        fs = []
+        return make_repr_str(self, fs)
+
+
+def positions_factory(spatial_flag, periodic_flag, n, dim=None,
                       L=None, origin_flags=None,
                       rng=None, obstructor=None):
-    if not periodic_flag:
+    if not spatial_flag:
+        return NonePositions()
+    elif not periodic_flag:
         r_0 = np.zeros([n, dim])
         return Positions(r_0)
     else:

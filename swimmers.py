@@ -16,3 +16,17 @@ class Swimmers(object):
     def __repr__(self):
         fs = [('v_0', self.v_0)]
         return make_repr_str(self, fs)
+
+
+class NoneSwimmers(object):
+
+    def displace(self, positions, dt):
+        dr = None
+        return positions, dr
+
+
+def swimmers_factory(spatial_flag, v_0, ds):
+    if spatial_flag:
+        return Swimmers(v_0, ds)
+    else:
+        return NoneSwimmers()

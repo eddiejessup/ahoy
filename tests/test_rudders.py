@@ -19,7 +19,7 @@ class TestRotationRudders2D(test.TestBase):
         n = 10000
         t_max = 0.5
 
-        ds = directions.make_directions(n, self.dim, aligned_flag=True)
+        ds = directions.directions_factory(n, self.dim, aligned_flag=True)
         rudders = self.rudders_cls(self.noise_measurer)
 
         u_0 = ds.u()
@@ -45,7 +45,7 @@ class TestRotationRudders2D(test.TestBase):
         def get_ds(npy_seed):
             rng = np.random.RandomState(rng_seed)
             np.random.seed(npy_seed)
-            ds = directions.make_directions(n, self.dim, aligned_flag=True)
+            ds = directions.directions_factory(n, self.dim, aligned_flag=True)
             ruds = self.rudders_cls(self.noise_measurer)
             for _ in range(num_iterations):
                 ds = ruds.rotate(ds, self.dt, rng)
@@ -71,8 +71,8 @@ class TestTumbleRudders1D(TestRotationRudders2D):
         # In 1D is a half chance to tumble back to the same direction.
         if self.dim == 1:
             n_expected /= 2.0
-        ds = directions.make_directions(n, self.dim, aligned_flag=False,
-                                        rng=self.rng)
+        ds = directions.directions_factory(n, self.dim, aligned_flag=False,
+                                           rng=self.rng)
         u_0 = ds.u()
         ruds = rudders.TumbleRudders(noise_measurer)
         ds_rot = ruds.rotate(ds, dt, self.rng)
