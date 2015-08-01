@@ -25,20 +25,10 @@ class Field(object):
         return self._get_nearest_cell_ids(self._ps_to_rs(ps))
 
     def _get_grad_i(self, rs):
-        grad = self.c.grad
-        grad_i = np.empty(rs.T.shape)
-        near_cell_ids = self._get_nearest_cell_ids(rs)
-        for i in range(rs.shape[1]):
-            grad_i[i] = grad[:, near_cell_ids[i]]
-        return grad_i
+        return self.c.grad[:, self._get_nearest_cell_ids(rs)].value.T
 
     def _get_val_i(self, rs):
-        val = self.c
-        val_i = np.empty(rs.shape[1])
-        near_cell_ids = self._get_nearest_cell_ids(rs)
-        for i in range(rs.shape[1]):
-            val_i[i] = val[near_cell_ids[i]]
-        return val_i
+        return self.c[:, self._get_nearest_cell_ids(rs)].value.T
 
     def get_grad_i(self, ps):
         return self._get_grad_i(self._ps_to_rs(ps))
