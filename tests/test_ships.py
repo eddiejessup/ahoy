@@ -9,9 +9,10 @@ class TestShips(test.TestBase):
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
-            'n': 10,
-            # Must have aligned flag False to test uniform directions function.
             'aligned_flag': False,
+            'n': 10,
+            'spatial_flag': False,
+            # Must have aligned flag False to test uniform directions function.
             'chi': 0.1,
             'onesided_flag': True,
             # Must have tumbling to test tumbling function.
@@ -23,7 +24,6 @@ class TestShips(test.TestBase):
         }
 
         num_iterations = 100
-        rng_seed = 1
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
@@ -43,18 +43,17 @@ class TestShips(test.TestBase):
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
+            'aligned_flag': False,
             'n': 10,
             # Must have aligned flag False to test uniform directions function.
-            'aligned_flag': False,
+
+            'spatial_flag': True,
+            'periodic_flag': True,
             'v_0': 1.5,
             # Must have at least one periodic axis to test uniform points
             # function.
             'L': np.array([2.0, 2.2]),
             'origin_flags': np.array([False, False]),
-
-            'pore_turner': turners.AlignTurner(),
-            'pore_R': 0.1,
-            'pore_pf': 0.1,
 
             'chi': 0.1,
             'onesided_flag': True,
@@ -67,13 +66,18 @@ class TestShips(test.TestBase):
             'temporal_chemo_flag': True,
             'dt_mem': 0.05,
             't_mem': 5.0,
+
+            'pore_flag': True,
+            'pore_turner': turners.AlignTurner(),
+            'pore_R': 0.1,
+            'pore_pf': 0.1,
         }
 
         num_iterations = 100
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            shps = ships.spatial_ships_factory(**ships_kwargs)
+            shps = ships.ships_factory(**ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
             return shps
@@ -91,22 +95,16 @@ class TestShips(test.TestBase):
             'seed': 1,
             'dim': 2,
             'dt': 0.01,
-            'rho_0': 10.0,
-            # Must have aligned flag False to test uniform directions function.
             'aligned_flag': False,
+
+            'rho_0': 10.0,
+
+            # Must have aligned flag False to test uniform directions function.
+            'spatial_flag': True,
+            'periodic_flag': True,
             'v_0': 1.5,
             'L': np.array([2.0, 2.2]),
-
-            'c_dx': 0.2,
-            'c_D': 10.0,
-            'c_delta': 1000.0,
-            'c_0': 1.3,
-
             'origin_flags': np.array([False, False]),
-
-            'pore_turner': turners.AlignTurner(),
-            'pore_R': 0.2,
-            'pore_pf': 0.1,
 
             'chi': 0.3,
             'onesided_flag': True,
@@ -119,14 +117,24 @@ class TestShips(test.TestBase):
 
             'temporal_chemo_flag': True,
             'dt_mem': 0.1,
-            't_mem': 5.0
+            't_mem': 5.0,
+
+            'pore_flag': True,
+            'pore_turner': turners.AlignTurner(),
+            'pore_R': 0.2,
+            'pore_pf': 0.1,
+
+            'c_dx': 0.2,
+            'c_D': 10.0,
+            'c_delta': 1000.0,
+            'c_0': 1.3,
         }
 
         num_iterations = 100
 
         def get_ships(npy_seed):
             np.random.seed(npy_seed)
-            shps = ships.c_field_ships_factory(**ships_kwargs)
+            shps = ships.ships_factory(**ships_kwargs)
             for _ in range(num_iterations):
                 shps.iterate()
             return shps

@@ -25,7 +25,7 @@ class TestUniformMesh2D(TestUniformMesh1D):
 class TestPorousMesh(test.TestBase):
 
     def test_porous_random_seeding(self):
-        # Note, this is testing the reproducibility of the meshing.
+        '''Test the reproducibility of the meshing algorithm.'''
 
         L = np.array([2.0, 2.0])
         R = 0.1

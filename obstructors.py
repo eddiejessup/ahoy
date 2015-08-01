@@ -145,8 +145,9 @@ class PorousObstructor(SphereObstructor2D):
         return make_repr_str(self, fs)
 
 
-def obstructor_factory(pore_flag, turner, R, L, pf, rng, periodic_flag):
+def obstructor_factory(pore_flag, turner, R, L, pf, rng, c_field_flag):
     if pore_flag:
+        periodic_flag = not c_field_flag
         return PorousObstructor(turner, R, L, pf, rng, periodic_flag)
     else:
         return NoneObstructor()

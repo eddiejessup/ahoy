@@ -137,7 +137,7 @@ class CFieldShips(SpatialShips):
 
     def iterate(self):
         super(CFieldShips, self).iterate()
-        self.c_field.iterate(self.agents.positions)
+        self.c_field.iterate(self.agents.positions, self.time.dt)
 
     def __repr__(self):
         fs = [('time', self.time), ('agents', self.agents),
@@ -156,72 +156,42 @@ class CFieldShips(SpatialShips):
         return s
 
 
-def ships_factory(seed, dim, dt, n, aligned_flag,
+def ships_factory(seed, dim, dt,
+                  aligned_flag=None,
+                  n=None, rho_0=None,
+                  spatial_flag=None, v_0=None,
+                  periodic_flag=None, L=None, origin_flags=None,
                   chi=None, onesided_flag=None,
                   p_0=None, tumble_chemo_flag=None,
-                  Dr_0=None, rotation_chemo_flag=None):
+                  Dr_0=None, rotation_chemo_flag=None,
+                  temporal_chemo_flag=None, dt_mem=None, t_mem=None,
+                  pore_flag=None, pore_turner=None, pore_R=None, pore_pf=None,
+                  c_field_flag=None, c_dx=None, c_D=None, c_delta=None, c_0=None):
     rng = np.random.RandomState(seed)
     time = ahoy.stime.Time(dt)
-    ags = agents.agents_factory(rng, dim, n, aligned_flag,
+
+    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
+                                                L, pore_pf, rng, c_field_flag)
+
+    if c_field_flag:
+        c_field = field.food_field_factory(L, c_dx, c_D, c_delta,
+                                           c_0, obstructor)
+    else:
+        c_field = None
+
+    ags = agents.agents_factory(rng, dim, aligned_flag,
+                                n, rho_0,
                                 chi, onesided_flag,
                                 p_0, tumble_chemo_flag,
-                                Dr_0, rotation_chemo_flag)
-    return Ships(rng, time, ags)
+                                Dr_0, rotation_chemo_flag,
+                                temporal_chemo_flag, dt_mem, t_mem, time,
+                                spatial_flag, v_0,
+                                periodic_flag, L, origin_flags, obstructor,
+                                c_field)
 
-
-def spatial_ships_factory(seed, dim, dt, n, aligned_flag,
-                          v_0,
-                          L=None, origin_flags=None,
-                          pore_flag=None, pore_turner=None, pore_R=None,
-                          pore_pf=None,
-                          chi=None, onesided_flag=None,
-                          p_0=None, tumble_chemo_flag=None,
-                          Dr_0=None, rotation_chemo_flag=None,
-                          temporal_chemo_flag=None, dt_mem=None, t_mem=None):
-    rng = np.random.RandomState(seed)
-    time = ahoy.stime.Time(dt)
-    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
-                                                L, pore_pf, rng,
-                                                periodic_flag=True)
-    ags = agents.spatial_agents_factory(rng, dim, n, aligned_flag,
-                                        v_0,
-                                        L, origin_flags, obstructor,
-                                        chi, onesided_flag,
-                                        p_0, tumble_chemo_flag,
-                                        Dr_0, rotation_chemo_flag,
-                                        temporal_chemo_flag, dt_mem, t_mem,
-                                        time)
-    return SpatialShips(rng, time, ags, obstructor)
-
-
-def c_field_ships_factory(seed, dim, dt, rho_0, aligned_flag,
-                          v_0,
-                          L,
-                          c_dx, c_D, c_delta, c_0,
-                          origin_flags=None,
-                          pore_flag=None, pore_turner=None, pore_R=None,
-                          pore_pf=None,
-                          chi=None, onesided_flag=None,
-                          p_0=None, tumble_chemo_flag=None,
-                          Dr_0=None, rotation_chemo_flag=None,
-                          temporal_chemo_flag=None, dt_mem=None, t_mem=None):
-    rng = np.random.RandomState(seed)
-    time = ahoy.stime.Time(dt)
-    obstructor = obstructors.obstructor_factory(pore_flag, pore_turner, pore_R,
-                                                L, pore_pf, rng,
-                                                periodic_flag=False)
-    mesh = obstructor.get_mesh(L, c_dx)
-    c_field = field.FoodField(dim, mesh, dt, c_D, c_delta, c_0)
-
-    volume_free = mesh.cellVolumes.sum()
-    n = int(round(rho_0 * volume_free))
-    ags = agents.spatial_agents_factory(rng, dim, n, aligned_flag,
-                                        v_0,
-                                        L, origin_flags, obstructor,
-                                        chi, onesided_flag,
-                                        p_0, tumble_chemo_flag,
-                                        Dr_0, rotation_chemo_flag,
-                                        temporal_chemo_flag, dt_mem, t_mem,
-                                        time,
-                                        c_field)
-    return CFieldShips(rng, time, ags, obstructor, c_field)
+    if not spatial_flag:
+        return Ships(rng, time, ags)
+    elif c_field_flag:
+        return CFieldShips(rng, time, ags, obstructor, c_field)
+    else:
+        return SpatialShips(rng, time, ags, obstructor)

@@ -10,9 +10,8 @@ class TestPeriodicPositions1D(test.TestBase):
 
     def setUp(self):
         super(TestPeriodicPositions1D, self).setUp()
-        origin_flags = np.zeros([self.dim], dtype=np.bool)
-        self.ps = positions.positions_factory(self.n, self.dim, self.L,
-                                              origin_flags, self.rng)
+        self.ps = positions.positions_factory(True, self.n, L=self.L,
+                                              rng=self.rng)
 
     def test_wrapping_down(self):
         dr = np.zeros_like(self.ps.r)
@@ -42,8 +41,7 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
 
     def test_partial_infinite_boundaries(self):
         L = np.array([np.inf, 1.7])
-        ps = positions.positions_factory(self.n, self.dim, L,
-                                         np.array([False, False]), self.rng)
+        ps = positions.positions_factory(True, self.n, L=L, rng=self.rng)
         dr = self.rng.uniform(-1.0, 1.0, size=ps.r.shape)
         ps.r += dr
         r_naive = ps.r_0[:, 0] + dr[:, 0]

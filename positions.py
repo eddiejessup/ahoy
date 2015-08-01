@@ -82,18 +82,19 @@ class PeriodicPositions(Positions):
         return make_repr_str(self, fs)
 
 
-def positions_factory(n, dim, L=None, origin_flags=None, rng=None,
-                      obstructor=None):
-    if L is None or np.all(np.isinf(L)):
+def positions_factory(periodic_flag, n, dim=None,
+                      L=None, origin_flags=None,
+                      rng=None, obstructor=None):
+    if not periodic_flag:
         r_0 = np.zeros([n, dim])
         return Positions(r_0)
     else:
-        r_0 = get_uniform_points(n, dim, L, origin_flags, rng, obstructor)
+        r_0 = get_uniform_points(n, L, origin_flags, rng, obstructor)
         return PeriodicPositions(L, r_0)
 
 
-def get_uniform_points(n, dim, L, origin_flags=None, rng=None,
-                       obstructor=None):
+def get_uniform_points(n, L, origin_flags=None, rng=None, obstructor=None):
+    dim = L.shape[0]
     if origin_flags is None:
         origin_flags = np.zeros([dim], dtype=np.bool)
     if rng is None:

@@ -6,7 +6,7 @@ from ahoy.utils.meta import make_repr_str
 
 
 class Field(object):
-    def __init__(self, dim, mesh, c_0):
+    def __init__(self, mesh, c_0):
         self.mesh = mesh
         self.c_0 = c_0
         self.c = fipy.CellVariable(mesh=self.mesh, value=self.c_0)
@@ -53,9 +53,8 @@ class Field(object):
 
 class FoodField(Field):
 
-    def __init__(self, dim, mesh, dt, D, delta, c_0):
-        super(FoodField, self).__init__(dim, mesh, c_0)
-        self.dt = dt
+    def __init__(self, mesh, D, delta, c_0):
+        super(FoodField, self).__init__(mesh, c_0)
         self.D = D
         self.delta = delta
 
@@ -72,12 +71,17 @@ class FoodField(Field):
             rho_array[i] += 1.0 / self.rho.mesh.cellVolumes[i]
         return rho_array
 
-    def iterate(self, ps):
+    def iterate(self, ps, dt):
         rho_array = self._get_rho_array(ps)
         self.rho.setValue(rho_array)
-        self.eq.solve(dt=self.dt)
+        self.eq.solve(dt=dt)
 
     def __repr__(self):
         fs = [('dim', self.dim), ('mesh', self.mesh), ('c_0', self.c_0),
-              ('dt', self.dt), ('D', self.D), ('delta', self.delta)]
+              ('D', self.D), ('delta', self.delta)]
         return make_repr_str(self, fs)
+
+
+def food_field_factory(L, c_dx, c_D, c_delta, c_0, obstructor):
+    mesh = obstructor.get_mesh(L, c_dx)
+    return FoodField(mesh, c_D, c_delta, c_0)
