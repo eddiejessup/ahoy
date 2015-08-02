@@ -64,7 +64,7 @@ class Model(object):
             if rs.is_chemotactic:
                 type_s = 'T' if nm.is_temporal else 'S'
                 side = 2 - rs.is_onesided
-                s += ',chi={:3g},side={:d},type={}'.format(nm.chi, side,
+                s += ',chi={:.2g},side={:d},type={}'.format(nm.chi, side,
                                                            type_s)
                 if nm.is_temporal:
                     measurer = nm.dc_dx_measurer
@@ -88,7 +88,7 @@ class Model(object):
             elif obs.turner.__class__ is turners.AlignTurner:
                 s_turner = 'align'
             pf = obs.fraction_occupied
-            s += 'Pore(R={:g},pf={:3g},turn={})'.format(obs.R, pf, s_turner)
+            s += 'Pore(R={:g},pf={:.2g},turn={})'.format(obs.R, pf, s_turner)
         return s
 
     def _get_output_dirname_field_part(self):
