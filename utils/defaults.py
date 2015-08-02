@@ -10,6 +10,8 @@ default_model_kwargs = {
     't_mem': 5.0,
     'pore_R': 30.0,
     'L': np.array([300.0, 300.0]),
+    'Dr_0': 1.0
+    'p_0': 1.0
 }
 
 combo_to_chi = {
