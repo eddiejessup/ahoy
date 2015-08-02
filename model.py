@@ -50,7 +50,7 @@ class Model(object):
                 s += ',L={}'.format(tuple(ags.positions.L_repr()))
 
         # Rudders
-        for rs in ags.rudder_sets:
+        for rs in ags.rudder_sets.sets:
             nm = rs.noise_measurer
             if isinstance(rs, ahoy.rudders.TumbleRudders):
                 noise_str = 'p'
