@@ -169,7 +169,8 @@ def run_pf_scan_drift():
         model_kwargs_cur['temporal_chemo_flag'] = temporal_chemo_flag
         key = noise_var, onesided_flag, temporal_chemo_flag
         model_kwargs_cur['chi'] = combo_to_chi[key]
-        model_kwargs_cur['pf'] = pf
+        model_kwargs_cur['pore_pf'] = pf
+
         model_kwarg_sets.append(model_kwargs_cur)
 
     run_utils.run_kwarg_scan(Model, model_kwarg_sets,
