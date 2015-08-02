@@ -2,7 +2,7 @@ from __future__ import print_function, division
 from itertools import product
 import numpy as np
 from scipy.stats import multivariate_normal
-from ahoy import positions, field
+from ahoy import positions, fields
 from ahoy.mesh import uniform_mesh_factory
 import test
 
@@ -28,7 +28,7 @@ class TestField1D(test.TestBase):
         n = 100
 
         mesh = uniform_mesh_factory(self.L, self.dx)
-        f = field.Field(mesh, c_0=1.0)
+        f = fields.Field(mesh, c_0=1.0)
 
         rs_random = positions.get_uniform_points(n, self.L, rng=self.rng)
         rs = np.append(rs_random, self.rs_special, axis=0)
@@ -62,7 +62,7 @@ class TestFoodField1D(test.TestBase):
         D = 1.0
         delta = 1.0
         c_0 = 1.0
-        f = field.FoodField(mesh, D, delta, c_0)
+        f = fields.FoodField(mesh, D, delta, c_0)
         rho_array = f._get_rho_array(ps_centers)
         self.assertTrue(np.allclose(rho_array, rho_expected))
 
@@ -78,7 +78,7 @@ class TestFoodField1D(test.TestBase):
         D = 0.0
         delta = 1.0
         c_0 = 1.0
-        f = field.FoodField(mesh, D, delta, c_0)
+        f = fields.FoodField(mesh, D, delta, c_0)
         f.iterate(ps_centers, dt)
         c_expected = c_0 * np.exp(-delta * rho_expected * dt)
         self.assertTrue(np.allclose(f.c, c_expected))
@@ -101,7 +101,7 @@ class TestFoodField1D(test.TestBase):
         c_0_array = np.zeros(mesh.cellCenters.shape[1])
         c_0_array[i_center] = c_0
 
-        f = field.FoodField(mesh, D, delta, c_0_array)
+        f = fields.FoodField(mesh, D, delta, c_0_array)
 
         for t in np.arange(0.0, t_max, dt):
             f.iterate(ps, dt)
@@ -135,7 +135,7 @@ class TestFoodField1D(test.TestBase):
 
         def get_f(npy_seed):
             np.random.seed(npy_seed)
-            f = field.FoodField(mesh, D, delta, c_0)
+            f = fields.FoodField(mesh, D, delta, c_0)
             for t in np.arange(0.0, t_max, dt):
                 ps.r += self.rng.uniform(-self.dx, self.dx, size=(n, dim))
                 f.iterate(ps, dt)
