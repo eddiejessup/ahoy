@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ahoy.utils.meta import make_repr_str
-from ahoy import measurers
+from ahoy import measurers, dc_dx_measurers
 
 
 class NoiseMeasurer(measurers.Measurer):

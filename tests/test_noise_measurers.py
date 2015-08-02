@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ahoy import directions, measurers, noise_measurers
+from ahoy import directions, c_measurers, dc_dx_measurers, noise_measurers
 import test
 
 
@@ -15,8 +15,9 @@ class TestChemoNoiseMeasurer1D(test.TestBase):
         self.v_0 = 2.2
 
     def run_valchemo(self, ds, chi, noise_expected):
-        grad_c_measurer = measurers.ConstantGradCMeasurer(self.n, self.dim)
-        dc_dx_measurer = measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
+        grad_c_measurer = c_measurers.ConstantGradCMeasurer(self.n, self.dim)
+        dc_dx_measurer = dc_dx_measurers.SpatialDcDxMeasurer(ds,
+                                                             grad_c_measurer)
         noise_measurer = self.noise_measurer_cls(self.noise_0, chi,
                                                  dc_dx_measurer)
         noise = noise_measurer.get_noise()
