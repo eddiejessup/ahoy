@@ -1,8 +1,10 @@
 from __future__ import print_function, division
 import numpy as np
 from ahoy.utils.meta import make_repr_str
-from ahoy import directions, rudders, positions, swimmers
 from ahoy.rudder_sets import rudder_set_factory
+from ahoy.directions import directions_factory
+from ahoy.positions import positions_factory
+from ahoy.swimmers import swimmers_factory
 
 
 class Agents(object):
@@ -39,10 +41,10 @@ def agents_factory(rng, dim, aligned_flag,
         except AttributeError:
             volume_free = np.product(L)
         n = int(round(rho_0 * volume_free))
-    ds = directions.directions_factory(n, dim, aligned_flag=aligned_flag,
-                                       rng=rng)
-    ps = positions.positions_factory(spatial_flag, periodic_flag, n, dim, L,
-                                     origin_flags, rng, obstructor)
+    ds = directions_factory(n, dim, aligned_flag=aligned_flag,
+                            rng=rng)
+    ps = positions_factory(spatial_flag, periodic_flag, n, dim, L,
+                           origin_flags, rng, obstructor)
     rudder_sets = rudder_set_factory(temporal_chemo_flag,
                                      ds,
                                      ps, v_0, dt_mem, t_mem, time,
@@ -50,5 +52,5 @@ def agents_factory(rng, dim, aligned_flag,
                                      onesided_flag, chi,
                                      tumble_flag, p_0, tumble_chemo_flag,
                                      rotation_flag, Dr_0, dim, rotation_chemo_flag)
-    swims = swimmers.swimmers_factory(spatial_flag, v_0, ds)
+    swims = swimmers_factory(spatial_flag, v_0, ds)
     return Agents(ds, ps, rudder_sets, swims)

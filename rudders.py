@@ -80,10 +80,21 @@ def rotation_rudders_nd(dim, *args, **kwargs):
                                   ' dimension')
 
 
-def rudders_factory(tumble_flag, dim, chemo_flag, onesided_flag, noise_0, chi,
-                    dc_dx_measurer):
-    noise_measurer = noise_measurer_factory(chemo_flag, onesided_flag, noise_0,
-                                            chi, dc_dx_measurer)
+def rudders_factory(tumble_flag, dim,
+                    chemo_flag,
+                    noise_0,
+                    onesided_flag, chi,
+                    temporal_chemo_flag,
+                    ds,
+                    ps, v_0, dt_mem, t_mem, t_rot_0, time,
+                    c_field_flag, c_field):
+    noise_measurer = noise_measurer_factory(chemo_flag,
+                                            noise_0,
+                                            onesided_flag, chi,
+                                            temporal_chemo_flag,
+                                            ds,
+                                            ps, v_0, dt_mem, t_mem, t_rot_0, time,
+                                            c_field_flag, c_field)
     if tumble_flag:
         rudders = TumbleRudders(noise_measurer)
     else:

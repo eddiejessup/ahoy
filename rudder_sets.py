@@ -2,7 +2,6 @@ from __future__ import print_function, division
 import numpy as np
 from ahoy.rudders import TumbleRudders, RotationRudders, rudders_factory
 from ahoy.utils.meta import make_repr_str
-from ahoy.dc_dx_measurers import dc_dx_factory
 
 
 class RudderSets(object):
@@ -54,17 +53,32 @@ def rudder_set_factory(temporal_chemo_flag,
                        onesided_flag, chi,
                        tumble_flag, p_0, tumble_chemo_flag,
                        rotation_flag, Dr_0, dim, rotation_chemo_flag):
-    dc_dx_measurer = dc_dx_factory(temporal_chemo_flag,
-                                   ds,
-                                   ps, v_0, dt_mem, t_mem, p_0, Dr_0, time,
-                                   c_field_flag, c_field)
+    D_rot_0 = 0.0
+    if tumble_flag:
+        D_rot_0 += p_0
+    if rotation_flag:
+        D_rot_0 += Dr_0
+    t_rot_0 = 1.0 / D_rot_0
+
     sets = RudderSets()
     if tumble_flag:
-        sets.sets.append(rudders_factory(True, dim, tumble_chemo_flag,
-                                         onesided_flag, p_0, chi,
-                                         dc_dx_measurer))
+        rudders = rudders_factory(True, dim,
+                                  tumble_chemo_flag,
+                                  p_0,
+                                  onesided_flag, chi,
+                                  temporal_chemo_flag,
+                                  ds,
+                                  ps, v_0, dt_mem, t_mem, t_rot_0, time,
+                                  c_field_flag, c_field)
+        sets.sets.append(rudders)
     if rotation_flag:
-        sets.sets.append(rudders_factory(False, dim, rotation_chemo_flag,
-                                         onesided_flag, p_0, chi,
-                                         dc_dx_measurer))
+        rudders = rudders_factory(False, dim,
+                                  rotation_chemo_flag,
+                                  Dr_0,
+                                  onesided_flag, chi,
+                                  temporal_chemo_flag,
+                                  ds,
+                                  ps, v_0, dt_mem, t_mem, t_rot_0, time,
+                                  c_field_flag, c_field)
+        sets.sets.append(rudders)
     return sets
