@@ -72,11 +72,6 @@ class PeriodicPositions(Positions):
             wraps[:, i_dim] = np.sign(self.r[:, i_dim]) * wraps_mag
         return wraps
 
-    def L_repr(self):
-        def format_inf(x):
-            return x if np.isfinite(x) else 'i'
-        return [format_inf(e) for e in self.L]
-
     def __repr__(self):
         fs = [('n', self.n), ('dim', self.dim), ('L', self.L)]
         return make_repr_str(self, fs)

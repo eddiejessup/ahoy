@@ -31,8 +31,6 @@ class ChemoNoiseMeasurer(NoiseMeasurer):
 
     def get_noise(self):
         dc_dxs = self.dc_dx_measurer.get_dc_dxs()
-        print(self.chi * dc_dxs.max(), self.chi * dc_dxs.min(),
-              self.chi * dc_dxs.mean())
         return self.noise_0 * (1.0 - self.chi * dc_dxs)
 
     def __repr__(self):

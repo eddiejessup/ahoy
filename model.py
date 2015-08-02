@@ -47,7 +47,11 @@ class Model(object):
                                                  for o in self.origin_flags]))
             s += ',origin={},v={:g}'.format(origin_str, ags.swimmers.v_0)
             if isinstance(ags.positions, ahoy.positions.PeriodicPositions):
-                s += ',L={}'.format(tuple(ags.positions.L_repr()))
+                def format_inf(x):
+                    return '{:g}'.format(x) if np.isfinite(x) else 'i'
+                L_str = '({})'.format(','.join([format_inf(e)
+                                                for e in ags.positions.L]))
+                s += ',L={}'.format(L_str)
 
         # Rudders
         for rs in ags.rudder_sets.sets:
@@ -84,7 +88,7 @@ class Model(object):
             elif obs.turner.__class__ is turners.AlignTurner:
                 s_turner = 'align'
             pf = obs.fraction_occupied
-            s += 'Pore(R={:g},pf={:.2g},turn={})'.format(obs.R, pf, s_turner)
+            s += 'Pore(R={:g},pf={:3g},turn={})'.format(obs.R, pf, s_turner)
         return s
 
     def _get_output_dirname_field_part(self):
