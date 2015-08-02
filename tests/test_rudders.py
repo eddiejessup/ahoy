@@ -84,7 +84,3 @@ class TestTumbleRudders1D(TestRotationRudders2D):
 
 class TestTumbleRudders2D(TestTumbleRudders1D):
     dim = 2
-
-# TODO
-# class TestRudderSetFactory(test.TestBase):
-#     pass
