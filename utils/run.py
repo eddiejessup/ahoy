@@ -92,8 +92,8 @@ def run_chi_scan():
     }
     model_kwargs = dict(default_model_kwargs, **extra_model_kwargs)
 
-    t_output_every = 1.0
-    t_upto = 10.0
+    t_output_every = 100.0
+    t_upto = 200.0
     chis = np.linspace(0.0, 0.95, 3)
     force_resume = True
     parallel = True
