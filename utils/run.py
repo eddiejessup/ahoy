@@ -72,11 +72,11 @@ def run_pf_scan():
     for noise_var, turner, pf in product(noise_vars, turners, pfs):
         model_kwargs_cur = model_kwargs.copy()
         if noise_var == 'Dr_0':
-            model_kwargs_cur['Dr_0'] = 1.0
-            model_kwargs_cur['p_0'] = 0.0
+            model_kwargs_cur['rotation_flag'] = True
+            model_kwargs_cur['tumble_flag'] = False
         else:
-            model_kwargs_cur['Dr_0'] = 0.0
-            model_kwargs_cur['p_0'] = 1.0
+            model_kwargs_cur['rotation_flag'] = False
+            model_kwargs_cur['tumble_flag'] = True
         model_kwargs_cur['pore_turner'] = turner
         model_kwargs_cur['pore_pf'] = pf
         model_kwarg_sets.append(model_kwargs_cur)
@@ -111,14 +111,14 @@ def run_chi_scan():
         if noise_var == 'Dr_0':
             if dim == 1:
                 continue
-            model_kwargs_cur['Dr_0'] = 1.0
+            model_kwargs_cur['rotation_flag'] = True
             model_kwargs_cur['rotation_chemo_flag'] = True
-            model_kwargs_cur['p_0'] = 0.0
+            model_kwargs_cur['tumble_flag'] = False
             model_kwargs_cur['tumble_chemo_flag'] = False
         else:
-            model_kwargs_cur['Dr_0'] = 0.0
+            model_kwargs_cur['rotation_flag'] = False
             model_kwargs_cur['rotation_chemo_flag'] = False
-            model_kwargs_cur['p_0'] = 1.0
+            model_kwargs_cur['tumble_flag'] = True
             model_kwargs_cur['tumble_chemo_flag'] = True
         model_kwargs_cur['dim'] = dim
         model_kwargs_cur['onesided_flag'] = onesided_flag
@@ -156,14 +156,14 @@ def run_pf_scan_drift():
         model_kwargs_cur = model_kwargs.copy()
 
         if noise_var == 'Dr_0':
-            model_kwargs_cur['Dr_0'] = 1.0
+            model_kwargs_cur['rotation_flag'] = True
             model_kwargs_cur['rotation_chemo_flag'] = True
-            model_kwargs_cur['p_0'] = 0.0
+            model_kwargs_cur['tumble_flag'] = False
             model_kwargs_cur['tumble_chemo_flag'] = False
         else:
-            model_kwargs_cur['Dr_0'] = 0.0
+            model_kwargs_cur['rotation_flag'] = False
             model_kwargs_cur['rotation_chemo_flag'] = False
-            model_kwargs_cur['p_0'] = 1.0
+            model_kwargs_cur['tumble_flag'] = True
             model_kwargs_cur['tumble_chemo_flag'] = True
         model_kwargs_cur['onesided_flag'] = onesided_flag
         model_kwargs_cur['temporal_chemo_flag'] = temporal_chemo_flag
