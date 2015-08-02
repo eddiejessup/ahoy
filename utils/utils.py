@@ -36,12 +36,12 @@ def get_diff_coeff(x, t):
 
 def get_ud_vector(m):
     dr = m.ships.agents.positions.dr()
-    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.ships.agents.swimmers.v_0
+    return np.mean(get_vd_coeff(dr, m.ships.time.t), axis=0) / m.ships.agents.swimmers.v_0
 
 
 def get_ud_scalar(m):
     dr = m.ships.agents.positions.dr_mag()
-    return np.mean(get_vd_coeff(dr, m.time.t), axis=0) / m.ships.agents.swimmers.v_0
+    return np.mean(get_vd_coeff(dr, m.ships.time.t), axis=0) / m.ships.agents.swimmers.v_0
 
 
 def get_D_vector(m):
