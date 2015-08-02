@@ -46,12 +46,12 @@ def get_ud_scalar(m):
 
 def get_D_vector(m):
     dr = m.ships.agents.positions.dr
-    return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
+    return np.mean(get_diff_coeff(dr, m.ships.time.t), axis=0)
 
 
 def get_D_scalar(m):
     dr = m.ships.agents.positions.dr_mag
-    return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
+    return np.mean(get_diff_coeff(dr, m.ships.time.t), axis=0)
 
 
 def get_r_vector(m):
