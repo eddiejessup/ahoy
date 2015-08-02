@@ -9,7 +9,7 @@ class Swimmers(object):
         self.directions = directions
 
     def displace(self, positions, dt):
-        dr = self.v_0 * self.directions.u() * dt
+        dr = self.v_0 * self.directions.u * dt
         positions.r += dr
         return positions, dr
 

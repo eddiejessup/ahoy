@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ahoy import stime, directions, measurers
+from ahoy import stime, directions, c_measurers, dc_dx_measurers
 import test
 
 
@@ -11,8 +11,9 @@ class TestLinearSpatialDcDxMeasurer(test.TestBase):
 
     def run_nd(self, dim, u_0, dc_dxs_expected):
         ds = directions.directions_nd(u_0)
-        grad_c_measurer = measurers.ConstantGradCMeasurer(self.n, dim)
-        dc_dx_measurer = measurers.SpatialDcDxMeasurer(ds, grad_c_measurer)
+        grad_c_measurer = c_measurers.ConstantGradCMeasurer(self.n, dim)
+        dc_dx_measurer = dc_dx_measurers.SpatialDcDxMeasurer(ds,
+                                                             grad_c_measurer)
         dc_dxs = dc_dx_measurer.get_dc_dxs()
         self.assertTrue(np.allclose(dc_dxs, dc_dxs_expected))
 
@@ -56,6 +57,7 @@ class MockPositions(object):
     def iterate(self, dt):
         self.r += self.v_0 * self.u_0 * dt
 
+    @property
     def dr(self):
         return self.r
 
@@ -73,11 +75,13 @@ class TestLinearTemporalDcDxMeasurer(TestLinearSpatialDcDxMeasurer):
     def run_nd(self, dim, u_0, dc_dxs_expected):
         time = stime.Time()
         ps = MockPositions(dim, self.n, self.v_0, u_0)
-        c_measurer = measurers.LinearCMeasurer(ps)
-        dc_dx_measurer = measurers.TemporalDcDxMeasurer(c_measurer, self.v_0,
-                                                        self.dt_mem,
-                                                        self.t_mem,
-                                                        self.t_rot_0, time)
+        c_measurer = c_measurers.LinearCMeasurer(ps)
+        dc_dx_measurer = dc_dx_measurers.TemporalDcDxMeasurer(c_measurer,
+                                                              self.v_0,
+                                                              self.dt_mem,
+                                                              self.t_mem,
+                                                              self.t_rot_0,
+                                                              time)
         while time.t < 2.0 * self.t_mem:
             ps.iterate(self.dt)
             dc_dxs = dc_dx_measurer.get_dc_dxs()

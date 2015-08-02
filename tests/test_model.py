@@ -9,18 +9,25 @@ class TestModel(test.TestBase):
     def test_model_random_seeding(self):
         model_kwargs = {
             'seed': 1,
-            'dim': 2,
             'dt': 0.01,
-            'aligned_flag': False,
+
             'n': 10,
-            'spatial_flag': False,
+            'dim': 2,
             # Must have aligned flag False to test uniform directions function.
+            'aligned_flag': False,
+
+            'spatial_flag': False,
+
             'chi': 0.1,
             'onesided_flag': True,
+
             # Must have tumbling to test tumbling function.
+            'tumble_flag': True,
             'p_0': 1.3,
             'tumble_chemo_flag': True,
+
             # Must have rotational diffusion to test rot diff function.
+            'rotation_flag': True,
             'Dr_0': 1.3,
             'rotation_chemo_flag': True,
         }
@@ -37,17 +44,18 @@ class TestModel(test.TestBase):
         model_1 = get_model(2)
         model_2 = get_model(3)
 
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))
 
     def test_spatial_model_random_seeding(self):
         model_kwargs = {
             'seed': 1,
-            'dim': 2,
             'dt': 0.01,
-            'aligned_flag': False,
+
+            'dim': 2,
             'n': 10,
             # Must have aligned flag False to test uniform directions function.
+            'aligned_flag': False,
 
             'spatial_flag': True,
             'periodic_flag': True,
@@ -59,12 +67,17 @@ class TestModel(test.TestBase):
 
             'chi': 0.1,
             'onesided_flag': True,
+
             # Must have tumbling to test tumbling function.
+            'tumble_flag': True,
             'p_0': 1.3,
             'tumble_chemo_flag': True,
+
             # Must have rotational diffusion to test rot diff function.
+            'rotation_flag': True,
             'Dr_0': 1.3,
             'rotation_chemo_flag': True,
+
             'temporal_chemo_flag': True,
             'dt_mem': 0.05,
             't_mem': 5.0,
@@ -89,19 +102,19 @@ class TestModel(test.TestBase):
 
         self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
                                     model_2.ships.agents.positions.r))
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))
 
     def test_c_field_model_random_seeding(self):
         model_kwargs = {
             'seed': 1,
-            'dim': 2,
             'dt': 0.01,
+
+            'dim': 2,
+            'rho_0': 10.0,
+            # Must have aligned flag False to test uniform directions function.
             'aligned_flag': False,
 
-            'rho_0': 10.0,
-
-            # Must have aligned flag False to test uniform directions function.
             'spatial_flag': True,
             'periodic_flag': True,
             'v_0': 1.5,
@@ -110,10 +123,14 @@ class TestModel(test.TestBase):
 
             'chi': 0.3,
             'onesided_flag': True,
+
             # Must have tumbling to test tumbling function.
             'p_0': 1.3,
+            'tumble_flag': True,
             'tumble_chemo_flag': True,
+
             # Must have rotational diffusion to test rot diff function.
+            'rotation_flag': True,
             'Dr_0': 1.3,
             'rotation_chemo_flag': True,
 
@@ -146,5 +163,5 @@ class TestModel(test.TestBase):
 
         self.assertTrue(np.allclose(model_1.ships.agents.positions.r,
                                     model_2.ships.agents.positions.r))
-        self.assertTrue(np.allclose(model_1.ships.agents.directions.u(),
-                                    model_2.ships.agents.directions.u()))
+        self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
+                                    model_2.ships.agents.directions.u))

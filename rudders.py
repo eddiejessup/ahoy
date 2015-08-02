@@ -11,26 +11,29 @@ class Rudders(object):
     def __init__(self, noise_measurer):
         self.noise_measurer = noise_measurer
 
+    @property
+    def is_chemotactic(self):
+        return isinstance(self.noise_measurer,
+                          noise_measurers.ChemoNoiseMeasurer)
+
+    @property
+    def is_onesided(self):
+        return isinstance(self.noise_measurer,
+                          noise_measurers.OneSidedChemoNoiseMeasurer)
+
+    @property
+    def chi(self):
+        if self.is_chemotactic:
+            return self.noise_measurer.chi
+        else:
+            return None
+
     def rotate(self, directions, dt, rng=None):
         noise = self.noise_measurer.get_noise()
         return self._rotate(directions, noise, dt, rng)
 
     def _rotate(self, directions, noise, dt, rng):
         return directions
-
-    def is_chemotactic(self):
-        return isinstance(self.noise_measurer,
-                          noise_measurers.ChemoNoiseMeasurer)
-
-    def is_onesided(self):
-        return isinstance(self.noise_measurer,
-                          noise_measurers.OneSidedChemoNoiseMeasurer)
-
-    def get_chi(self):
-        if self.is_chemotactic():
-            return self.noise_measurer.chi
-        else:
-            return None
 
     def __repr__(self):
         fs = [('noise_measurer', self.noise_measurer)]
@@ -69,7 +72,7 @@ class TumbleRudders(Rudders):
         return directions.tumble(tumblers, rng)
 
 
-def rotation_rudders_factory(dim, *args, **kwargs):
+def rotation_rudders_nd(dim, *args, **kwargs):
     if dim == 2:
         return RotationRudders2D(*args, **kwargs)
     else:
@@ -77,19 +80,12 @@ def rotation_rudders_factory(dim, *args, **kwargs):
                                   ' dimension')
 
 
-def rudder_set_factory(onesided_flag, chi, dc_dx_measurer,
-                       tumble_chemo_flag, p_0,
-                       rotation_chemo_flag, Dr_0, dim):
-    rudder_sets = []
-    if p_0:
-        tumble_noise_measurer = noise_measurer_factory(tumble_chemo_flag,
-                                                       onesided_flag, p_0, chi,
-                                                       dc_dx_measurer)
-        rudder_sets.append(TumbleRudders(tumble_noise_measurer))
-    if Dr_0:
-        rotation_noise_measurer = noise_measurer_factory(rotation_chemo_flag,
-                                                         onesided_flag, Dr_0,
-                                                         chi, dc_dx_measurer)
-        rudder_sets.append(rotation_rudders_factory(dim,
-                                                    rotation_noise_measurer))
-    return rudder_sets
+def rudders_factory(tumble_flag, dim, chemo_flag, onesided_flag, noise_0, chi,
+                    dc_dx_measurer):
+    noise_measurer = noise_measurer_factory(chemo_flag, onesided_flag, noise_0,
+                                            chi, dc_dx_measurer)
+    if tumble_flag:
+        rudders = TumbleRudders(noise_measurer)
+    else:
+        rudders = rotation_rudders_nd(dim, noise_measurer)
+    return rudders

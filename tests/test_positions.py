@@ -20,14 +20,14 @@ class TestPeriodicPositions1D(test.TestBase):
         self.ps.r[0, 0] = self.L[0] / 2.0
         dr[0, 0] = 0.9 * self.L[0]
         self.ps.r += np.full(self.ps.r.shape, dr)
-        self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
+        self.assertTrue(np.abs(self.ps.r_w[:, 0]).max() < self.L[0] / 2.0)
 
     def test_wrapping_up(self):
         dr = np.zeros_like(self.ps.r)
         self.ps.r[-1, 0] = -self.L[0] / 2.0
         dr[-1, 0] = -0.9 * self.L[0]
         self.ps.r += np.full(self.ps.r.shape, dr)
-        self.assertTrue(np.abs(self.ps.r_w()[:, 0]).max() < self.L[0] / 2.0)
+        self.assertTrue(np.abs(self.ps.r_w[:, 0]).max() < self.L[0] / 2.0)
 
 
 class TestPeriodicPositions2D(TestPeriodicPositions1D):
@@ -39,7 +39,7 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
         self.ps.r[-1, -1] = -self.L[-1] / 2.0
         dr[-1, -1] = -0.9 * self.L[-1]
         self.ps.r += np.full(self.ps.r.shape, dr)
-        self.assertTrue(np.abs(self.ps.r_w()[:, -1]).max() < self.L[-1] / 2.0)
+        self.assertTrue(np.abs(self.ps.r_w[:, -1]).max() < self.L[-1] / 2.0)
 
     def test_partial_infinite_boundaries(self):
         L = np.array([np.inf, 1.7])
@@ -50,7 +50,7 @@ class TestPeriodicPositions2D(TestPeriodicPositions1D):
         ps.r += dr
         r_naive = ps.r_0[:, 0] + dr[:, 0]
         # Check no wrapping along infinite axis
-        self.assertTrue(np.allclose(r_naive, ps.r_w()[:, 0]))
+        self.assertTrue(np.allclose(r_naive, ps.r_w[:, 0]))
         self.assertTrue(np.allclose(r_naive, ps.r[:, 0]))
         # Check done wrapping along finite axis
-        self.assertTrue(np.all(np.abs(ps.r_w()[:, 1]) < L[1] / 2.0))
+        self.assertTrue(np.all(np.abs(ps.r_w[:, 1]) < L[1] / 2.0))

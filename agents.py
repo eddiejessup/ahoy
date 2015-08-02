@@ -1,8 +1,8 @@
 from __future__ import print_function, division
 import numpy as np
 from ahoy.utils.meta import make_repr_str
-from ahoy import (directions, measurers, rudders, positions,
-                  swimmers)
+from ahoy import directions, rudders, positions, swimmers
+from ahoy.rudder_sets import rudder_set_factory
 
 
 class Agents(object):
@@ -13,32 +13,8 @@ class Agents(object):
         self.positions = positions
         self.swimmers = swimmers
 
-    def get_chi(self):
-        for ruds in self.rudder_sets:
-            if ruds.is_chemotactic():
-                return ruds.get_chi()
-
-    def does_tumbling(self):
-        for rs in self.rudder_sets:
-            if isinstance(rs, rudders.TumbleRudders):
-                return True
-        return False
-
-    def does_rotation(self):
-        for rs in self.rudder_sets:
-            if isinstance(rs, rudders.RotationRudders):
-                return True
-        return False
-
-    def get_chemo_rudders(self):
-        for rs in self.rudder_sets:
-            if rs.is_chemotactic():
-                return rs
-        raise Exception
-
     def iterate(self, dt, rng, obstructor):
-        for ruds in self.rudder_sets:
-            self.directions = ruds.rotate(self.directions, dt, rng)
+        self.directions = self.rudder_sets.rotate(self.directions, dt, rng)
         self.positions, dr = self.swimmers.displace(self.positions, dt)
         obstructor.obstruct(self.positions, dr, self.directions)
 
@@ -51,8 +27,8 @@ class Agents(object):
 def agents_factory(rng, dim, aligned_flag,
                    n=None, rho_0=None,
                    chi=None, onesided_flag=None,
-                   p_0=None, tumble_chemo_flag=None,
-                   Dr_0=None, rotation_chemo_flag=None,
+                   tumble_flag=None, p_0=None, tumble_chemo_flag=None,
+                   rotation_flag=None, Dr_0=None, rotation_chemo_flag=None,
                    temporal_chemo_flag=None, dt_mem=None, t_mem=None, time=None,
                    spatial_flag=None, v_0=None,
                    periodic_flag=None, L=None, origin_flags=None, obstructor=None,
@@ -67,14 +43,12 @@ def agents_factory(rng, dim, aligned_flag,
                                        rng=rng)
     ps = positions.positions_factory(spatial_flag, periodic_flag, n, dim, L,
                                      origin_flags, rng, obstructor)
-    dc_dx_measurer = measurers.dc_dx_factory(temporal_chemo_flag,
-                                             ds,
-                                             ps, v_0, dt_mem, t_mem, p_0, Dr_0,
-                                             time,
-                                             c_field_flag, c_field)
-    rudder_sets = rudders.rudder_set_factory(onesided_flag, chi,
-                                             dc_dx_measurer,
-                                             tumble_chemo_flag, p_0,
-                                             rotation_chemo_flag, Dr_0, dim)
+    rudder_sets = rudder_set_factory(temporal_chemo_flag,
+                                     ds,
+                                     ps, v_0, dt_mem, t_mem, time,
+                                     c_field_flag, c_field,
+                                     onesided_flag, chi,
+                                     tumble_flag, p_0, tumble_chemo_flag,
+                                     rotation_flag, Dr_0, dim, rotation_chemo_flag)
     swims = swimmers.swimmers_factory(spatial_flag, v_0, ds)
     return Agents(ds, ps, rudder_sets, swims)

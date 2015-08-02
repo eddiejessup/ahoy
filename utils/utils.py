@@ -45,27 +45,27 @@ def get_ud_scalar(m):
 
 
 def get_D_vector(m):
-    dr = m.ships.agents.positions.dr()
+    dr = m.ships.agents.positions.dr
     return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
 
 
 def get_D_scalar(m):
-    dr = m.ships.agents.positions.dr_mag()
+    dr = m.ships.agents.positions.dr_mag
     return np.mean(get_diff_coeff(dr, m.time.t), axis=0)
 
 
 def get_r_vector(m):
-    dr = m.ships.agents.positions.dr()
+    dr = m.ships.agents.positions.dr
     return np.mean(dr, axis=0)
 
 
 def get_r_scalar(m):
-    dr = m.ships.agents.positions.dr_mag()
+    dr = m.ships.agents.positions.dr_mag
     return np.mean(dr, axis=0)
 
 
 def get_u_net_vector(m):
-    return np.mean(m.ships.agents.directions.u(), axis=0)
+    return np.mean(m.ships.agents.directions.u, axis=0)
 
 
 def get_u_net_scalar(m):
@@ -73,7 +73,7 @@ def get_u_net_scalar(m):
 
 
 def get_chi(m):
-    return m.ships.agents.get_chi()
+    return m.ships.agents.chi
 
 
 def get_pf(m):
@@ -293,10 +293,10 @@ def get_equiv_chi(ud_0, dirnames):
 
 
 def get_equiv_chi_key(m):
-    noise_var_key = 'p_0' if m.ships.agents.does_tumbling() else 'Dr_0'
+    noise_var_key = 'p_0' if m.ships.agents.does_tumbling else 'Dr_0'
     chemo_ruds = m.ships.agents.get_chemo_rudders()
-    key = (noise_var_key, chemo_ruds.is_onesided(),
-           chemo_ruds.noise_measurer.is_temporal())
+    key = (noise_var_key, chemo_ruds.is_onesided,
+           chemo_ruds.noise_measurer.is_temporal)
     return key
 
 

@@ -24,7 +24,7 @@ class Model(object):
 
     @property
     def aligned_flags(self):
-        return np.all(self.ships.agents.directions.u_0() == 0.0, axis=0)
+        return np.all(self.ships.agents.directions.u_0 == 0.0, axis=0)
 
     @property
     def origin_flags(self):
@@ -47,23 +47,26 @@ class Model(object):
                                                  for o in self.origin_flags]))
             s += ',origin={},v={:g}'.format(origin_str, ags.swimmers.v_0)
             if isinstance(ags.positions, ahoy.positions.PeriodicPositions):
-                s += ',L={}'.format(tuple(ags.positions.L_repr()))
+                def format_inf(x):
+                    return '{:g}'.format(x) if np.isfinite(x) else 'i'
+                L_str = '({})'.format(','.join([format_inf(e)
+                                                for e in ags.positions.L]))
+                s += ',L={}'.format(L_str)
 
         # Rudders
-        for rs in ags.rudder_sets:
+        for rs in ags.rudder_sets.sets:
             nm = rs.noise_measurer
             if isinstance(rs, ahoy.rudders.TumbleRudders):
                 noise_str = 'p'
             elif isinstance(rs, ahoy.rudders.RotationRudders):
                 noise_str = 'Dr'
             s += ',{}={:g}'.format(noise_str, nm.noise_0)
-            if rs.is_chemotactic():
-                chemo_temp = nm.is_temporal()
-                type_s = 'T' if chemo_temp else 'S'
-                s += ',chi={:g},side={:d},type={}'.format(nm.chi,
-                                                          2 - rs.is_onesided(),
-                                                          type_s)
-                if chemo_temp:
+            if rs.is_chemotactic:
+                type_s = 'T' if nm.is_temporal else 'S'
+                side = 2 - rs.is_onesided
+                s += ',chi={:3g},side={:d},type={}'.format(nm.chi, side,
+                                                           type_s)
+                if nm.is_temporal:
                     measurer = nm.dc_dx_measurer
                     s += ',dtMem={:g},tMem={:g}'.format(measurer.dt_mem,
                                                         measurer.t_mem)
@@ -85,7 +88,7 @@ class Model(object):
             elif obs.turner.__class__ is turners.AlignTurner:
                 s_turner = 'align'
             pf = obs.fraction_occupied
-            s += 'Pore(R={:g},pf={:.2g},turn={})'.format(obs.R, pf, s_turner)
+            s += 'Pore(R={:g},pf={:3g},turn={})'.format(obs.R, pf, s_turner)
         return s
 
     def _get_output_dirname_field_part(self):

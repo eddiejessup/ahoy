@@ -18,20 +18,25 @@ class Positions(object):
     def dim(self):
         return self.r.shape[1]
 
+    @property
     def r_mag(self):
         return vector.vector_mag(self.r)
 
+    @property
     def dr(self):
         return self.r - self.r_0
 
+    @property
     def dr_mag(self):
-        return vector.vector_mag(self.dr())
+        return vector.vector_mag(self.dr)
 
+    @property
     def r_w(self):
         return self.r
 
+    @property
     def r_w_mag(self):
-        return vector.vector_mag(self.r_w())
+        return vector.vector_mag(self.r_w)
 
     def __repr__(self):
         fs = [('n', self.n), ('dim', self.dim)]
@@ -48,8 +53,16 @@ class PeriodicPositions(Positions):
     def volume(self):
         return np.product(self.L)
 
+    @property
+    def r_w(self):
+        wraps = self.get_wraps()
+        r_w = self.r.copy()
+        for i_dim in np.where(np.isfinite(self.L))[0]:
+            r_w[:, i_dim] -= wraps[:, i_dim] * self.L[i_dim]
+        return r_w
+
     def get_density_field(self, dx):
-        return fields.density(self.r_w(), self.L, dx)
+        return fields.density(self.r_w, self.L, dx)
 
     def get_wraps(self):
         wraps = np.zeros(self.r.shape, dtype=np.int)
@@ -58,18 +71,6 @@ class PeriodicPositions(Positions):
                          self.L[i_dim])
             wraps[:, i_dim] = np.sign(self.r[:, i_dim]) * wraps_mag
         return wraps
-
-    def r_w(self):
-        wraps = self.get_wraps()
-        r_w = self.r.copy()
-        for i_dim in np.where(np.isfinite(self.L))[0]:
-            r_w[:, i_dim] -= wraps[:, i_dim] * self.L[i_dim]
-        return r_w
-
-    def L_repr(self):
-        def format_inf(x):
-            return x if np.isfinite(x) else 'i'
-        return [format_inf(e) for e in self.L]
 
     def __repr__(self):
         fs = [('n', self.n), ('dim', self.dim), ('L', self.L)]
