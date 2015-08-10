@@ -14,15 +14,17 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'Cython',
-    'matplotlib',
     'numpy',
     'scipy',
+    'matplotlib',
+    'fipy',
     'ciabatta',
 ]
 
 test_requirements = [
     'numpy',
     'scipy',
+    'fipy',
 ]
 
 extensions = cythonize([
