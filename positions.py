@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from ciabatta import fields, vector
-from ahoy.utils.meta import make_repr_str
+from ciabatta.meta import make_repr_str
 
 
 class Positions(object):

@@ -1,5 +1,5 @@
 from __future__ import print_function, division
-from ahoy.utils.meta import make_repr_str
+from ciabatta.meta import make_repr_str
 
 
 class Swimmers(object):

@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import numpy as np
 import fipy
 from fipy.terms import TransientTerm, DiffusionTerm, ImplicitSourceTerm
-from ahoy.utils.meta import make_repr_str
+from ciabatta.meta import make_repr_str
 
 
 class Field(object):

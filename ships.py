@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 import numpy as np
-from ahoy.utils.meta import make_repr_str
+from ciabatta.meta import make_repr_str
 from ahoy.stime import Time
 from ahoy.obstructors import obstructor_factory
 from ahoy.agents import agents_factory

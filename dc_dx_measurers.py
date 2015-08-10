@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from ahoy.utils.meta import make_repr_str
+from ciabatta.meta import make_repr_str
 from ahoy.ring_buffer import CylinderBuffer
 from ahoy import measurers, c_measurers
 
