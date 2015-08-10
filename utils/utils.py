@@ -362,3 +362,16 @@ def get_linear_density(m, dx):
         R = 0.0
     Lx, Ly = m.ships.agents.positions.L
     return linear_density(xs, xcs, R, Lx, Ly, dx)
+
+
+def angle_density(ths, dth):
+    nth = int(round(2.0 * np.pi / dth))
+    ns, th_bins = np.histogram(ths, bins=nth, range=(-np.pi, np.pi))
+    dth = th_bins[1] - th_bins[0]
+    densities = ns.astype(np.float) / (ns * dth).sum()
+    return densities, th_bins
+
+
+def get_angle_density(m, dth):
+    ths = m.ships.agents.directions.th
+    return angle_density(ths, dth)

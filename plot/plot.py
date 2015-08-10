@@ -252,3 +252,10 @@ def plot_p_0_Ds_scalar(dirnames, ax):
     ax.set_xscale('log')
     ax.set_yscale('log')
 
+
+def plot_th_density(ds, th_bins, fig):
+    ax = plt.subplot(111, polar=True)
+    dth = th_bins[1] - th_bins[0]
+    ax.plot(th_bins[:-1], ds * dth)
+    ax.set_rmax(1.0)
+    ax.grid(True)
