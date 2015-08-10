@@ -34,7 +34,7 @@ extensions = cythonize([
 
 setup(
     name='ahoy',
-    version='0.1.0',
+    version='0.1.1',
     description="Agent-based simulations of active particles",
     long_description=readme + '\n\n' + history,
     author="Elliot Marsden",
