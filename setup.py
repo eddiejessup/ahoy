@@ -18,6 +18,7 @@ requirements = [
     'scipy',
     'matplotlib',
     'fipy',
+    'ez_setup',
     'ciabatta',
 ]
 
