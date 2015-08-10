@@ -9,18 +9,24 @@ from ahoy.utils.defaults import default_model_kwargs, combo_to_chi
 
 def run_spatial():
     extra_model_kwargs = {
+        'n': 50000,
         'spatial_flag': True,
         'periodic_flag': True,
-        'pore_flag': True,
+        'pore_flag': False,
         'pore_turner': ahoy.turners.AlignTurner(),
         'pore_pf': 0.0707,
+
+        'tumble_flag': True,
+        'tumble_chemo_flag': True,
+        'onesided_flag': True,
+        'chi': 0.5,
     }
     model_kwargs = dict(default_model_kwargs, **extra_model_kwargs)
 
     model = Model(**model_kwargs)
 
-    t_output_every = 100.0
-    t_upto = 5000.0
+    t_output_every = 50.0
+    t_upto = 100.0
     output_dir = None
     force_resume = None
 
@@ -141,13 +147,13 @@ def run_pf_scan_drift():
     model_kwargs = dict(default_model_kwargs, **extra_model_kwargs)
 
     t_output_every = 100.0
-    t_upto = 400.0
+    t_upto = 500.0
+    pore_pfs = np.linspace(0.0, 0.8, 11)
     force_resume = True
     parallel = True
 
     model_kwarg_sets = []
 
-    pfs = np.linspace(0.0, 0.8, 22)
     noise_vars = ['Dr_0', 'p_0']
     onesided_flags = [True, False]
     temporal_chemo_flags = [True, False]
@@ -169,8 +175,7 @@ def run_pf_scan_drift():
         model_kwargs_cur['temporal_chemo_flag'] = temporal_chemo_flag
         key = noise_var, onesided_flag, temporal_chemo_flag
         model_kwargs_cur['chi'] = combo_to_chi[key]
-        model_kwargs_cur['pore_pf'] = pf
-
+        model_kwargs_cur['pf'] = pf
         model_kwarg_sets.append(model_kwargs_cur)
 
     run_utils.run_kwarg_scan(Model, model_kwarg_sets,
