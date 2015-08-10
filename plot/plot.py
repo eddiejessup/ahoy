@@ -149,94 +149,51 @@ def plot_vis(dirname):
         plot_2d(dirname)
 
 
-def plot_t_uds_scalar(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_uds_scalar(dirname, ax):
     ts, uds = utils.t_uds_scalar(dirname)
     ax.plot(ts, uds)
 
-    plt.show()
 
-
-def plot_t_uds_vector(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_uds_vector(dirname, ax):
     ts, uds = utils.t_uds_vector(dirname)
     for vd_set in uds.T:
         ax.plot(ts, vd_set)
 
-    plt.show()
 
-
-def plot_t_Ds_scalar(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_Ds_scalar(dirname, ax):
     ts, Ds = utils.t_Ds_scalar(dirname)
     ax.plot(ts, Ds)
 
-    plt.show()
 
-
-def plot_t_Ds_vector(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_Ds_vector(dirname, ax):
     ts, Ds = utils.t_Ds_vector(dirname)
     for D_set in Ds.T:
         ax.plot(ts, D_set)
 
-    plt.show()
 
-
-def plot_t_rs_scalar(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_rs_scalar(dirname, ax):
     ts, rs = utils.t_rs_scalar(dirname)
     ax.plot(ts, rs)
 
-    plt.show()
 
-
-def plot_t_rs_vector(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_rs_vector(dirname, ax):
     ts, rs = utils.t_rs_vector(dirname)
     for r_set in rs.T:
         ax.plot(ts, r_set)
 
-    plt.show()
 
-
-def plot_t_u_nets_scalar(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_u_nets_scalar(dirname, ax):
     ts, u_nets = utils.t_u_nets_scalar(dirname)
     ax.plot(ts, u_nets)
 
-    plt.show()
 
-
-def plot_t_u_nets_vector(dirname):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_t_u_nets_vector(dirname, ax):
     ts, u_nets = utils.t_u_nets_vector(dirname)
     for u_net_set in u_nets.T:
         ax.plot(ts, u_net_set)
 
-    plt.show()
 
-
-def plot_chi_uds_x(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_chi_uds_x(dirnames, ax):
     chis, uds = utils.chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
     chis, uds = chis[i_sort], uds[i_sort]
@@ -244,13 +201,8 @@ def plot_chi_uds_x(dirnames):
     ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 1.1)
 
-    plt.show()
 
-
-def plot_pf_Ds_scalar(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_pf_Ds_scalar(dirnames, ax):
     pfs, Ds = utils.pf_Ds_scalar(dirnames)
     i_sort = np.argsort(pfs)
     pfs, Ds = pfs[i_sort], Ds[i_sort]
@@ -258,13 +210,8 @@ def plot_pf_Ds_scalar(dirnames):
     ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 410.0)
 
-    plt.show()
 
-
-def plot_pf_uds_x(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_pf_uds_x(dirnames, ax):
     pfs, uds = utils.pf_uds_x(dirnames)
     i_sort = np.argsort(pfs)
     pfs, uds = pfs[i_sort], uds[i_sort]
@@ -272,13 +219,8 @@ def plot_pf_uds_x(dirnames):
     ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 1.01)
 
-    plt.show()
 
-
-def plot_pf_duds_x(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_pf_duds_x(dirnames, ax):
     pfs, uds = utils.pf_uds_x(dirnames)
     i_sort = np.argsort(pfs)
     pfs, uds = pfs[i_sort], uds[i_sort]
@@ -288,13 +230,8 @@ def plot_pf_duds_x(dirnames):
     ax.set_xlim(-0.02, 1.0)
     # ax.set_ylim(0.0, 1.0)
 
-    plt.show()
 
-
-def plot_Dr_0_Ds_scalar(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_Dr_0_Ds_scalar(dirnames, ax):
     Dr_0s, Ds = utils.Dr_0_Ds_scalar(dirnames)
     i_sort = np.argsort(Dr_0s)
     Dr_0s, Ds = Dr_0s[i_sort], Ds[i_sort]
@@ -304,13 +241,8 @@ def plot_Dr_0_Ds_scalar(dirnames):
     ax.set_xscale('log')
     ax.set_yscale('log')
 
-    plt.show()
 
-
-def plot_p_0_Ds_scalar(dirnames):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
+def plot_p_0_Ds_scalar(dirnames, ax):
     p_0s, Ds = utils.p_0_Ds_scalar(dirnames)
     i_sort = np.argsort(p_0s)
     p_0s, Ds = p_0s[i_sort], Ds[i_sort]
@@ -320,4 +252,3 @@ def plot_p_0_Ds_scalar(dirnames):
     ax.set_xscale('log')
     ax.set_yscale('log')
 
-    plt.show()
