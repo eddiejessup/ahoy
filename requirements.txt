@@ -1,6 +1,7 @@
+wheel
 Cython
-matplotlib
 numpy
 scipy
-fipy
+matplotlib
 ez_setup
+fipy
