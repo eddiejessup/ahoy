@@ -6,3 +6,4 @@ matplotlib
 ez_setup
 fipy
 ciabatta
+agaro

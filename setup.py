@@ -20,6 +20,7 @@ requirements = [
     'ez_setup',
     'fipy',
     'ciabatta',
+    'agaro',
 ]
 
 test_requirements = [
