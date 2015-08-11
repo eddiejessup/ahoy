@@ -30,8 +30,14 @@ test_requirements = [
     'Cython',
     'numpy',
     'scipy',
+    'matplotlib',
+    'ez_setup',
     'fipy',
     'ciabatta',
+    'spatious',
+    'fealty',
+    'agaro',
+    'metropack',
 ]
 
 extensions = cythonize([
