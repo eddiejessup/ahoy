@@ -26,6 +26,7 @@ test_requirements = [
     'numpy',
     'scipy',
     'fipy',
+    'ciabatta',
 ]
 
 extensions = cythonize([

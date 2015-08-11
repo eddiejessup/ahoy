@@ -5,3 +5,4 @@ scipy
 matplotlib
 ez_setup
 fipy
+ciabatta
