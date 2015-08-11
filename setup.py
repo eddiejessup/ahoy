@@ -24,6 +24,7 @@ requirements = [
 ]
 
 test_requirements = [
+    'Cython',
     'numpy',
     'scipy',
     'fipy',
