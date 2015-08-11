@@ -1,10 +1,10 @@
 from __future__ import print_function, division
 import numpy as np
-from ciabatta import vector
-from ahoy import rudders
+from spatious import vector
 from agaro.output_utils import (get_filenames, filename_to_model,
                                 get_recent_model)
 from agaro.measure_utils import measures
+from ahoy import rudders
 
 
 def seg_intersect(p1, p2, yi):

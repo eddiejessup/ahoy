@@ -1,8 +1,9 @@
 from __future__ import print_function, division
 import numpy as np
-from ciabatta import vector, crandom
-from ciabatta.vector import smallest_signed_angle as angle_dist
+from ciabatta import crandom
 from ciabatta.meta import make_repr_str
+from spatious import vector
+from spatious.vector import smallest_signed_angle as angle_dist
 
 
 class Turner(object):
