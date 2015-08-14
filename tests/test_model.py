@@ -1,5 +1,4 @@
 import numpy as np
-from ahoy import turners
 from ahoy.model import Model
 import test
 
@@ -83,7 +82,7 @@ class TestModel(test.TestBase):
             't_mem': 5.0,
 
             'pore_flag': True,
-            'pore_turner': turners.AlignTurner(),
+            'pore_turner': 'align',
             'pore_R': 0.1,
             'pore_pf': 0.1,
         }
@@ -139,7 +138,7 @@ class TestModel(test.TestBase):
             't_mem': 5.0,
 
             'pore_flag': True,
-            'pore_turner': turners.AlignTurner(),
+            'pore_turner': 'align',
             'pore_R': 0.2,
             'pore_pf': 0.1,
 

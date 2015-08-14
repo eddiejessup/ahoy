@@ -4,7 +4,7 @@ import numpy as np
 from ciabatta.meta import make_repr_str
 from spatious import vector, distance, geom
 from metropack import pack
-from ahoy import mesh
+from ahoy import mesh, turners
 
 
 class NoneObstructor(object):
@@ -145,9 +145,17 @@ class PorousObstructor(SphereObstructor2D):
               ('fraction_occupied', self.fraction_occupied)]
         return make_repr_str(self, fs)
 
+turner_str_map = {
+    'stall': turners.Turner(),
+    'bounce_back': turners.BounceBackTurner(),
+    'reflect': turners.ReflectTurner(),
+    'align': turners.AlignTurner(),
+}
 
-def obstructor_factory(pore_flag, turner, R, L, pf, rng, periodic_flag):
+
+def obstructor_factory(pore_flag, turner_str, R, L, pf, rng, periodic_flag):
     if pore_flag:
-        return PorousObstructor(turner, R, L, pf, rng, periodic_flag)
+        return PorousObstructor(turner_str_map[turner_str], R, L, pf, rng,
+                                periodic_flag)
     else:
         return NoneObstructor()
