@@ -2,7 +2,7 @@
 
 __author__ = 'Elliot Marsden'
 __email__ = 'elliot.marsden@gmail.com'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 from ahoy import directions
 from ahoy import positions
