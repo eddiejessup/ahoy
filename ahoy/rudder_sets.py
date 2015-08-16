@@ -36,14 +36,14 @@ class RudderSets(object):
         raise Exception
 
     @property
-    def Dr_0(self, m):
+    def Dr_0(self):
         for rs in self.sets:
             if isinstance(rs, RotationRudders):
                 return rs.noise_measurer.noise_0
         return None
 
     @property
-    def p_0(self, m):
+    def p_0(self):
         for ruds in self.sets:
             if isinstance(ruds, TumbleRudders):
                 return ruds.noise_measurer.noise_0
