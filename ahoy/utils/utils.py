@@ -296,9 +296,9 @@ def get_equiv_chi(ud_0, dirnames):
 
 def get_equiv_chi_key(m):
     noise_var_key = 'p_0' if m.ships.agents.does_tumbling else 'Dr_0'
-    chemo_ruds = m.ships.agents.get_chemo_rudders()
-    key = (noise_var_key, chemo_ruds.is_onesided,
-           chemo_ruds.noise_measurer.is_temporal)
+    chemo_rudders = m.ships.agents.rudder_sets.chemo_rudders
+    key = (noise_var_key, chemo_rudders.is_onesided,
+           chemo_rudders.noise_measurer.is_temporal)
     return key
 
 
