@@ -20,6 +20,14 @@ class Agents(object):
         self.positions, dr = self.swimmers.displace(self.positions, dt)
         obstructor.obstruct(self.positions, dr, self.directions)
 
+    @property
+    def chi(self):
+        return self.rudder_sets.chi
+
+    @property
+    def n(self):
+        return self.directions.n
+
     def __repr__(self):
         fs = [('directions', self.directions), ('positions', self.positions),
               ('rudder_sets', self.rudder_sets), ('swimmers', self.swimmers)]
