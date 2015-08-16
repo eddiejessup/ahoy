@@ -83,17 +83,11 @@ def get_pf(m):
 
 
 def get_Dr_0(m):
-    for ruds in m.ships.agents.rudder_sets:
-        if isinstance(ruds, rudders.RotationRudders):
-            return ruds.noise_measurer.noise_0
-    return 0.0
+    return m.ships.agents.rudder_sets.Dr_0
 
 
 def get_p_0(m):
-    for ruds in m.ships.agents.rudder_sets:
-        if isinstance(ruds, rudders.TumbleRudders):
-            return ruds.noise_measurer.noise_0
-    return 0.0
+    return m.ships.agents.rudder_sets.p_0
 
 
 def _t_measures(dirname, measure_func):

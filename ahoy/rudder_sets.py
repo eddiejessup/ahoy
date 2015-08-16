@@ -35,6 +35,20 @@ class RudderSets(object):
                 return rs
         raise Exception
 
+    @property
+    def Dr_0(self, m):
+        for rs in self.sets:
+            if isinstance(rs, RotationRudders):
+                return rs.noise_measurer.noise_0
+        return None
+
+    @property
+    def p_0(self, m):
+        for ruds in self.sets:
+            if isinstance(ruds, TumbleRudders):
+                return ruds.noise_measurer.noise_0
+        return None
+
     def rotate(self, directions, dt, rng):
         for rudders in self.sets:
             directions = rudders.rotate(directions, dt, rng)
