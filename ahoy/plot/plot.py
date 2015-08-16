@@ -142,7 +142,7 @@ def plot_1d(dirname):
 
 
 def plot_vis(dirname):
-    dim = output_utils.get_recent_model(dirname).dim
+    dim = output_utils.get_recent_model(dirname).ships.dim
     if dim == 1:
         plot_1d(dirname)
     elif dim == 2:
