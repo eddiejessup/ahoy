@@ -45,6 +45,24 @@ extensions = cythonize([
               include_dirs=[numpy.get_include()]),
 ])
 
+console_scripts = [
+    'plot_chi_uds_x = ahoy.utils.scripts:plot_chi_uds_x',
+    'plot_Dr_0_Ds_scalar = ahoy.utils.scripts:plot_Dr_0_Ds_scalar',
+    'plot_linear_density = ahoy.utils.scripts:plot_linear_density',
+    'plot_p_0_Ds_scalar = ahoy.utils.scripts:plot_p_0_Ds_scalar',
+    'plot_pf_Ds_scalar = ahoy.utils.scripts:plot_pf_Ds_scalar',
+    'plot_pf_uds_x = ahoy.utils.scripts:plot_pf_uds_x',
+    'plot_t_Ds_scalar = ahoy.utils.scripts:plot_t_Ds_scalar',
+    'plot_t_Ds_vector = ahoy.utils.scripts:plot_t_Ds_vector',
+    'plot_t_rs_scalar = ahoy.utils.scripts:plot_t_rs_scalar',
+    'plot_t_rs_vector = ahoy.utils.scripts:plot_t_rs_vector',
+    'plot_t_u_nets_scalar = ahoy.utils.scripts:plot_t_u_nets_scalar',
+    'plot_t_u_nets_vector = ahoy.utils.scripts:plot_t_u_nets_vector',
+    'plot_t_uds_scalar = ahoy.utils.scripts:plot_t_uds_scalar',
+    'plot_t_uds_vector = ahoy.utils.scripts:plot_t_uds_vector',
+    'plot_vis = ahoy.utils.scripts:plot_vis',
+]
+
 setup(
     name='ahoy',
     version='0.3.0',
@@ -74,4 +92,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     ext_modules=extensions,
+    entry_points={
+        'console_scripts': console_scripts,
+    }
 )
