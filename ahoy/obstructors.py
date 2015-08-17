@@ -153,9 +153,10 @@ turner_str_map = {
 }
 
 
-def obstructor_factory(pore_flag, turner_str, R, L, pf, rng, periodic_flag):
+def obstructor_factory(pore_flag, turner_str, R, L, pf, rng,
+                       pore_periodic_flag):
     if pore_flag:
         return PorousObstructor(turner_str_map[turner_str], R, L, pf, rng,
-                                periodic_flag)
+                                pore_periodic_flag)
     else:
         return NoneObstructor()

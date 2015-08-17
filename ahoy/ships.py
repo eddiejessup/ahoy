@@ -46,10 +46,10 @@ def ships_factory(rng, dim,
                   c_field_flag=None, c_dx=None, c_D=None, c_delta=None,
                   c_0=None):
     time = Time()
-    periodic_flag = not c_field_flag
+    pore_periodic_flag = not c_field_flag
     obstructor = obstructor_factory(pore_flag, pore_turner,
                                     pore_R, L, pore_pf, rng,
-                                    periodic_flag)
+                                    pore_periodic_flag)
     c_field = food_field_factory(c_field_flag, L, c_dx, c_D, c_delta,
                                  c_0, obstructor)
     ags = agents_factory(rng, dim, aligned_flag,
