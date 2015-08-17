@@ -37,9 +37,9 @@ class Model(object):
     def _get_output_dirname_agent_part(self):
         ags = self.ships.agents
 
-        origin_str = '({})'.format(','.join(['{:d}'.format(a)
-                                             for a in self.aligned_flags]))
-        s = 'n={},align={}'.format(ags.positions.n, origin_str)
+        aligned_str = '({})'.format(','.join(['{:d}'.format(a)
+                                              for a in self.aligned_flags]))
+        s = 'n={},align={}'.format(ags.positions.n, aligned_str)
 
         # Space and swimming
         if isinstance(ags.positions, ahoy.positions.Positions):
