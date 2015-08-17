@@ -208,7 +208,6 @@ def plot_pf_Ds_scalar(dirnames, ax):
     pfs, Ds = pfs[i_sort], Ds[i_sort]
     ax.scatter(pfs, Ds)
     ax.set_xlim(-0.02, 1.0)
-    ax.set_ylim(0.0, 410.0)
 
 
 def plot_pf_uds_x(dirnames, ax):
@@ -236,8 +235,6 @@ def plot_Dr_0_Ds_scalar(dirnames, ax):
     i_sort = np.argsort(Dr_0s)
     Dr_0s, Ds = Dr_0s[i_sort], Ds[i_sort]
     ax.scatter(Dr_0s, Ds)
-    # ax.set_xlim(-0.02, 1.0)
-    # ax.set_ylim(0.0, 410.0)
     ax.set_xscale('log')
     ax.set_yscale('log')
 
@@ -247,8 +244,6 @@ def plot_p_0_Ds_scalar(dirnames, ax):
     i_sort = np.argsort(p_0s)
     p_0s, Ds = p_0s[i_sort], Ds[i_sort]
     ax.scatter(p_0s, Ds)
-    # ax.set_xlim(-0.02, 1.0)
-    # ax.set_ylim(0.0, 410.0)
     ax.set_xscale('log')
     ax.set_yscale('log')
 
