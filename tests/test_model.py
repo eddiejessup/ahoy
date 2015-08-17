@@ -164,3 +164,24 @@ class TestModel(test.TestBase):
                                     model_2.ships.agents.positions.r))
         self.assertTrue(np.allclose(model_1.ships.agents.directions.u,
                                     model_2.ships.agents.directions.u))
+
+    def test_1d_model(self):
+        model_kwargs = {
+            'seed': 1,
+            'dim': 1,
+            'dt': 0.01,
+            'n': 5000,
+            'v_0': 20.0,
+            'dt_mem': 0.1,
+            't_mem': 5.0,
+            'pore_R': 20.0,
+            'pore_turner': 'align',
+            'L': np.array([300.0, 300.0]),
+            'Dr_0': 1.0,
+            'p_0': 1.0,
+            'spatial_flag': True,
+        }
+        model = Model(**model_kwargs)
+        self.assertTrue(model.ships.agents.positions.dim, 1)
+        self.assertTrue(model.ships.agents.directions.dim, 1)
+        self.assertTrue(model.ships.dim, 1)
