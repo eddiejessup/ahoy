@@ -66,14 +66,16 @@ def rudder_set_factory(temporal_chemo_flag,
                        onesided_flag, chi,
                        tumble_flag, p_0, tumble_chemo_flag,
                        rotation_flag, Dr_0, dim, rotation_chemo_flag):
-    D_rot_0 = 0.0
-    if tumble_flag:
-        D_rot_0 += p_0
-    if rotation_flag:
-        D_rot_0 += Dr_0
-    t_rot_0 = 1.0 / D_rot_0
-
     sets = RudderSets()
+
+    if tumble_flag or rotation_flag:
+        D_rot_0 = 0.0
+        if tumble_flag:
+            D_rot_0 += p_0
+        if rotation_flag:
+            D_rot_0 += Dr_0
+        t_rot_0 = 1.0 / D_rot_0
+
     if tumble_flag:
         rudders = rudders_factory(True, dim,
                                   tumble_chemo_flag,
