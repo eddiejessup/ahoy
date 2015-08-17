@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from ahoy._version import get_versions
+
 __author__ = 'Elliot Marsden'
 __email__ = 'elliot.marsden@gmail.com'
-__version__ = '0.5.1'
+__version__ = get_versions()['version']
+
+del get_versions
 
 from ahoy import directions
 from ahoy import positions

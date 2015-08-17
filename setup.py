@@ -3,6 +3,7 @@
 
 import setuptools
 from setuptools import setup, Extension
+import versioneer
 from Cython.Build import cythonize
 import numpy
 
@@ -65,7 +66,8 @@ console_scripts = [
 
 setup(
     name='ahoy',
-    version='0.5.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description="Agent-based simulations of active particles",
     long_description=readme + '\n\n' + history,
     author="Elliot Marsden",
