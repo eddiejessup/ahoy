@@ -25,6 +25,10 @@ class Agents(object):
         return self.rudder_sets.chi
 
     @property
+    def noise_0_tot(self):
+        return self.rudder_sets.noise_0_tot
+
+    @property
     def n(self):
         return self.directions.n
 

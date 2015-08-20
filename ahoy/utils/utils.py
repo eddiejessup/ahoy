@@ -89,6 +89,10 @@ def get_p_0(m):
     return m.ships.agents.rudder_sets.p_0
 
 
+def get_noise_0_tot(m):
+    return m.ships.agents.noise_0_tot
+
+
 def _t_measures(dirname, measure_func):
     ts, measures = [], []
     for fname in get_filenames(dirname):
@@ -266,6 +270,12 @@ def Dr_0_Ds_scalar(dirnames, t_steady=None):
     Dr_0s = measures(dirnames, get_Dr_0, t_steady)
     Ds = measures(dirnames, get_D_scalar, t_steady)
     return Dr_0s, Ds
+
+
+def noise_0_tot_Ds_scalar(dirnames, t_steady=None):
+    noise_0_tots = measures(dirnames, get_noise_0_tot, t_steady)
+    Ds = measures(dirnames, get_D_scalar, t_steady)
+    return noise_0_tots, Ds
 
 
 def p_0_Ds_scalar(dirnames, t_steady=None):

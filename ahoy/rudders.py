@@ -28,6 +28,10 @@ class Rudders(object):
         else:
             return None
 
+    @property
+    def noise_0(self):
+        return self.noise_measurer.noise_0
+
     def rotate(self, directions, dt, rng=None):
         noise = self.noise_measurer.get_noise()
         return self._rotate(directions, noise, dt, rng)

@@ -15,6 +15,10 @@ class RudderSets(object):
                 return rudders.chi
 
     @property
+    def noise_0_tot(self):
+        return sum(r.noise_0 for r in self.sets)
+
+    @property
     def does_tumbling(self):
         for rs in self.sets:
             if isinstance(rs, TumbleRudders):
