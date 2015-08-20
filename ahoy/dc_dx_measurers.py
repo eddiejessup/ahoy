@@ -12,7 +12,8 @@ def get_K(t, dt, t_rot_0):
     gs = ts / t_rot_0
     K = np.exp(-gs) * (1.0 - A * (gs + (gs ** 2) / 2.0))
     K[K < 0.0] *= np.abs(K[K >= 0.0].sum() / K[K < 0.0].sum())
-    K /= np.sum(K * -ts * dt)
+    norm_const = np.sum(K * -ts * dt)
+    K /= norm_const
     return K
 
 
