@@ -232,7 +232,7 @@ def t_rs_scalar(dirname):
     ts: numpy.ndarray[dtype=float]
         Times.
     rs: numpy.ndarray[dtype=float]
-         Particle diffusion constants.
+         Particle displacements
     """
     return t_measures(dirname, get_time, get_r_scalar)
 
@@ -251,7 +251,7 @@ def t_rs_vector(dirname):
     ts: numpy.ndarray[dtype=float]
         Times.
     rs: numpy.ndarray[dtype=float]
-         Particle diffusion constants.
+         Particle displacements
     """
     return t_measures(dirname, get_time, get_r_vector)
 
