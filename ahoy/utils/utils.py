@@ -1,9 +1,8 @@
 from __future__ import print_function, division
 import numpy as np
-from spatious import vector
-from agaro.output_utils import (get_filenames, filename_to_model,
-                                get_recent_model)
-from agaro.measure_utils import measures
+from scipy.stats import sem
+from agaro.output_utils import get_recent_model
+from agaro.measure_utils import measures, t_measures, params
 
 
 def seg_intersect(p1, p2, yi):
@@ -33,44 +32,62 @@ def get_diff_coeff(x, t):
     return x ** 2 / (2.0 * t)
 
 
+# Measure getters
+
+
 def get_ud_vector(m):
     dr = m.ships.agents.positions.dr
-    return (np.mean(get_vd_coeff(dr, m.ships.time.t), axis=0) /
-            m.ships.agents.swimmers.v_0)
+    uds = get_vd_coeff(dr, m.ships.time.t) / m.ships.agents.swimmers.v_0
+    return np.mean(uds, axis=0), sem(uds, axis=0)
 
 
 def get_ud_scalar(m):
     dr = m.ships.agents.positions.dr_mag
-    return (np.mean(get_vd_coeff(dr, m.ships.time.t), axis=0) /
-            m.ships.agents.swimmers.v_0)
+    uds = get_vd_coeff(dr, m.ships.time.t) / m.ships.agents.swimmers.v_0
+    return np.mean(uds, axis=0), sem(uds, axis=0)
 
 
 def get_D_vector(m):
     dr = m.ships.agents.positions.dr
-    return np.mean(get_diff_coeff(dr, m.ships.time.t), axis=0)
+    Ds = get_diff_coeff(dr, m.ships.time.t)
+    return np.mean(Ds, axis=0), sem(Ds, axis=0)
 
 
 def get_D_scalar(m):
     dr = m.ships.agents.positions.dr_mag
-    return np.mean(get_diff_coeff(dr, m.ships.time.t), axis=0)
+    Ds = get_diff_coeff(dr, m.ships.time.t)
+    return np.mean(Ds, axis=0), sem(Ds, axis=0)
 
 
 def get_r_vector(m):
     dr = m.ships.agents.positions.dr
-    return np.mean(dr, axis=0)
+    return np.mean(dr, axis=0), sem(dr, axis=0)
 
 
 def get_r_scalar(m):
     dr = m.ships.agents.positions.dr_mag
-    return np.mean(dr, axis=0)
+    return np.mean(dr, axis=0), sem(dr, axis=0)
 
 
 def get_u_net_vector(m):
-    return np.mean(m.ships.agents.directions.u, axis=0)
+    us = m.ships.agents.directions.u
+    return np.mean(us, axis=0), sem(us, axis=0)
 
 
 def get_u_net_scalar(m):
-    return vector.vector_mag(get_u_net_vector(m))
+    u_net, u_net_err = get_u_net_vector(m)
+
+    u_net_sq = np.square(u_net)
+    u_net_sq_err = 2.0 * u_net * u_net_err
+
+    u_net_mag_sq = np.sum(u_net_sq)
+    u_net_mag_sq_err = np.sqrt(np.sum(np.square(u_net_sq_err)))
+
+    u_net_mag = np.sqrt(u_net_mag_sq)
+    u_net_mag_err = 0.5 * u_net_mag_sq_err / u_net_mag
+    return u_net_mag, u_net_mag_err
+
+# Parameter getters
 
 
 def get_chi(m):
@@ -93,13 +110,10 @@ def get_noise_0_tot(m):
     return m.ships.agents.noise_0_tot
 
 
-def _t_measures(dirname, measure_func):
-    ts, measures = [], []
-    for fname in get_filenames(dirname):
-        m = filename_to_model(fname)
-        ts.append(m.ships.time.t)
-        measures.append(measure_func(m))
-    return np.array(ts), np.array(measures)
+def get_time(m):
+    return m.ships.time.t
+
+# Time dependence
 
 
 def t_uds_vector(dirname):
@@ -118,7 +132,7 @@ def t_uds_vector(dirname):
     uds: numpy.ndarray[dtype=float]
          Drift speeds, normalised by the swimmer speed.
     """
-    return _t_measures(dirname, get_ud_vector)
+    return t_measures(dirname, get_ud_vector)
 
 
 def t_uds_scalar(dirname):
@@ -137,7 +151,7 @@ def t_uds_scalar(dirname):
     uds: numpy.ndarray[dtype=float]
          Particle drift speeds.
     """
-    return _t_measures(dirname, get_ud_scalar)
+    return t_measures(dirname, get_ud_scalar)
 
 
 def t_Ds_scalar(dirname):
@@ -156,7 +170,7 @@ def t_Ds_scalar(dirname):
     Ds: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return _t_measures(dirname, get_D_scalar)
+    return t_measures(dirname, get_D_scalar)
 
 
 def t_Ds_vector(dirname):
@@ -175,7 +189,7 @@ def t_Ds_vector(dirname):
     Ds: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return _t_measures(dirname, get_D_vector)
+    return t_measures(dirname, get_D_vector)
 
 
 def t_rs_scalar(dirname):
@@ -194,7 +208,7 @@ def t_rs_scalar(dirname):
     rs: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return _t_measures(dirname, get_r_scalar)
+    return t_measures(dirname, get_r_scalar)
 
 
 def t_rs_vector(dirname):
@@ -213,7 +227,7 @@ def t_rs_vector(dirname):
     rs: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return _t_measures(dirname, get_r_vector)
+    return t_measures(dirname, get_r_vector)
 
 
 def t_u_nets_scalar(dirname):
@@ -232,7 +246,7 @@ def t_u_nets_scalar(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle speeds.
     """
-    return _t_measures(dirname, get_u_net_scalar)
+    return t_measures(dirname, get_u_net_scalar)
 
 
 def t_u_nets_vector(dirname):
@@ -251,49 +265,55 @@ def t_u_nets_vector(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle velocities.
     """
-    return _t_measures(dirname, get_u_net_vector)
+    return t_measures(dirname, get_u_net_vector)
+
+
+# Parameter to measure relations
 
 
 def chi_uds_x(dirnames, t_steady=None):
-    chis = measures(dirnames, get_chi, t_steady)
-    uds = measures(dirnames, get_ud_vector, t_steady)
-    return chis, uds[:, 0]
+    chis = params(dirnames, get_chi)
+    uds, uds_err = measures(dirnames, get_ud_vector, t_steady)
+    return chis, uds[:, 0], uds_err[:, 0]
 
 
 def pf_Ds_scalar(dirnames, t_steady=None):
-    pfs = measures(dirnames, get_pf, t_steady)
-    Ds = measures(dirnames, get_D_scalar, t_steady)
-    return pfs, Ds
-
-
-def Dr_0_Ds_scalar(dirnames, t_steady=None):
-    Dr_0s = measures(dirnames, get_Dr_0, t_steady)
-    Ds = measures(dirnames, get_D_scalar, t_steady)
-    return Dr_0s, Ds
-
-
-def noise_0_tot_Ds_scalar(dirnames, t_steady=None):
-    noise_0_tots = measures(dirnames, get_noise_0_tot, t_steady)
-    Ds = measures(dirnames, get_D_scalar, t_steady)
-    return noise_0_tots, Ds
-
-
-def p_0_Ds_scalar(dirnames, t_steady=None):
-    p_0s = measures(dirnames, get_p_0, t_steady)
-    Ds = measures(dirnames, get_D_scalar, t_steady)
-    return p_0s, Ds
+    pfs = params(dirnames, get_pf)
+    Ds, Ds_err = measures(dirnames, get_D_scalar, t_steady)
+    return pfs, Ds, Ds_err
 
 
 def pf_uds_x(dirnames, t_steady=None):
-    pfs = measures(dirnames, get_pf, t_steady)
-    uds = measures(dirnames, get_ud_vector, t_steady)
-    return pfs, uds[:, 0]
+    pfs = params(dirnames, get_pf)
+    uds, uds_err = measures(dirnames, get_ud_vector, t_steady)
+    return pfs, uds[:, 0], uds_err[:, 0]
+
+
+def Dr_0_Ds_scalar(dirnames, t_steady=None):
+    Dr_0s = params(dirnames, get_Dr_0)
+    Ds, Ds_err = measures(dirnames, get_D_scalar, t_steady)
+    return Dr_0s, Ds, Ds_err
+
+
+def p_0_Ds_scalar(dirnames, t_steady=None):
+    p_0s = params(dirnames, get_p_0)
+    Ds, Ds_err = measures(dirnames, get_D_scalar, t_steady)
+    return p_0s, Ds, Ds_err
+
+
+def noise_0_tot_Ds_scalar(dirnames, t_steady=None):
+    noise_0_tots = params(dirnames, get_noise_0_tot)
+    Ds, Ds_err = measures(dirnames, get_D_scalar, t_steady)
+    return noise_0_tots, Ds, Ds_err
+
+
+# Related to finding equivalent chis to give equal drift speeds
 
 
 def get_equiv_chi(ud_0, dirnames):
-    chis, uds = chi_uds_x(dirnames)
+    chis, uds, uds_err = chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
-    chis, uds = chis[i_sort], uds[i_sort]
+    chis, uds, uds_err = chis[i_sort], uds[i_sort], uds_err[i_sort]
     return curve_intersect(chis, uds, ud_0)
 
 
@@ -317,6 +337,9 @@ def get_equiv_chi_dict(ud_0, dirname_sets):
         key, chi_equiv = get_equiv_chi_item(ud_0, dirnames)
         params_to_chi[key] = chi_equiv
     return params_to_chi
+
+
+# Density distributions
 
 
 def circle_segment_angle(d, R):

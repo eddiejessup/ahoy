@@ -150,51 +150,51 @@ def plot_vis(dirname):
 
 
 def plot_t_uds_scalar(dirname, ax):
-    ts, uds = utils.t_uds_scalar(dirname)
+    ts, uds, uds_err = utils.t_uds_scalar(dirname)
     ax.plot(ts, uds)
 
 
 def plot_t_uds_vector(dirname, ax):
-    ts, uds = utils.t_uds_vector(dirname)
+    ts, uds, uds_err = utils.t_uds_vector(dirname)
     for vd_set in uds.T:
         ax.plot(ts, vd_set)
 
 
 def plot_t_Ds_scalar(dirname, ax):
-    ts, Ds = utils.t_Ds_scalar(dirname)
+    ts, Ds, Ds_err = utils.t_Ds_scalar(dirname)
     ax.plot(ts, Ds)
 
 
 def plot_t_Ds_vector(dirname, ax):
-    ts, Ds = utils.t_Ds_vector(dirname)
+    ts, Ds, Ds_err = utils.t_Ds_vector(dirname)
     for D_set in Ds.T:
         ax.plot(ts, D_set)
 
 
 def plot_t_rs_scalar(dirname, ax):
-    ts, rs = utils.t_rs_scalar(dirname)
+    ts, rs, rs_err = utils.t_rs_scalar(dirname)
     ax.plot(ts, rs)
 
 
 def plot_t_rs_vector(dirname, ax):
-    ts, rs = utils.t_rs_vector(dirname)
+    ts, rs, rs_err = utils.t_rs_vector(dirname)
     for r_set in rs.T:
         ax.plot(ts, r_set)
 
 
 def plot_t_u_nets_scalar(dirname, ax):
-    ts, u_nets = utils.t_u_nets_scalar(dirname)
+    ts, u_nets, u_nets_err = utils.t_u_nets_scalar(dirname)
     ax.plot(ts, u_nets)
 
 
 def plot_t_u_nets_vector(dirname, ax):
-    ts, u_nets = utils.t_u_nets_vector(dirname)
+    ts, u_nets, u_nets_err = utils.t_u_nets_vector(dirname)
     for u_net_set in u_nets.T:
         ax.plot(ts, u_net_set)
 
 
 def plot_chi_uds_x(dirnames, ax):
-    chis, uds = utils.chi_uds_x(dirnames)
+    chis, uds, uds_err = utils.chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
     chis, uds = chis[i_sort], uds[i_sort]
     ax.scatter(chis, uds)
@@ -203,7 +203,7 @@ def plot_chi_uds_x(dirnames, ax):
 
 
 def plot_pf_Ds_scalar(dirnames, ax):
-    pfs, Ds = utils.pf_Ds_scalar(dirnames)
+    pfs, Ds, Ds_err = utils.pf_Ds_scalar(dirnames)
     i_sort = np.argsort(pfs)
     pfs, Ds = pfs[i_sort], Ds[i_sort]
     ax.scatter(pfs, Ds)
@@ -211,7 +211,7 @@ def plot_pf_Ds_scalar(dirnames, ax):
 
 
 def plot_pf_uds_x(dirnames, ax):
-    pfs, uds = utils.pf_uds_x(dirnames)
+    pfs, uds, uds_err = utils.pf_uds_x(dirnames)
     i_sort = np.argsort(pfs)
     pfs, uds = pfs[i_sort], uds[i_sort]
     ax.scatter(pfs, uds / uds[0])
@@ -231,7 +231,7 @@ def plot_pf_duds_x(dirnames, ax):
 
 
 def plot_Dr_0_Ds_scalar(dirnames, ax):
-    Dr_0s, Ds = utils.Dr_0_Ds_scalar(dirnames)
+    Dr_0s, Ds, Ds_err = utils.Dr_0_Ds_scalar(dirnames)
     i_sort = np.argsort(Dr_0s)
     Dr_0s, Ds = Dr_0s[i_sort], Ds[i_sort]
     ax.scatter(Dr_0s, Ds)
@@ -240,7 +240,7 @@ def plot_Dr_0_Ds_scalar(dirnames, ax):
 
 
 def plot_p_0_Ds_scalar(dirnames, ax):
-    p_0s, Ds = utils.p_0_Ds_scalar(dirnames)
+    p_0s, Ds, Ds_err = utils.p_0_Ds_scalar(dirnames)
     i_sort = np.argsort(p_0s)
     p_0s, Ds = p_0s[i_sort], Ds[i_sort]
     ax.scatter(p_0s, Ds)
