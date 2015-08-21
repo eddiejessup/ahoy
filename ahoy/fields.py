@@ -28,7 +28,7 @@ class Field(object):
         return self.c.grad[:, self._get_nearest_cell_ids(rs)].value.T
 
     def _get_val_i(self, rs):
-        return self.c[:, self._get_nearest_cell_ids(rs)].value.T
+        return self.c[self._get_nearest_cell_ids(rs)].value.T
 
     def get_grad_i(self, ps):
         return self._get_grad_i(self._ps_to_rs(ps))
