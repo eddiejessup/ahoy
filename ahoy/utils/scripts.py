@@ -24,6 +24,12 @@ def plot_t_uds_vector():
     plt.show()
 
 
+def plot_t_uds_abs_x():
+    ax = plt.gca()
+    plot.plot_t_uds_abs_x(sys.argv[1], ax)
+    plt.show()
+
+
 def plot_t_Ds_scalar():
     ax = plt.gca()
     plot.plot_t_Ds_scalar(sys.argv[1], ax)

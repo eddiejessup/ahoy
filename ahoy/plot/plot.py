@@ -160,6 +160,11 @@ def plot_t_uds_vector(dirname, ax):
         ax.plot(ts, vd_set)
 
 
+def plot_t_uds_abs_x(dirname, ax):
+    ts, uds, uds_err = utils.t_uds_abs(dirname)
+    ax.plot(ts, uds[:, 0])
+
+
 def plot_t_Ds_scalar(dirname, ax):
     ts, Ds, Ds_err = utils.t_Ds_scalar(dirname)
     ax.plot(ts, Ds)

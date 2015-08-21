@@ -47,6 +47,13 @@ def get_ud_scalar(m):
     return np.mean(uds, axis=0), sem(uds, axis=0)
 
 
+def get_ud_abs(m):
+    dr = m.ships.agents.positions.dr
+    uds = np.abs(get_vd_coeff(dr, m.ships.time.t) /
+                 m.ships.agents.swimmers.v_0)
+    return np.mean(uds, axis=0), sem(uds, axis=0)
+
+
 def get_D_vector(m):
     dr = m.ships.agents.positions.dr
     Ds = get_diff_coeff(dr, m.ships.time.t)
@@ -152,6 +159,25 @@ def t_uds_scalar(dirname):
          Particle drift speeds.
     """
     return t_measures(dirname, get_time, get_ud_scalar)
+
+
+def t_uds_abs(dirname):
+    """Calculate the overall particle absolute drift speed over time
+    for a model output directory.
+
+    Parameters
+    ----------
+    dirname: str
+        A model output directory path
+
+    Returns
+    -------
+    ts: numpy.ndarray[dtype=float]
+        Times.
+    uds_abs: numpy.ndarray[dtype=float]
+         Particle absolute drift speeds.
+    """
+    return t_measures(dirname, get_time, get_ud_abs)
 
 
 def t_Ds_scalar(dirname):

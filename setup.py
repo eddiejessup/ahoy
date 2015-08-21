@@ -51,6 +51,7 @@ console_scripts = [
     'aplot_linear_density = ahoy.utils.scripts:plot_linear_density',
     'aplot_t_uds_scalar = ahoy.utils.scripts:plot_t_uds_scalar',
     'aplot_t_uds_vector = ahoy.utils.scripts:plot_t_uds_vector',
+    'aplot_t_uds_abs_x = ahoy.utils.scripts:plot_t_uds_abs_x',
     'aplot_t_Ds_scalar = ahoy.utils.scripts:plot_t_Ds_scalar',
     'aplot_t_Ds_vector = ahoy.utils.scripts:plot_t_Ds_vector',
     'aplot_t_rs_scalar = ahoy.utils.scripts:plot_t_rs_scalar',
