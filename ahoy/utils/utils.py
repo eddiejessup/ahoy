@@ -132,7 +132,7 @@ def t_uds_vector(dirname):
     uds: numpy.ndarray[dtype=float]
          Drift speeds, normalised by the swimmer speed.
     """
-    return t_measures(dirname, get_ud_vector)
+    return t_measures(dirname, get_time, get_ud_vector)
 
 
 def t_uds_scalar(dirname):
@@ -151,7 +151,7 @@ def t_uds_scalar(dirname):
     uds: numpy.ndarray[dtype=float]
          Particle drift speeds.
     """
-    return t_measures(dirname, get_ud_scalar)
+    return t_measures(dirname, get_time, get_ud_scalar)
 
 
 def t_Ds_scalar(dirname):
@@ -170,7 +170,7 @@ def t_Ds_scalar(dirname):
     Ds: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return t_measures(dirname, get_D_scalar)
+    return t_measures(dirname, get_time, get_D_scalar)
 
 
 def t_Ds_vector(dirname):
@@ -189,7 +189,7 @@ def t_Ds_vector(dirname):
     Ds: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return t_measures(dirname, get_D_vector)
+    return t_measures(dirname, get_time, get_D_vector)
 
 
 def t_rs_scalar(dirname):
@@ -208,7 +208,7 @@ def t_rs_scalar(dirname):
     rs: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return t_measures(dirname, get_r_scalar)
+    return t_measures(dirname, get_time, get_r_scalar)
 
 
 def t_rs_vector(dirname):
@@ -227,7 +227,7 @@ def t_rs_vector(dirname):
     rs: numpy.ndarray[dtype=float]
          Particle diffusion constants.
     """
-    return t_measures(dirname, get_r_vector)
+    return t_measures(dirname, get_time, get_r_vector)
 
 
 def t_u_nets_scalar(dirname):
@@ -246,7 +246,7 @@ def t_u_nets_scalar(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle speeds.
     """
-    return t_measures(dirname, get_u_net_scalar)
+    return t_measures(dirname, get_time, get_u_net_scalar)
 
 
 def t_u_nets_vector(dirname):
@@ -265,7 +265,7 @@ def t_u_nets_vector(dirname):
     v_nets: numpy.ndarray[dtype=float]
          Centre-of-mass particle velocities.
     """
-    return t_measures(dirname, get_u_net_vector)
+    return t_measures(dirname, get_time, get_u_net_vector)
 
 
 # Parameter to measure relations
