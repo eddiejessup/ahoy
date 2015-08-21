@@ -4,39 +4,23 @@ import matplotlib.pyplot as plt
 from ahoy.plot import plot
 
 
-def plot_chi_uds_x():
-    ax = plt.gca()
-    plot.plot_chi_uds_x(sys.argv[1:], ax)
-    plt.show()
-
-
-def plot_Dr_0_Ds_scalar():
-    ax = plt.gca()
-    plot.plot_Dr_0_Ds_scalar(sys.argv[1:], ax)
-    plt.show()
+def plot_vis():
+    plot.plot_vis(sys.argv[1])
 
 
 def plot_linear_density():
+    plot.plot_linear_density(sys.argv[1])
+
+
+def plot_t_uds_scalar():
     ax = plt.gca()
-    plot.plot_linear_density(sys.argv[1], ax)
+    plot.plot_t_uds_scalar(sys.argv[1], ax)
     plt.show()
 
 
-def plot_p_0_Ds_scalar():
+def plot_t_uds_vector():
     ax = plt.gca()
-    plot.plot_p_0_Ds_scalar(sys.argv[1:], ax)
-    plt.show()
-
-
-def plot_pf_Ds_scalar():
-    ax = plt.gca()
-    plot.plot_pf_Ds_scalar(sys.argv[1:], ax)
-    plt.show()
-
-
-def plot_pf_uds_x():
-    ax = plt.gca()
-    plot.plot_pf_uds_x(sys.argv[1:], ax)
+    plot.plot_t_uds_vector(sys.argv[1], ax)
     plt.show()
 
 
@@ -76,17 +60,31 @@ def plot_t_u_nets_vector():
     plt.show()
 
 
-def plot_t_uds_scalar():
+def plot_chi_uds_x():
     ax = plt.gca()
-    plot.plot_t_uds_scalar(sys.argv[1], ax)
+    plot.plot_chi_uds_x(sys.argv[1:], ax)
     plt.show()
 
 
-def plot_t_uds_vector():
+def plot_pf_Ds_scalar():
     ax = plt.gca()
-    plot.plot_t_uds_vector(sys.argv[1], ax)
+    plot.plot_pf_Ds_scalar(sys.argv[1:], ax)
     plt.show()
 
 
-def plot_vis():
-    plot.plot_vis(sys.argv[1])
+def plot_pf_uds_x():
+    ax = plt.gca()
+    plot.plot_pf_uds_x(sys.argv[1:], ax)
+    plt.show()
+
+
+def plot_Dr_0_Ds_scalar():
+    ax = plt.gca()
+    plot.plot_Dr_0_Ds_scalar(sys.argv[1:], ax)
+    plt.show()
+
+
+def plot_p_0_Ds_scalar():
+    ax = plt.gca()
+    plot.plot_p_0_Ds_scalar(sys.argv[1:], ax)
+    plt.show()
