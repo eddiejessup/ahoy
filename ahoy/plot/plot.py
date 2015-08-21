@@ -219,17 +219,6 @@ def plot_pf_uds_x(dirnames, ax):
     ax.set_ylim(0.0, 1.01)
 
 
-def plot_pf_duds_x(dirnames, ax):
-    pfs, uds = utils.pf_uds_x(dirnames)
-    i_sort = np.argsort(pfs)
-    pfs, uds = pfs[i_sort], uds[i_sort]
-    uds_norm = uds / uds[0]
-    duds = np.diff(uds_norm) / pfs[:-1]
-    ax.scatter(pfs[:-1], duds)
-    ax.set_xlim(-0.02, 1.0)
-    # ax.set_ylim(0.0, 1.0)
-
-
 def plot_Dr_0_Ds_scalar(dirnames, ax):
     Dr_0s, Ds, Ds_err = utils.Dr_0_Ds_scalar(dirnames)
     i_sort = np.argsort(Dr_0s)
