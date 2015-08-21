@@ -188,7 +188,7 @@ def plot_t_rs_vector(dirname, ax):
 
 
 def plot_t_rs_abs_x(dirname, ax):
-    ts, rs, rs_err = utils.t_rs_vector(dirname)
+    ts, rs, rs_err = utils.t_rs_abs(dirname)
     ax.plot(ts, rs[:, 0])
 
 
