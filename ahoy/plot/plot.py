@@ -197,7 +197,7 @@ def plot_chi_uds_x(dirnames, ax):
     chis, uds, uds_err = utils.chi_uds_x(dirnames)
     i_sort = np.argsort(chis)
     chis, uds = chis[i_sort], uds[i_sort]
-    ax.scatter(chis, uds)
+    ax.plot(chis, uds)
     ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 1.1)
 
@@ -206,7 +206,7 @@ def plot_pf_Ds_scalar(dirnames, ax):
     pfs, Ds, Ds_err = utils.pf_Ds_scalar(dirnames)
     i_sort = np.argsort(pfs)
     pfs, Ds = pfs[i_sort], Ds[i_sort]
-    ax.scatter(pfs, Ds)
+    ax.plot(pfs, Ds)
     ax.set_xlim(-0.02, 1.0)
 
 
@@ -214,7 +214,7 @@ def plot_pf_uds_x(dirnames, ax):
     pfs, uds, uds_err = utils.pf_uds_x(dirnames)
     i_sort = np.argsort(pfs)
     pfs, uds = pfs[i_sort], uds[i_sort]
-    ax.scatter(pfs, uds / uds[0])
+    ax.plot(pfs, uds / uds[0])
     ax.set_xlim(-0.02, 1.0)
     ax.set_ylim(0.0, 1.01)
 
@@ -234,7 +234,7 @@ def plot_Dr_0_Ds_scalar(dirnames, ax):
     Dr_0s, Ds, Ds_err = utils.Dr_0_Ds_scalar(dirnames)
     i_sort = np.argsort(Dr_0s)
     Dr_0s, Ds = Dr_0s[i_sort], Ds[i_sort]
-    ax.scatter(Dr_0s, Ds)
+    ax.plot(Dr_0s, Ds)
     ax.set_xscale('log')
     ax.set_yscale('log')
 
@@ -243,7 +243,7 @@ def plot_p_0_Ds_scalar(dirnames, ax):
     p_0s, Ds, Ds_err = utils.p_0_Ds_scalar(dirnames)
     i_sort = np.argsort(p_0s)
     p_0s, Ds = p_0s[i_sort], Ds[i_sort]
-    ax.scatter(p_0s, Ds)
+    ax.plot(p_0s, Ds)
     ax.set_xscale('log')
     ax.set_yscale('log')
 
