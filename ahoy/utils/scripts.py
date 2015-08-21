@@ -54,6 +54,12 @@ def plot_t_rs_vector():
     plt.show()
 
 
+def plot_t_rs_abs_x():
+    ax = plt.gca()
+    plot.plot_t_rs_abs_x(sys.argv[1], ax)
+    plt.show()
+
+
 def plot_t_u_nets_scalar():
     ax = plt.gca()
     plot.plot_t_u_nets_scalar(sys.argv[1], ax)

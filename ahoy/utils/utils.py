@@ -76,6 +76,11 @@ def get_r_scalar(m):
     return np.mean(dr, axis=0), sem(dr, axis=0)
 
 
+def get_r_abs(m):
+    dr = np.abs(m.ships.agents.positions.dr)
+    return np.mean(dr, axis=0), sem(dr, axis=0)
+
+
 def get_u_net_vector(m):
     us = m.ships.agents.directions.u
     return np.mean(us, axis=0), sem(us, axis=0)
@@ -254,6 +259,25 @@ def t_rs_vector(dirname):
          Particle displacements
     """
     return t_measures(dirname, get_time, get_r_vector)
+
+
+def t_rs_abs(dirname):
+    """Calculate the absolute particle displacement over time along each axis
+    for a model output directory.
+
+    Parameters
+    ----------
+    dirname: str
+        A model output directory path
+
+    Returns
+    -------
+    ts: numpy.ndarray[dtype=float]
+        Times.
+    rs: numpy.ndarray[dtype=float]
+         Particle absolute displacements
+    """
+    return t_measures(dirname, get_time, get_r_abs)
 
 
 def t_u_nets_scalar(dirname):

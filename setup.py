@@ -56,6 +56,7 @@ console_scripts = [
     'aplot_t_Ds_vector = ahoy.utils.scripts:plot_t_Ds_vector',
     'aplot_t_rs_scalar = ahoy.utils.scripts:plot_t_rs_scalar',
     'aplot_t_rs_vector = ahoy.utils.scripts:plot_t_rs_vector',
+    'aplot_t_rs_abs_x = ahoy.utils.scripts:plot_t_rs_abs_x',
     'aplot_t_u_nets_scalar = ahoy.utils.scripts:plot_t_u_nets_scalar',
     'aplot_t_u_nets_vector = ahoy.utils.scripts:plot_t_u_nets_vector',
     'aplot_chi_uds_x = ahoy.utils.scripts:plot_chi_uds_x',
