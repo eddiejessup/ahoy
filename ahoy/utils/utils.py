@@ -99,6 +99,7 @@ def get_u_net_scalar(m):
     u_net_mag_err = 0.5 * u_net_mag_sq_err / u_net_mag
     return u_net_mag, u_net_mag_err
 
+
 # Parameter getters
 
 
@@ -124,6 +125,7 @@ def get_noise_0_tot(m):
 
 def get_time(m):
     return m.ships.time.t
+
 
 # Time dependence
 
