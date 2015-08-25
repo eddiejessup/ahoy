@@ -39,6 +39,9 @@ class Positions(object):
     def r_w_mag(self):
         return vector.vector_mag(self.r_w)
 
+    def displace(self, dr):
+        self.r += dr
+
     def __repr__(self):
         fs = [('n', self.n), ('dim', self.dim)]
         return make_repr_str(self, fs)
@@ -83,6 +86,9 @@ class NonePositions(object):
     def __repr__(self):
         fs = []
         return make_repr_str(self, fs)
+
+    def displace(self, dr):
+        pass
 
 
 def positions_factory(spatial_flag, periodic_flag, n, dim=None,

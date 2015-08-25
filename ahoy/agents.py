@@ -18,7 +18,7 @@ class Agents(object):
     def iterate(self, dt, rng, obstructor):
         self.rudder_sets.rotate(self.directions, dt, rng)
         dr = self.swimmers.get_dr(dt)
-        self.swimmers.displace(self.positions, dr)
+        self.positions.displace(dr)
         obstructor.obstruct(self.positions, dr, self.directions)
 
     @property
