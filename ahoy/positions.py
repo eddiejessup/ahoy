@@ -88,7 +88,7 @@ class NonePositions(object):
         return make_repr_str(self, fs)
 
     def displace(self, dr):
-        pass
+        return
 
 
 def positions_factory(spatial_flag, periodic_flag, n, dim=None,

@@ -37,7 +37,7 @@ class Rudders(object):
         self._rotate(directions, noise, dt, rng)
 
     def _rotate(self, directions, noise, dt, rng):
-        pass
+        return
 
     def __repr__(self):
         fs = [('noise_measurer', self.noise_measurer)]
