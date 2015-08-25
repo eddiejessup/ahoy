@@ -34,10 +34,10 @@ class Rudders(object):
 
     def rotate(self, directions, dt, rng=None):
         noise = self.noise_measurer.get_noise()
-        return self._rotate(directions, noise, dt, rng)
+        self._rotate(directions, noise, dt, rng)
 
     def _rotate(self, directions, noise, dt, rng):
-        return directions
+        pass
 
     def __repr__(self):
         fs = [('noise_measurer', self.noise_measurer)]
@@ -53,7 +53,7 @@ class RotationRudders(Rudders):
 
     def _rotate(self, directions, noise, dt, rng):
         dth = self._get_dth(directions, noise, dt, rng)
-        return directions.rotate(dth)
+        directions.rotate(dth)
 
 
 class RotationRudders2D(RotationRudders):
@@ -73,7 +73,7 @@ class TumbleRudders(Rudders):
 
     def _rotate(self, directions, noise, dt, rng):
         tumblers = self._get_tumblers(directions, noise, dt, rng)
-        return directions.tumble(tumblers, rng)
+        directions.tumble(tumblers, rng)
 
 
 def rotation_rudders_nd(dim, *args, **kwargs):

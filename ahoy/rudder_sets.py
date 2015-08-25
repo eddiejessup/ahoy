@@ -55,8 +55,7 @@ class RudderSets(object):
 
     def rotate(self, directions, dt, rng):
         for rudders in self.sets:
-            directions = rudders.rotate(directions, dt, rng)
-        return directions
+            rudders.rotate(directions, dt, rng)
 
     def __repr__(self):
         fs = [('sets', self.sets)]

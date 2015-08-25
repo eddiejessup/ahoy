@@ -26,7 +26,7 @@ class TestRotationRudders2D(test.TestBase):
         ts = np.arange(0.0, t_max, self.dt)
         mean_dots = []
         for t in ts:
-            ds = rudders.rotate(ds, self.dt, self.rng)
+            rudders.rotate(ds, self.dt, self.rng)
             mean_dot = np.mean(np.sum(u_0 * ds.u, axis=-1))
             mean_dots.append(mean_dot)
 
@@ -48,7 +48,7 @@ class TestRotationRudders2D(test.TestBase):
             ds = directions.directions_factory(n, self.dim, aligned_flag=True)
             ruds = self.rudders_cls(self.noise_measurer)
             for _ in range(num_iterations):
-                ds = ruds.rotate(ds, self.dt, rng)
+                ruds.rotate(ds, self.dt, rng)
             return ds
 
         ds_1 = get_ds(2)
@@ -73,10 +73,9 @@ class TestTumbleRudders1D(TestRotationRudders2D):
             n_expected /= 2.0
         ds = directions.directions_factory(n, self.dim, aligned_flag=False,
                                            rng=self.rng)
-        u_0 = ds.u
         ruds = rudders.TumbleRudders(noise_measurer)
-        ds_rot = ruds.rotate(ds, dt, self.rng)
-        u_change = np.not_equal(u_0, ds_rot.u)
+        ruds.rotate(ds, dt, self.rng)
+        u_change = np.not_equal(ds.u_0, ds.u)
         n_actual = np.any(u_change, axis=-1).sum()
         err = np.abs(n_expected - n_actual) / n_expected
         self.assertTrue(err < 0.05)

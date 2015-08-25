@@ -31,7 +31,6 @@ class Directions1D(object):
         if rng is None:
             rng = np.random
         self.sign[tumblers] = crandom.randbool(tumblers.sum(), rng=rng)
-        return self
 
     def __repr__(self):
         fs = [('n', self.n)]
@@ -59,11 +58,9 @@ class Directions2D(Directions1D):
         if rng is None:
             rng = np.random
         self.th[tumblers] = rng.uniform(-np.pi, np.pi, size=tumblers.sum())
-        return self
 
     def rotate(self, dth):
         self.th += dth
-        return self
 
     def __repr__(self):
         fs = [('n', self.n)]
