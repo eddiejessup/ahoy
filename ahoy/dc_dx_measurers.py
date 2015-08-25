@@ -73,6 +73,8 @@ class TemporalDcDxMeasurer(DcDxMeasurer):
             self.dc_dx_cache = self._get_dc_dxs()
             self.t_last_update = t_now
 
+    # TODO: This is bad, it both returns a value *and* has side-effects.
+    # Iterating the measurer and getting the value should be distinct.
     def get_dc_dxs(self):
         self.iterate()
         return self.dc_dx_cache
