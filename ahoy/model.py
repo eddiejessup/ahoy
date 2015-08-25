@@ -65,7 +65,7 @@ class Model(object):
                 type_s = 'T' if nm.is_temporal else 'S'
                 side = 2 - rs.is_onesided
                 s += ',chi={:.2g},side={:d},type={}'.format(nm.chi, side,
-                                                           type_s)
+                                                            type_s)
                 if nm.is_temporal:
                     measurer = nm.dc_dx_measurer
                     s += ',dtMem={:g},tMem={:g}'.format(measurer.dt_mem,
