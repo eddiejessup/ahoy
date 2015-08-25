@@ -11,7 +11,8 @@ def get_K(t, dt, t_rot_0):
     ts = np.arange(0.0, t, dt)
     gs = ts / t_rot_0
     K = np.exp(-gs) * (1.0 - A * (gs + (gs ** 2) / 2.0))
-    K[K < 0.0] *= np.abs(K[K >= 0.0].sum() / K[K < 0.0].sum())
+    trunc_scale = np.abs(K[K >= 0.0].sum() / K[K < 0.0].sum())
+    K[K < 0.0] *= trunc_scale
     norm_const = np.sum(K * -ts * dt)
     K /= norm_const
     return K
