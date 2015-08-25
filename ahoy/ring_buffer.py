@@ -32,6 +32,7 @@ class CylinderBuffer(RingBuffer):
         self.i_zero = 0
 
         # Optimisation
+        # TODO: These variables should be underscored
         self.inds_p = np.arange(0, self.n_p, dtype=np.uint)
         self.inds_a = self.inds_p.copy()
         self.b = np.empty([self.n_l], dtype=np.float)
