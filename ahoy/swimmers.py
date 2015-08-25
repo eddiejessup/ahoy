@@ -1,4 +1,5 @@
 from __future__ import print_function, division
+import numpy as np
 from ciabatta.meta import make_repr_str
 
 
@@ -8,10 +9,12 @@ class Swimmers(object):
         self.v_0 = v_0
         self.directions = directions
 
-    def displace(self, positions, dt):
-        dr = self.v_0 * self.directions.u * dt
+    def get_dr(self, dt):
+        return self.v_0 * self.directions.u * dt
+
+    # Smell: this does not depend on the object state.
+    def displace(self, positions, dr):
         positions.r += dr
-        return positions, dr
 
     def __repr__(self):
         fs = [('v_0', self.v_0)]
@@ -20,9 +23,11 @@ class Swimmers(object):
 
 class NoneSwimmers(object):
 
+    def get_dr(self, dt):
+        return np.zeros_like(self.directions.u)
+
     def displace(self, positions, dt):
-        dr = None
-        return positions, dr
+        pass
 
 
 def swimmers_factory(spatial_flag, v_0, ds):
