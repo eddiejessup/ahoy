@@ -54,12 +54,11 @@ class FoodField(Field):
                    DiffusionTerm(coeff=self.D, var=self.c) -
                    ImplicitSourceTerm(coeff=self.delta * self.rho, var=self.c))
 
-    # TODO: Profile this, seems like the for loop might be slow.
     def _get_rho_array(self, ps):
         rho_array = np.zeros(self.rho.shape)
         cids = self.get_nearest_cell_ids(ps)
-        for i in cids:
-            rho_array[i] += 1.0 / self.rho.mesh.cellVolumes[i]
+        drhos = 1.0 / self.rho.mesh.cellVolumes[cids]
+        np.add.at(rho_array, cids, drhos)
         return rho_array
 
     def iterate(self, ps, dt):
